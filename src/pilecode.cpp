@@ -105,8 +105,8 @@ namespace pilecode {
 	{
 		Pos p(wx, wy, wz);
 
-		p.x += cx + x;
-		p.y += cy + y;
+		p.x += cx_ + x_;
+		p.y += cy_ + y_;
 		return p;
 	}
 }

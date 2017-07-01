@@ -156,11 +156,11 @@ namespace pilecode {
 		Pos GetPos(int wx, int wy, int wz = 0);
 	private:
 		// screen coordinates of origin
-		int cx = 320;
-		int cy = 200;
+		int cx_ = 320;
+		int cy_ = 200;
 
 		// screen offset in pixels
-		int x = 0;
-		int y = 0;
+		int x_ = 0;
+		int y_ = 0;
 	};
 }
