@@ -32,5 +32,6 @@ namespace pilecode {
 	{
 		image::g_tile[kTlNone].Load("data/tile-none.tga");
 		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
+		image::g_tile[kTlExit].Load("data/tile-exit.tga");
 	}
 }

@@ -41,7 +41,7 @@ namespace pilecode {
 	enum TileType {
 		kTlNone = 0,
 		kTlBrick,
-		//kTlExit,
+		kTlExit,
 
 		kTlMax
 	};
