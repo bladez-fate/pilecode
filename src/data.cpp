@@ -20,47 +20,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "pilecode.h"
 #include "data.h"
+#include "pilecode.h"
 
-#include "engine/easy.h"
+namespace pilecode {
+	namespace image {
+		ae::Sprite g_tile[kTlMax];
+	}
 
-using namespace arctic;  // NOLINT
-using namespace arctic::easy;  // NOLINT
-using namespace pilecode; // NOLINT
-
-World g_world;
-ViewPort g_vp;
-
-void Init()
-{
-	InitData();
-	ResizeScreen(640, 400);
-
-	Platform* plat = new Platform({
-		{0, 1, 1, 1},
-		{0, 0, 1, 0},
-		{1, 1, 1, 0}
-	});
-	g_world.AddPlatform(plat);
-}
-
-void Render()
-{
-	Clear();
-
-	g_world.Draw(&g_vp);
-
-	ShowFrame();
-}
-
-void EasyMain()
-{
-	Init();
-	while (true) {
-		if (IsKey(kKeyEscape)) {
-			break;
-		}
-		Render();
+	void InitData()
+	{
+		image::g_tile[kTlNone].Load("data/tile-none.tga");
+		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
 	}
 }

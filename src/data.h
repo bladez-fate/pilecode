@@ -20,47 +20,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#pragma once
+
 #include "pilecode.h"
-#include "data.h"
 
 #include "engine/easy.h"
 
-using namespace arctic;  // NOLINT
-using namespace arctic::easy;  // NOLINT
-using namespace pilecode; // NOLINT
-
-World g_world;
-ViewPort g_vp;
-
-void Init()
-{
-	InitData();
-	ResizeScreen(640, 400);
-
-	Platform* plat = new Platform({
-		{0, 1, 1, 1},
-		{0, 0, 1, 0},
-		{1, 1, 1, 0}
-	});
-	g_world.AddPlatform(plat);
-}
-
-void Render()
-{
-	Clear();
-
-	g_world.Draw(&g_vp);
-
-	ShowFrame();
-}
-
-void EasyMain()
-{
-	Init();
-	while (true) {
-		if (IsKey(kKeyEscape)) {
-			break;
-		}
-		Render();
+namespace pilecode {
+	namespace image {
+		extern ae::Sprite g_tile[kTlMax];
 	}
+
+	void InitData();
 }

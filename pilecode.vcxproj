@@ -198,6 +198,8 @@
     <ClInclude Include="..\arctic\engine\vec3si32.h" />
     <ClInclude Include="..\arctic\engine\vec4f.h" />
     <ClInclude Include="..\arctic\engine\vec4si32.h" />
+    <ClInclude Include="src\data.h" />
+    <ClInclude Include="src\pilecode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\arctic\engine\arctic_input.cpp" />
@@ -210,7 +212,9 @@
     <ClCompile Include="..\arctic\engine\easy_sprite.cpp" />
     <ClCompile Include="..\arctic\engine\easy_sprite_instance.cpp" />
     <ClCompile Include="..\arctic\engine\engine.cpp" />
+    <ClCompile Include="src\data.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\pilecode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
