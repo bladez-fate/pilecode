@@ -117,9 +117,9 @@ namespace pilecode {
 
 	struct Pos {
 		// world to screen representation parameters
-		static constexpr int dx = 14 * 4;
-		static constexpr int dy = 7 * 4;
-		static constexpr int dz = 48 * 4;
+		static int dx;
+		static int dy;
+		static int dz;
 
 		// screen coordinates
 		int x;

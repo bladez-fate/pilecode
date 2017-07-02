@@ -27,6 +27,10 @@
 
 namespace pilecode {
 
+	int Pos::dx = 14 * 4;
+	int Pos::dy = 7 * 4;
+	int Pos::dz = 48 * 4;
+
 	namespace screen {
 		int w = 1680;
 		int h = 1050;
