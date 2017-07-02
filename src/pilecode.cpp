@@ -26,6 +26,15 @@
 #include "engine/easy.h"
 
 namespace pilecode {
+
+	namespace screen {
+		int w = 1680;
+		int h = 1050;
+		int cx = w/2;
+		int cy = h/2;
+		size_t size = w*h;
+	}
+
 	Tile::Tile()
 		: type_(kTlNone)
 		, letter_(kLtSpace)
@@ -36,16 +45,9 @@ namespace pilecode {
 		if (type_ != kTlNone) {
 			image::g_tile[type_].Draw(p.x, p.y);
 		}
-	}
-
-	void Tile::setType(TileType type)
-	{
-		type_ = type;
-	}
-
-	void Tile::setLetter(Letter letter)
-	{
-		letter_ = letter;
+		if (letter_ != kLtSpace) {
+			image::g_letter[letter_].Draw(p.x, p.y);
+		}
 	}
 
 	Platform::Platform(std::initializer_list<std::initializer_list<int>> data)
@@ -66,11 +68,16 @@ namespace pilecode {
 
 		Tile* tile = &tiles_[0];
 		for (auto& xdata : data) {
-			Tile* xtile = tile;
+			Tile* t = tile;
 			for (int x : xdata) {
-				xtile->setType(TileType(x));
-				xtile->setLetter(kLtSpace);
-				xtile++;
+				t->set_type(TileType(x));
+				if (t->type() != kTlNone) {
+					t->set_letter(Letter(1+rand()%4));
+				}
+				else {
+					t->set_letter(kLtSpace);
+				}
+				t++;
 			}
 			tile += w_;
 		}

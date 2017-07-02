@@ -29,6 +29,8 @@
 namespace pilecode {
 	namespace image {
 		extern ae::Sprite g_tile[kTlMax];
+		extern ae::Sprite g_letter[kLtMax];
+		extern ae::Sprite g_frame;
 	}
 
 	void InitData();

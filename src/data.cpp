@@ -26,12 +26,22 @@
 namespace pilecode {
 	namespace image {
 		ae::Sprite g_tile[kTlMax];
+		ae::Sprite g_letter[kLtMax];
+		ae::Sprite g_frame;
 	}
 
 	void InitData()
 	{
-		image::g_tile[kTlNone].Load("data/tile-none.tga");
+		image::g_tile[kTlNone].Load("data/empty.tga");
 		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
-		image::g_tile[kTlExit].Load("data/tile-exit.tga");
+		image::g_tile[kTlExit].Load("data/tile-brick.tga");
+
+		image::g_letter[kLtSpace].Load("data/empty.tga");
+		image::g_letter[kLtUp].Load("data/letter-up.tga");
+		image::g_letter[kLtDown].Load("data/letter-down.tga");
+		image::g_letter[kLtRight].Load("data/letter-right.tga");
+		image::g_letter[kLtLeft].Load("data/letter-left.tga");
+
+		image::g_frame.Load("data/letter-frame.tga");
 	}
 }

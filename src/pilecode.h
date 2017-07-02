@@ -28,6 +28,14 @@
 
 namespace pilecode {
 
+	namespace screen {
+		extern int w;
+		extern int h;
+		extern int cx;
+		extern int cy;
+		extern size_t size;
+	}
+
 	namespace ae = arctic::easy;
 
 	class Robot;
@@ -52,7 +60,7 @@ namespace pilecode {
 		kLtDown,           // y-
 		kLtRight,          // x+
 		kLtLeft,           // x-
-		
+
 		kLtMax		
 	};
 
@@ -61,8 +69,10 @@ namespace pilecode {
 		Tile();
 		void Draw(ViewPort* vp, Pos p);
 
-		void setType(TileType type);
-		void setLetter(Letter letter);
+		TileType type() const { return type_;  }
+		Letter letter() const { return letter_;  }
+		void set_type(TileType type) { type_ = type;  }
+		void set_letter(Letter letter) { letter_ = letter; }
 	private:
 		TileType type_;
 		Letter letter_;
@@ -106,6 +116,11 @@ namespace pilecode {
 	};
 
 	struct Pos {
+		// world to screen representation parameters
+		static constexpr int dx = 14 * 4;
+		static constexpr int dy = 7 * 4;
+		static constexpr int dz = 48 * 4;
+
 		// screen coordinates
 		int x;
 		int y;
@@ -116,8 +131,8 @@ namespace pilecode {
 		int wz;
 
 		Pos(int _wx, int _wy, int _wz)
-			: x(14 * (_wy - _wx))
-			, y(-7 * (_wx + _wy))
+			: x(dx * (_wy - _wx))
+			, y(-dy * (_wx + _wy))
 			, wx(_wx), wy(_wy), wz(_wz)
 		{}
 
@@ -125,29 +140,29 @@ namespace pilecode {
 		void Up()
 		{
 			wy++;
-			x += 14;
-			y -= 7;
+			x += dx;
+			y -= dy;
 		}
 
 		void Down()
 		{
 			wy--;
-			x -= 14;
-			y += 7;
+			x -= dx;
+			y += dy;
 		}
 
 		void Right()
 		{
 			wx++;
-			x -= 14;
-			y -= 7;
+			x -= dx;
+			y -= dy;
 		}
 
 		void Left()
 		{
 			wx--;
-			x += 14;
-			y += 7;
+			x += dx;
+			y += dy;
 		}
 	};
 
@@ -156,8 +171,8 @@ namespace pilecode {
 		Pos GetPos(int wx, int wy, int wz = 0);
 	private:
 		// screen coordinates of origin
-		int cx_ = 320;
-		int cy_ = 200;
+		int cx_ = screen::cx;
+		int cy_ = screen::cy;
 
 		// screen offset in pixels
 		int x_ = 0;
