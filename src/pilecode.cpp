@@ -100,16 +100,36 @@ namespace pilecode {
 		}
 	}
 
+	Robot::Robot(Platform* platform, int x, int y, Direction dir)
+		: platform_(platform)
+		, x_(x), y_(y)
+		, dir_(dir)
+	{}
+
+	void Robot::Draw(ViewPort * vp)
+	{
+		Pos p = vp->GetPos(platform_->worldX(x_), platform_->worldY(y_));
+		image::g_robot.Draw(p.x, p.y);
+	}
+
 	void World::Draw(ViewPort* vp)
 	{
 		for (auto& p : platform_) {
 			p->Draw(vp);
+		}
+		for (auto& r : robot_) {
+			r->Draw(vp);
 		}
 	}
 
 	void World::AddPlatform(Platform* platform)
 	{
 		platform_.emplace_back(platform);
+	}
+
+	void World::AddRobot(Robot * robot)
+	{
+		robot_.emplace_back(robot);
 	}
 
 	Pos ViewPort::GetPos(int wx, int wy, int wz)

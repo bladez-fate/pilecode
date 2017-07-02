@@ -31,6 +31,7 @@ namespace pilecode {
 		extern ae::Sprite g_tile[kTlMax];
 		extern ae::Sprite g_letter[kLtMax];
 		extern ae::Sprite g_frame;
+		extern ae::Sprite g_robot;
 	}
 
 	void InitData();

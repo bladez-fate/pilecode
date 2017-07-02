@@ -28,6 +28,7 @@ namespace pilecode {
 		ae::Sprite g_tile[kTlMax];
 		ae::Sprite g_letter[kLtMax];
 		ae::Sprite g_frame;
+		ae::Sprite g_robot;
 	}
 
 	void InitData()
@@ -43,5 +44,6 @@ namespace pilecode {
 		image::g_letter[kLtLeft].Load("data/letter-left.tga");
 
 		image::g_frame.Load("data/letter-frame.tga");
+		image::g_robot.Load("data/robot.tga");
 	}
 }

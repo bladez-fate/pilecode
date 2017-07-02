@@ -49,6 +49,8 @@ void Init()
 	    { 0, 1, 1, 0, 1, 0, 0 }
 	});
 	g_world->AddPlatform(plat);
+	g_world->AddRobot(new Robot(plat, 2, 0, Robot::kDirUp));
+	g_world->AddRobot(new Robot(plat, 4, 4, Robot::kDirUp));
 }
 
 void Render()

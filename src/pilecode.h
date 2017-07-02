@@ -82,6 +82,11 @@ namespace pilecode {
 	public:
 		Platform(std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
+		
+		// converts coordinates relative to platform to world's frame
+		int worldX(int rx) const { return rx + x_; }
+		int worldY(int ry) const { return ry + y_; }
+		int worldZ(int rz) const { return rz + z_; }
 	private:
 		int x_;
 		int y_;
@@ -95,7 +100,17 @@ namespace pilecode {
 
 	class Robot {
 	public:
+		enum Direction {
+			kDirRight,
+			kDirUp,
+			kDirLeft,
+			kDirDown,
+		};
+	public:
+		Robot(Platform* platform, int x, int y, Direction dir);
+		void Draw(ViewPort* vp);
 	private:
+		// robot is currently on this platform
 		Platform* platform_;
 
 		// coordinates are relative to platform
@@ -103,16 +118,17 @@ namespace pilecode {
 		int y_;
 
 		// direction of motion
-		int dx_;
-		int dy_;
+		Direction dir_;
 	};
 
 	class World {
 	public:
 		void Draw(ViewPort* vp);
 		void AddPlatform(Platform* platform);
+		void AddRobot(Robot* robot);
 	private:
 		std::vector<std::shared_ptr<Platform>> platform_;
+		std::vector<std::shared_ptr<Robot>> robot_;
 	};
 
 	struct Pos {
@@ -135,7 +151,6 @@ namespace pilecode {
 			, y(-dy * (_wx + _wy))
 			, wx(_wx), wy(_wy), wz(_wz)
 		{}
-
 
 		void Up()
 		{
