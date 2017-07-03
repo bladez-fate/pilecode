@@ -261,7 +261,7 @@ namespace pilecode {
 	class ViewPort {
 	public:
 		ViewPort(const WorldParams& wparams);
-		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, ar::Vec2Si32 off);
+		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zlayer, ar::Vec2Si32 off);
 		void BeginRender(double time);
 		void EndRender();
 
@@ -288,6 +288,8 @@ namespace pilecode {
 		double progress_ = 0.0; // 0 - previous world state, 1 - current world state 
 
 		// rendering artifacts
+		static constexpr size_t zlBits = 2ull;
+		static constexpr size_t zlSize = 1ull << zlBits;
 		struct RenderCmnd {
 			enum Type {
 				kSprite = 0,

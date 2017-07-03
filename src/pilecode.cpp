@@ -47,10 +47,10 @@ namespace pilecode {
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz)
 	{
 		if (type_ != kTlNone) {
-			vp->Draw(&image::g_tile[type_], wx, wy, wz, ar::Vec2Si32(0, 0));
+			vp->Draw(&image::g_tile[type_], wx, wy, wz, 1, ar::Vec2Si32(0, 0));
 		}
 		if (letter_ != kLtSpace) {
-			vp->Draw(&image::g_letter[letter_], wx, wy, wz, ar::Vec2Si32(0, 0));
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, ar::Vec2Si32(0, 0));
 		}
 	}
 
@@ -128,11 +128,13 @@ namespace pilecode {
 			platform_->worldX(px_),
 			platform_->worldY(py_),
 			platform_->worldZ(0),
+			2,
 			off);
 		vp->Draw(&image::g_robot,
 			platform_->worldX(px_),
 			platform_->worldY(py_),
 			platform_->worldZ(0),
+			2,
 			off);
 	}
 
@@ -218,12 +220,15 @@ namespace pilecode {
 
 	ViewPort::ViewPort(const WorldParams& wparams)
 		: wparams_(wparams)
-		, cmnds_(wparams.size())
+		, cmnds_(wparams.size() * zlSize)
 	{}
 
-	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, ar::Vec2Si32 off)
+	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zl, ar::Vec2Si32 off)
 	{
-		size_t index = wparams_.index(wx, wy, wz);
+		if (!(zl >= 0 && zl < zlSize)) {
+			abort();
+		}
+		size_t index = wparams_.index(wx, wy, (wz << zlBits) + zl);
 		RenderList& rlist = cmnds_[index];
 		rlist.emplace_back(RenderCmnd(sprite, off));
 	}
@@ -241,16 +246,18 @@ namespace pilecode {
 		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
 		for (int iz = 0; iz < wparams_.zsize(); iz++, p2.Ceil()) {
-			Pos p1 = p2;
-			for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
-				Pos p0 = p1;
-				for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
-					for (RenderCmnd& cmnd : *rlist) {
-						cmnd.Apply(p0.x, p0.y);
+			for (int zl = 0; zl < zlSize; zl++) {
+				Pos p1 = p2;
+				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
+					Pos p0 = p1;
+					for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
+						for (RenderCmnd& cmnd : *rlist) {
+							cmnd.Apply(p0.x, p0.y);
+						}
+						// note that render lists are cleared after rendering
+						rlist->clear();
+						rlist++;
 					}
-					// note that render lists are cleared after rendering
-					rlist->clear();
-					rlist++;
 				}
 			}
 		}
