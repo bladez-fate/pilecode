@@ -150,7 +150,15 @@ namespace pilecode {
 		rlist.emplace_back(RenderCmnd(sprite, off_x, off_y));
 	}
 
-	void ViewPort::Render()
+	void ViewPort::BeginRender()
+	{
+		curFrameTime_ = ae::Time();
+		if (lastFrameTime_ == 0.0) {
+			lastFrameTime_ = curFrameTime_ - 1.0;
+		}
+	}
+
+	void ViewPort::EndRender()
 	{
 		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
@@ -168,6 +176,7 @@ namespace pilecode {
 				}
 			}
 		}
+		lastFrameTime_ = curFrameTime_;
 	}
 
 	Pos ViewPort::GetPos(int wx, int wy, int wz)

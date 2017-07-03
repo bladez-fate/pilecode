@@ -220,7 +220,8 @@ namespace pilecode {
 	public:
 		ViewPort(const WorldParams& wparams);
 		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int off_x, int off_y);
-		void Render();
+		void BeginRender();
+		void EndRender();
 
 	private:
 		Pos GetPos(int wx, int wy, int wz = 0);
@@ -235,6 +236,11 @@ namespace pilecode {
 		// screen offset in pixels
 		int x_ = 0;
 		int y_ = 0;
+
+		// time-related
+		double lastFrameTime_ = 0.0f;
+		double curFrameTime_ = 0.0f;
+		double progress = 0.0f; // 0 - previous world state, 1 - current world state 
 
 		// rendering artifacts
 		struct RenderCmnd {

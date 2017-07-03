@@ -59,8 +59,9 @@ void Render()
 {
 	Clear();
 
+	g_vp->BeginRender();
 	g_world->Draw(g_vp.get());
-	g_vp->Render();
+	g_vp->EndRender();
 
 	ShowFrame();
 }
