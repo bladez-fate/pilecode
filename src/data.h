@@ -32,6 +32,7 @@ namespace pilecode {
 		extern ae::Sprite g_letter[kLtMax];
 		extern ae::Sprite g_frame;
 		extern ae::Sprite g_robot;
+		extern ae::Sprite g_robotShadow;
 	}
 
 	void InitData();

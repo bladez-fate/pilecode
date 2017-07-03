@@ -240,7 +240,10 @@ namespace pilecode {
 		struct RenderCmnd {
 			enum Type {
 				kSprite = 0,
+				kSpriteRgba = 1,
 			};
+
+			Type type_;
 
 			ae::Sprite* sprite_;
 			int off_x_;

@@ -111,6 +111,11 @@ namespace pilecode {
 			platform_->worldY(y_),
 			platform_->worldZ(0),
 			0, 0);
+		vp->Draw(&image::g_robotShadow,
+			platform_->worldX(x_),
+			platform_->worldY(y_),
+			platform_->worldZ(0),
+			0, 0);
 	}
 
 	void World::Draw(ViewPort* vp)
@@ -175,13 +180,20 @@ namespace pilecode {
 	}
 
 	ViewPort::RenderCmnd::RenderCmnd(ae::Sprite* sprite, int off_x, int off_y)
-		: sprite_(sprite)
+		: type_(kSpriteRgba)
+		, sprite_(sprite)
 		, off_x_(off_x)
 		, off_y_(off_y)
 	{}
 
 	void ViewPort::RenderCmnd::Apply(int x, int y)
 	{
-		sprite_->Draw(x + off_x_, y + off_y_);
+		switch (type_) {
+		case kSprite:
+			sprite_->Draw(x + off_x_, y + off_y_);
+			break;
+		case kSpriteRgba:
+			sprite_->Draw(x + off_x_, y + off_y_);
+		}
 	}
 }
