@@ -41,6 +41,7 @@ namespace pilecode {
 	class Robot;
 	class Tile;
 	class Platform;
+	class WorldParams;
 	class World;
 
 	struct Pos;
@@ -67,7 +68,7 @@ namespace pilecode {
 	class Tile {
 	public:
 		Tile();
-		void Draw(ViewPort* vp, Pos p);
+		void Draw(ViewPort* vp, int wx, int wy, int wz);
 
 		TileType type() const { return type_;  }
 		Letter letter() const { return letter_;  }
@@ -119,6 +120,28 @@ namespace pilecode {
 
 		// direction of motion
 		Direction dir_;
+	};
+
+	class WorldParams {
+	public:
+		WorldParams(size_t xsize, size_t ysize, size_t zsize)
+			: xsize_(xsize), ysize_(ysize), zsize_(zsize)
+			, xysize_(xsize * ysize)
+			, xyzsize_(xsize * ysize * zsize)
+		{}
+
+		size_t xsize() const { return xsize_; }
+		size_t ysize() const { return ysize_; }
+		size_t zsize() const { return zsize_; }
+		
+		size_t size() const { return xyzsize_; }
+		size_t index(int x, int y, int z) const { return z * xysize_ + y * xsize_ + x;  }
+	private:
+		size_t xsize_;
+		size_t ysize_;
+		size_t zsize_;
+		size_t xysize_;
+		size_t xyzsize_;
 	};
 
 	class World {
@@ -179,12 +202,32 @@ namespace pilecode {
 			x += dx;
 			y += dy;
 		}
+
+		void Ceil()
+		{
+			wz++;
+			y += dz;
+		}
+
+		void Floor()
+		{
+			wz--;
+			y -= dz;
+		}
 	};
 
 	class ViewPort {
 	public:
-		Pos GetPos(int wx, int wy, int wz = 0);
+		ViewPort(const WorldParams& wparams);
+		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int off_x, int off_y);
+		void Render();
+
 	private:
+		Pos GetPos(int wx, int wy, int wz = 0);
+
+	private:
+		WorldParams wparams_;
+
 		// screen coordinates of origin
 		int cx_ = screen::cx;
 		int cy_ = screen::cy;
@@ -192,5 +235,22 @@ namespace pilecode {
 		// screen offset in pixels
 		int x_ = 0;
 		int y_ = 0;
+
+		// rendering artifacts
+		struct RenderCmnd {
+			enum Type {
+				kSprite = 0,
+			};
+
+			ae::Sprite* sprite_;
+			int off_x_;
+			int off_y_;
+
+			RenderCmnd(ae::Sprite* sprite, int off_x, int off_y);
+			void Apply(int x, int y);
+		};
+
+		using RenderList = std::vector<RenderCmnd>;
+		std::vector<RenderList> cmnds_;
 	};
 }

@@ -29,6 +29,7 @@ using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
 using namespace pilecode; // NOLINT
 
+std::unique_ptr<WorldParams> g_wparams;
 std::unique_ptr<World> g_world;
 std::unique_ptr<ViewPort> g_vp;
 
@@ -37,8 +38,9 @@ void Init()
 	InitData();
 	ResizeScreen(screen::w, screen::h);
 
+	g_wparams.reset(new WorldParams(200, 200, 10));
 	g_world.reset(new World());
-	g_vp.reset(new ViewPort());
+	g_vp.reset(new ViewPort(*g_wparams));
 
 	Platform* plat = new Platform({
 		{ 0, 0, 1, 1, 1, 1, 0 },
@@ -58,6 +60,7 @@ void Render()
 	Clear();
 
 	g_world->Draw(g_vp.get());
+	g_vp->Render();
 
 	ShowFrame();
 }

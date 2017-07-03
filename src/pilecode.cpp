@@ -44,13 +44,13 @@ namespace pilecode {
 		, letter_(kLtSpace)
 	{}
 
-	void Tile::Draw(ViewPort * vp, Pos p)
+	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz)
 	{
 		if (type_ != kTlNone) {
-			image::g_tile[type_].Draw(p.x, p.y);
+			vp->Draw(&image::g_tile[type_], wx, wy, wz, 0, 0);
 		}
 		if (letter_ != kLtSpace) {
-			image::g_letter[letter_].Draw(p.x, p.y);
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 0, 0);
 		}
 	}
 
@@ -90,11 +90,9 @@ namespace pilecode {
 	void Platform::Draw(ViewPort * vp)
 	{
 		Tile* tile = &tiles_[0];
-		Pos p = vp->GetPos(x_, y_);
-		for (int iy = 0; iy < h_; iy++, p.Up()) {
-			Pos p0 = p;
-			for (int ix = 0; ix < w_; ix++, p0.Right()) {
-				tile->Draw(vp, p0);
+		for (int iy = 0; iy < h_; iy++) {
+			for (int ix = 0; ix < w_; ix++) {
+				tile->Draw(vp, worldX(ix), worldY(iy), z_);
 				tile++;
 			}
 		}
@@ -108,8 +106,11 @@ namespace pilecode {
 
 	void Robot::Draw(ViewPort * vp)
 	{
-		Pos p = vp->GetPos(platform_->worldX(x_), platform_->worldY(y_));
-		image::g_robot.Draw(p.x, p.y);
+		vp->Draw(&image::g_robot,
+			platform_->worldX(x_),
+			platform_->worldY(y_),
+			platform_->worldZ(0),
+			0, 0);
 	}
 
 	void World::Draw(ViewPort* vp)
@@ -132,6 +133,38 @@ namespace pilecode {
 		robot_.emplace_back(robot);
 	}
 
+	ViewPort::ViewPort(const WorldParams& wparams)
+		: wparams_(wparams)
+		, cmnds_(wparams.size())
+	{}
+
+	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int off_x, int off_y)
+	{
+		size_t index = wparams_.index(wx, wy, wz);
+		RenderList& rlist = cmnds_[index];
+		rlist.emplace_back(RenderCmnd(sprite, off_x, off_y));
+	}
+
+	void ViewPort::Render()
+	{
+		Pos p2 = GetPos(0, 0);
+		RenderList* rlist = &cmnds_[0];
+		for (int iz = 0; iz < wparams_.zsize(); iz++, p2.Ceil()) {
+			Pos p1 = p2;
+			for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
+				Pos p0 = p1;
+				for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
+					for (RenderCmnd& cmnd : *rlist) {
+						cmnd.Apply(p0.x, p0.y);
+					}
+					// note that render lists are cleared after rendering
+					rlist->clear();
+					rlist++;
+				}
+			}
+		}
+	}
+
 	Pos ViewPort::GetPos(int wx, int wy, int wz)
 	{
 		Pos p(wx, wy, wz);
@@ -139,5 +172,16 @@ namespace pilecode {
 		p.x += cx_ + x_;
 		p.y += cy_ + y_;
 		return p;
+	}
+
+	ViewPort::RenderCmnd::RenderCmnd(ae::Sprite* sprite, int off_x, int off_y)
+		: sprite_(sprite)
+		, off_x_(off_x)
+		, off_y_(off_y)
+	{}
+
+	void ViewPort::RenderCmnd::Apply(int x, int y)
+	{
+		sprite_->Draw(x + off_x_, y + off_y_);
 	}
 }
