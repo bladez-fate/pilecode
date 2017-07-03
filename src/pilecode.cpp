@@ -47,11 +47,16 @@ namespace pilecode {
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz)
 	{
 		if (type_ != kTlNone) {
-			vp->Draw(&image::g_tile[type_], wx, wy, wz, 0, 0);
+			vp->Draw(&image::g_tile[type_], wx, wy, wz, ar::Vec2Si32(0, 0));
 		}
 		if (letter_ != kLtSpace) {
-			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 0, 0);
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, ar::Vec2Si32(0, 0));
 		}
+	}
+
+	bool Tile::isMovable() const
+	{
+		return type_ != kTlNone;
 	}
 
 	Platform::Platform(std::initializer_list<std::initializer_list<int>> data)
@@ -98,24 +103,90 @@ namespace pilecode {
 		}
 	}
 
+	const Tile* Platform::get_tile(int rx, int ry) const
+	{
+		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
+			return &tiles_[ry * w_ + rx];
+		} else {
+			return Tile::none();
+		}
+	}
+
 	Robot::Robot(Platform* platform, int x, int y, Direction dir)
 		: platform_(platform)
 		, x_(x), y_(y)
+		, px_(x), py_(y)
 		, dir_(dir)
 	{}
 
 	void Robot::Draw(ViewPort * vp)
 	{
-		vp->Draw(&image::g_robot,
-			platform_->worldX(x_),
-			platform_->worldY(y_),
-			platform_->worldZ(0),
-			0, 0);
+		ar::Vec2Si32 off = Pos::ToScreen(d_pos());
+		off.x = ar::Si32(off.x * vp->progress());
+		off.y = ar::Si32(off.y * vp->progress());
 		vp->Draw(&image::g_robotShadow,
-			platform_->worldX(x_),
-			platform_->worldY(y_),
+			platform_->worldX(px_),
+			platform_->worldY(py_),
 			platform_->worldZ(0),
-			0, 0);
+			off);
+		vp->Draw(&image::g_robot,
+			platform_->worldX(px_),
+			platform_->worldY(py_),
+			platform_->worldZ(0),
+			off);
+	}
+
+	void Robot::Simulate()
+	{
+		switch (platform_->get_tile(x_, y_)->letter()) {
+		case kLtSpace:
+			break; // just keep moving
+		case kLtUp:
+			dir_ = kDirUp;
+			break;
+		case kLtDown:
+			dir_ = kDirDown;
+			break;
+		case kLtRight:
+			dir_ = kDirRight;
+			break;
+		case kLtLeft:
+			dir_ = kDirLeft;
+			break;
+		}
+		int dx;
+		int dy;
+		switch (dir_) {
+		case kDirRight:
+			dx = 1;
+			dy = 0;
+			break;
+		case kDirUp:
+			dx = 0;
+			dy = 1;
+			break;
+		case kDirLeft:
+			dx = -1;
+			dy = 0;
+			break;
+		case kDirDown:
+			dx = 0;
+			dy = -1;
+			break;
+		}
+		px_ = x_;
+		py_ = y_;
+		int newx = x_ + dx;
+		int newy = y_ + dy;
+		if (platform_->get_tile(newx, newy)->isMovable()) {
+			x_ = newx;
+			y_ = newy;
+		}
+	}
+
+	ar::Vec2Si32 Robot::d_pos()
+	{
+		return ar::Vec2Si32(x_ - px_, y_ - py_);
 	}
 
 	void World::Draw(ViewPort* vp)
@@ -138,21 +209,28 @@ namespace pilecode {
 		robot_.emplace_back(robot);
 	}
 
+	void World::Simulate()
+	{
+		for (const auto& robot : robot_) {
+			robot->Simulate();
+		}
+	}
+
 	ViewPort::ViewPort(const WorldParams& wparams)
 		: wparams_(wparams)
 		, cmnds_(wparams.size())
 	{}
 
-	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int off_x, int off_y)
+	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, ar::Vec2Si32 off)
 	{
 		size_t index = wparams_.index(wx, wy, wz);
 		RenderList& rlist = cmnds_[index];
-		rlist.emplace_back(RenderCmnd(sprite, off_x, off_y));
+		rlist.emplace_back(RenderCmnd(sprite, off));
 	}
 
-	void ViewPort::BeginRender()
+	void ViewPort::BeginRender(double time)
 	{
-		curFrameTime_ = ae::Time();
+		curFrameTime_ = time;
 		if (lastFrameTime_ == 0.0) {
 			lastFrameTime_ = curFrameTime_ - 1.0;
 		}
@@ -188,21 +266,20 @@ namespace pilecode {
 		return p;
 	}
 
-	ViewPort::RenderCmnd::RenderCmnd(ae::Sprite* sprite, int off_x, int off_y)
+	ViewPort::RenderCmnd::RenderCmnd(ae::Sprite* sprite, ar::Vec2Si32 off)
 		: type_(kSpriteRgba)
 		, sprite_(sprite)
-		, off_x_(off_x)
-		, off_y_(off_y)
+		, off_(off)
 	{}
 
 	void ViewPort::RenderCmnd::Apply(int x, int y)
 	{
 		switch (type_) {
 		case kSprite:
-			sprite_->Draw(x + off_x_, y + off_y_);
+			sprite_->Draw(x + off_.x, y + off_.y);
 			break;
 		case kSpriteRgba:
-			sprite_->Draw(x + off_x_, y + off_y_);
+			sprite_->Draw(x + off_.x, y + off_.y);
 		}
 	}
 }

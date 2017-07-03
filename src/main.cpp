@@ -29,50 +29,84 @@ using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
 using namespace pilecode; // NOLINT
 
-std::unique_ptr<WorldParams> g_wparams;
-std::unique_ptr<World> g_world;
-std::unique_ptr<ViewPort> g_vp;
+class Game {
+public:
 
-void Init()
-{
-	InitData();
-	ResizeScreen(screen::w, screen::h);
+	std::unique_ptr<WorldParams> g_wparams;
+	std::unique_ptr<World> g_world;
+	std::unique_ptr<ViewPort> g_vp;
 
-	g_wparams.reset(new WorldParams(200, 200, 10));
-	g_world.reset(new World());
-	g_vp.reset(new ViewPort(*g_wparams));
+	double pauseBeforeStart_ = 0.2;
+	double secondsPerStep_ = 0.5;
+	double lastStepTime_ = 0.0;
+	double time_ = 0.0;
 
-	Platform* plat = new Platform({
-		{ 0, 0, 1, 1, 1, 1, 0 },
-		{ 0, 0, 1, 0, 1, 1, 1 },
-		{ 0, 0, 1, 1, 1, 0, 1 },
-  	    { 0, 1, 1, 2, 1, 0, 1 },
-	    { 1, 1, 1, 1, 1, 1, 1 },
-	    { 0, 1, 1, 0, 1, 0, 0 }
-	});
-	g_world->AddPlatform(plat);
-	g_world->AddRobot(new Robot(plat, 2, 0, Robot::kDirUp));
-	g_world->AddRobot(new Robot(plat, 4, 4, Robot::kDirUp));
-}
+	void Init()
+	{
+		InitData();
+		ResizeScreen(screen::w, screen::h);
 
-void Render()
-{
-	Clear();
+		g_wparams.reset(new WorldParams(200, 200, 10));
+		g_world.reset(new World());
+		g_vp.reset(new ViewPort(*g_wparams));
 
-	g_vp->BeginRender();
-	g_world->Draw(g_vp.get());
-	g_vp->EndRender();
+		Platform* plat = new Platform({
+			{ 0, 0, 1, 1, 1, 1, 0 },
+			{ 0, 1, 1, 0, 1, 1, 1 },
+			{ 0, 1, 1, 1, 1, 1, 1 },
+			{ 0, 1, 1, 2, 1, 1, 1 },
+			{ 1, 1, 1, 1, 1, 1, 1 },
+			{ 0, 1, 1, 0, 1, 0, 0 }
+		});
+		g_world->AddPlatform(plat);
+		g_world->AddRobot(new Robot(plat, 4, 4, Robot::kDirUp));
+	}
 
-	ShowFrame();
-}
+	void Update()
+	{
+		time_ = Time();
+		if (lastStepTime_ == 0.0) {
+			lastStepTime_ = time_ - secondsPerStep_ + pauseBeforeStart_;
+		}
+
+		while (true) {
+			double progress = (time_ - lastStepTime_) / secondsPerStep_;
+			if (progress > 1.0) {
+				g_world->Simulate();
+				lastStepTime_ = lastStepTime_ + secondsPerStep_;
+				time_ = Time();
+			}
+			else {
+				g_vp->set_progress(progress);
+				break;
+			}
+		}
+	}
+
+	void Render()
+	{
+		Clear();
+
+		g_vp->BeginRender(time_);
+		g_world->Draw(g_vp.get());
+		g_vp->EndRender();
+
+		ShowFrame();
+	}
+};
 
 void EasyMain()
 {
-	Init();
+	Game game;
+
+	srand((int)time(nullptr));
+
+	game.Init();
 	while (true) {
 		if (IsKey(kKeyEscape)) {
 			break;
 		}
-		Render();
+		game.Update();
+		game.Render();
 	}
 }

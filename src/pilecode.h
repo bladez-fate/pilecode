@@ -23,6 +23,8 @@
 #pragma once
 
 #include "engine/easy.h"
+#include "engine/vec2si32.h"
+#include "engine/vec3si32.h"
 
 #include <vector>
 
@@ -36,6 +38,7 @@ namespace pilecode {
 		extern size_t size;
 	}
 
+	namespace ar = arctic;
 	namespace ae = arctic::easy;
 
 	class Robot;
@@ -70,10 +73,18 @@ namespace pilecode {
 		Tile();
 		void Draw(ViewPort* vp, int wx, int wy, int wz);
 
+		bool isMovable() const;
+
 		TileType type() const { return type_;  }
 		Letter letter() const { return letter_;  }
 		void set_type(TileType type) { type_ = type;  }
 		void set_letter(Letter letter) { letter_ = letter; }
+
+		static const Tile* none()
+		{
+			static Tile noneTile;
+			return &noneTile;
+		}
 	private:
 		TileType type_;
 		Letter letter_;
@@ -83,6 +94,8 @@ namespace pilecode {
 	public:
 		Platform(std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
+
+		const Tile* get_tile(int rx, int ry) const;
 		
 		// converts coordinates relative to platform to world's frame
 		int worldX(int rx) const { return rx + x_; }
@@ -110,6 +123,9 @@ namespace pilecode {
 	public:
 		Robot(Platform* platform, int x, int y, Direction dir);
 		void Draw(ViewPort* vp);
+		void Simulate();
+
+		ar::Vec2Si32 d_pos();
 	private:
 		// robot is currently on this platform
 		Platform* platform_;
@@ -117,6 +133,8 @@ namespace pilecode {
 		// coordinates are relative to platform
 		int x_;
 		int y_;
+		int px_; // previous state
+		int py_; // previous state 
 
 		// direction of motion
 		Direction dir_;
@@ -146,9 +164,15 @@ namespace pilecode {
 
 	class World {
 	public:
+		// rendering
 		void Draw(ViewPort* vp);
+
+		// construction
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
+
+		// simulation
+		void Simulate();
 	private:
 		std::vector<std::shared_ptr<Platform>> platform_;
 		std::vector<std::shared_ptr<Robot>> robot_;
@@ -173,6 +197,14 @@ namespace pilecode {
 			: x(dx * (_wy - _wx))
 			, y(-dy * (_wx + _wy))
 			, wx(_wx), wy(_wy), wz(_wz)
+		{}
+
+		explicit Pos(ar::Vec2Si32 w)
+			: Pos(w.x, w.y, 0)
+		{}
+
+		explicit Pos(ar::Vec3Si32 w)
+			: Pos(w.x, w.y, w.z)
 		{}
 
 		void Up()
@@ -214,14 +246,27 @@ namespace pilecode {
 			wz--;
 			y -= dz;
 		}
+
+		ar::Vec2Si32 Screen() const
+		{
+			return ar::Vec2Si32(x, y);
+		}
+
+		static ar::Vec2Si32 ToScreen(ar::Vec2Si32 w)
+		{
+			return Pos(w).Screen();
+		}
 	};
 
 	class ViewPort {
 	public:
 		ViewPort(const WorldParams& wparams);
-		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int off_x, int off_y);
-		void BeginRender();
+		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, ar::Vec2Si32 off);
+		void BeginRender(double time);
 		void EndRender();
+
+		double progress() const { return progress_; }
+		void set_progress(double progress) { progress_ = progress; }
 
 	private:
 		Pos GetPos(int wx, int wy, int wz = 0);
@@ -238,9 +283,9 @@ namespace pilecode {
 		int y_ = 0;
 
 		// time-related
-		double lastFrameTime_ = 0.0f;
-		double curFrameTime_ = 0.0f;
-		double progress = 0.0f; // 0 - previous world state, 1 - current world state 
+		double lastFrameTime_ = 0.0;
+		double curFrameTime_ = 0.0;
+		double progress_ = 0.0; // 0 - previous world state, 1 - current world state 
 
 		// rendering artifacts
 		struct RenderCmnd {
@@ -252,10 +297,9 @@ namespace pilecode {
 			Type type_;
 
 			ae::Sprite* sprite_;
-			int off_x_;
-			int off_y_;
+			ar::Vec2Si32 off_;
 
-			RenderCmnd(ae::Sprite* sprite, int off_x, int off_y);
+			RenderCmnd(ae::Sprite* sprite, ar::Vec2Si32 off_);
 			void Apply(int x, int y);
 		};
 
