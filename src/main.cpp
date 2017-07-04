@@ -39,6 +39,7 @@ public:
 	double pauseBeforeStart_ = 0.2;
 	double secondsPerStep_ = 0.5;
 	double lastStepTime_ = 0.0;
+	double lastControlTime_ = 0.0;
 	double time_ = 0.0;
 
 	void Init()
@@ -46,11 +47,13 @@ public:
 		InitData();
 		ResizeScreen(screen::w, screen::h);
 
-		g_wparams.reset(new WorldParams(200, 200, 10));
+		g_wparams.reset(new WorldParams(200, 200, 2));
 		g_world.reset(new World());
 		g_vp.reset(new ViewPort(*g_wparams));
 
-		Platform* plat = new Platform({
+		Platform* plat1 = new Platform(
+			0, 0, 0,
+		{
 			{ 0, 0, 1, 1, 1, 1, 0 },
 			{ 0, 1, 1, 0, 1, 1, 1 },
 			{ 0, 1, 1, 1, 1, 1, 1 },
@@ -58,8 +61,66 @@ public:
 			{ 1, 1, 1, 1, 1, 1, 1 },
 			{ 0, 1, 1, 0, 1, 0, 0 }
 		});
-		g_world->AddPlatform(plat);
-		g_world->AddRobot(new Robot(plat, 4, 4, Robot::kDirUp));
+
+		Platform* plat2 = new Platform(
+			0, 10, 0,
+			{
+				{ 0, 1, 1, 1, 1, 1, 0 },
+				{ 1, 1, 1, 1, 1, 1, 1 },
+				{ 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 1, 1, 1, 1, 1, 0 },
+			});
+
+		Platform* plat3 = new Platform(
+			4, 5, 1,
+			{
+				{ 0, 1, 1 },
+				{ 1, 1, 1 },
+			});
+		g_world->AddPlatform(plat1);
+		g_world->AddPlatform(plat2);
+		g_world->AddPlatform(plat3);
+		g_world->AddRobot(new Robot(plat1, 4, 4, Robot::kDirUp));
+	}
+
+	bool Control()
+	{
+		double time = Time();
+		if (lastControlTime_ == 0.0) {
+			lastControlTime_ = time;
+		}
+		float dt = float(time - lastControlTime_);
+		lastControlTime_ = time;
+
+		if (IsKey(kKeyEscape)) {
+			return false;
+		}
+
+		float movePxlPerSec = float(screen::h) * 0.50f;
+		if (IsKey(kKeyUp)) {
+			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, 1.0f));
+		}
+		if (IsKey(kKeyDown)) {
+			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, -1.0f));
+		}
+		if (IsKey(kKeyRight)) {
+			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(1.0f, 0.0f));
+		}
+		if (IsKey(kKeyLeft)) {
+			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(-1.0f, 0.0f));
+		}
+
+		if (IsKey(kKeyA)) {
+			g_vp->IncVisibleZ();
+			ae::SetKey(kKeyA, false);
+		}
+
+		if (IsKey(kKeyZ)) {
+			g_vp->DecVisibleZ();
+			ae::SetKey(kKeyZ, false);
+		}
+
+		return true;
 	}
 
 	void Update()
@@ -103,7 +164,7 @@ void EasyMain()
 
 	game.Init();
 	while (true) {
-		if (IsKey(kKeyEscape)) {
+		if (!game.Control()) {
 			break;
 		}
 		game.Update();

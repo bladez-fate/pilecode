@@ -59,8 +59,9 @@ namespace pilecode {
 		return type_ != kTlNone;
 	}
 
-	Platform::Platform(std::initializer_list<std::initializer_list<int>> data)
-		: x_(0), y_(0), z_(0)
+	Platform::Platform(int x, int y, int z,
+		std::initializer_list<std::initializer_list<int>> data)
+		: x_(x), y_(y), z_(z)
 	{
 		w_ = 0;
 		h_ = 0;
@@ -221,6 +222,7 @@ namespace pilecode {
 	ViewPort::ViewPort(const WorldParams& wparams)
 		: wparams_(wparams)
 		, cmnds_(wparams.size() * zlSize)
+		, visible_z_(wparams.zsize())
 	{}
 
 	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zl, ar::Vec2Si32 off)
@@ -245,7 +247,7 @@ namespace pilecode {
 	{
 		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
-		for (int iz = 0; iz < wparams_.zsize(); iz++, p2.Ceil()) {
+		for (int iz = 0; iz < visible_z_; iz++, p2.Ceil()) {
 			for (int zl = 0; zl < zlSize; zl++) {
 				Pos p1 = p2;
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
@@ -264,12 +266,32 @@ namespace pilecode {
 		lastFrameTime_ = curFrameTime_;
 	}
 
+	void ViewPort::Move(ar::Vec2F delta)
+	{
+		x_ += delta.x;
+		y_ += delta.y;
+	}
+
+	void ViewPort::IncVisibleZ()
+	{
+		if (visible_z_ < wparams_.zsize()) {
+			visible_z_++;
+		}
+	}
+
+	void ViewPort::DecVisibleZ()
+	{
+		if (visible_z_ > 0) {
+			visible_z_--;
+		}
+	}
+
 	Pos ViewPort::GetPos(int wx, int wy, int wz)
 	{
 		Pos p(wx, wy, wz);
 
-		p.x += cx_ + x_;
-		p.y += cy_ + y_;
+		p.x += cx_ + int(x_ + 0.5f);
+		p.y += cy_ + int(y_ + 0.5f);
 		return p;
 	}
 

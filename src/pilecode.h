@@ -92,7 +92,7 @@ namespace pilecode {
 
 	class Platform {
 	public:
-		Platform(std::initializer_list<std::initializer_list<int>> data);
+		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
 
 		const Tile* get_tile(int rx, int ry) const;
@@ -265,6 +265,10 @@ namespace pilecode {
 		void BeginRender(double time);
 		void EndRender();
 
+		void Move(ar::Vec2F delta);
+		void IncVisibleZ();
+		void DecVisibleZ();
+
 		double progress() const { return progress_; }
 		void set_progress(double progress) { progress_ = progress; }
 
@@ -279,8 +283,11 @@ namespace pilecode {
 		int cy_ = screen::cy;
 
 		// screen offset in pixels
-		int x_ = 0;
-		int y_ = 0;
+		float x_ = 0;
+		float y_ = 0;
+		
+		// world rendering parameters
+		size_t visible_z_ = 0;
 
 		// time-related
 		double lastFrameTime_ = 0.0;
