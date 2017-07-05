@@ -29,6 +29,18 @@ using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
 using namespace pilecode; // NOLINT
 
+template <class T>
+bool IsKeyOnce(T t)
+{
+	if (ae::IsKey(t)) {
+		SetKey(t, false);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 class Game {
 public:
 	void Start()
@@ -95,19 +107,32 @@ public:
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(-1.0f, 0.0f));
 		}
 
-		if (IsKey(kKeyA)) {
-			ae::SetKey(kKeyA, false);
+		if (IsKeyOnce(kKeyA)) {
 			vp_->IncVisibleZ();
 		}
 
-		if (IsKey(kKeyZ)) {
-			ae::SetKey(kKeyZ, false);
+		if (IsKeyOnce(kKeyZ)) {
 			vp_->DecVisibleZ();
 		}
 
-		if (IsKey(kKeySpace)) {
- 			ae::SetKey(kKeySpace, false);
+		if (IsKeyOnce(kKeySpace)) {
 			simPaused_ = !simPaused_;
+		}
+
+		if (IsKeyOnce(kKey1)) {
+			simSpeed_ = 1.0;
+		}
+
+		if (IsKeyOnce(kKey2)) {
+			simSpeed_ = 2.0;
+		}
+
+		if (IsKeyOnce(kKey3)) {
+			simSpeed_ = 4.0;
+		}
+
+		if (IsKeyOnce(kKey4)) {
+			simSpeed_ = 8.0;
 		}
 
 		//ar::Vsec2Si32 mouse = ae::MousePos();
@@ -117,37 +142,43 @@ public:
 
 	void Update()
 	{
-		time_ = Time();
-		if (lastStepTime_ == 0.0) {
-			lastStepTime_ = time_ - secondsPerStep_;
+		double time = Time();
+		double secondsPerStep = secondsPerStepDefault_ / simSpeed_;
+		if (lastUpdateTime_ == 0.0) {
+			lastUpdateTime_ = time;
 		}
 
 		while (true) {
-			double progress = (time_ - lastStepTime_) / secondsPerStep_;
-			if (progress > 1.0) {
+			double progress = lastProgress_ + (time - lastUpdateTime_) / secondsPerStep;
+			if (progress >= 1.0) {
 				if (simPaused_) {
-					lastStepTime_ = 0;
-					vp_->set_progress(1.0);
+					lastUpdateTime_ = 0;
+					lastProgress_ = 1.0;
 					break;
 				}
 				else {
 					world_->Simulate();
-					lastStepTime_ = lastStepTime_ + secondsPerStep_;
+					lastUpdateTime_ = time;
+					lastProgress_ = progress - 1.0;
+					time = Time();
 				}
-				time_ = Time();
 			}
 			else {
 				vp_->set_progress(progress);
+				lastUpdateTime_ = time;
+				lastProgress_ = progress;
 				break;
 			}
 		}
+
+		vp_->set_progress(lastProgress_);
 	}
 
 	void Render()
 	{
 		Clear();
 
-		vp_->BeginRender(time_);
+		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
 		vp_->EndRender();
 
@@ -163,12 +194,12 @@ private:
 	std::unique_ptr<ViewPort> vp_;
 
 	// timing
-	double secondsPerStep_ = 0.5;
-	double lastStepTime_ = 0.0;
+	double secondsPerStepDefault_ = 0.5;
+	double lastUpdateTime_ = 0.0;
 	double lastControlTime_ = 0.0;
-	double time_ = 0.0;
 	
 	// simulation 
+	double lastProgress_ = 1.0;
 	bool simPaused_ = false;
 	double simSpeed_ = 1.0;
 };
