@@ -31,25 +31,11 @@ using namespace pilecode; // NOLINT
 
 class Game {
 public:
-
-	std::unique_ptr<WorldParams> g_wparams;
-	std::unique_ptr<World> g_world;
-	std::unique_ptr<ViewPort> g_vp;
-
-	double pauseBeforeStart_ = 0.2;
-	double secondsPerStep_ = 0.5;
-	double lastStepTime_ = 0.0;
-	double lastControlTime_ = 0.0;
-	double time_ = 0.0;
-
-	void Init()
+	void Start()
 	{
-		InitData();
-		ResizeScreen(screen::w, screen::h);
-
-		g_wparams.reset(new WorldParams(200, 200, 2));
-		g_world.reset(new World());
-		g_vp.reset(new ViewPort(*g_wparams));
+		wparams_.reset(new WorldParams(200, 200, 2));
+		world_.reset(new World());
+		vp_.reset(new ViewPort(*wparams_));
 
 		Platform* plat1 = new Platform(
 			0, 0, 0,
@@ -77,10 +63,10 @@ public:
 				{ 0, 1, 1 },
 				{ 1, 1, 1 },
 			});
-		g_world->AddPlatform(plat1);
-		g_world->AddPlatform(plat2);
-		g_world->AddPlatform(plat3);
-		g_world->AddRobot(new Robot(plat1, 4, 4, Robot::kDirUp));
+		world_->AddPlatform(plat1);
+		world_->AddPlatform(plat2);
+		world_->AddPlatform(plat3);
+		world_->AddRobot(new Robot(plat1, 4, 4, Robot::kDirUp));
 	}
 
 	bool Control()
@@ -98,25 +84,25 @@ public:
 
 		float movePxlPerSec = float(screen::h) * 0.50f;
 		if (IsKey(kKeyUp)) {
-			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, 1.0f));
+			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, 1.0f));
 		}
 		if (IsKey(kKeyDown)) {
-			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, -1.0f));
+			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, -1.0f));
 		}
 		if (IsKey(kKeyRight)) {
-			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(1.0f, 0.0f));
 		}
 		if (IsKey(kKeyLeft)) {
-			g_vp->Move(-movePxlPerSec * dt * ar::Vec2F(-1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(-1.0f, 0.0f));
 		}
 
 		if (IsKey(kKeyA)) {
-			g_vp->IncVisibleZ();
+			vp_->IncVisibleZ();
 			ae::SetKey(kKeyA, false);
 		}
 
 		if (IsKey(kKeyZ)) {
-			g_vp->DecVisibleZ();
+			vp_->DecVisibleZ();
 			ae::SetKey(kKeyZ, false);
 		}
 
@@ -133,12 +119,12 @@ public:
 		while (true) {
 			double progress = (time_ - lastStepTime_) / secondsPerStep_;
 			if (progress > 1.0) {
-				g_world->Simulate();
+				world_->Simulate();
 				lastStepTime_ = lastStepTime_ + secondsPerStep_;
 				time_ = Time();
 			}
 			else {
-				g_vp->set_progress(progress);
+				vp_->set_progress(progress);
 				break;
 			}
 		}
@@ -148,21 +134,38 @@ public:
 	{
 		Clear();
 
-		g_vp->BeginRender(time_);
-		g_world->Draw(g_vp.get());
-		g_vp->EndRender();
+		vp_->BeginRender(time_);
+		world_->Draw(vp_.get());
+		vp_->EndRender();
 
 		ShowFrame();
 	}
+private:
+	std::unique_ptr<WorldParams> wparams_;
+	std::unique_ptr<World> world_;
+	std::unique_ptr<ViewPort> vp_;
+
+	double pauseBeforeStart_ = 0.2;
+	double secondsPerStep_ = 0.5;
+	double lastStepTime_ = 0.0;
+	double lastControlTime_ = 0.0;
+	double time_ = 0.0;
 };
+
+void Init()
+{
+	InitData();
+	ResizeScreen(screen::w, screen::h);
+}
 
 void EasyMain()
 {
-	Game game;
-
+	Init();
 	srand((int)time(nullptr));
 
-	game.Init();
+	Game game;
+
+	game.Start();
 	while (true) {
 		if (!game.Control()) {
 			break;
