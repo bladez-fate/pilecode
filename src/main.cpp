@@ -82,29 +82,35 @@ public:
 			return false;
 		}
 
-		float movePxlPerSec = float(screen::h) * 0.50f;
 		if (IsKey(kKeyUp)) {
-			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, 1.0f));
+			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, 1.0f));
 		}
 		if (IsKey(kKeyDown)) {
-			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(0.0f, -1.0f));
+			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, -1.0f));
 		}
 		if (IsKey(kKeyRight)) {
-			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(1.0f, 0.0f));
 		}
 		if (IsKey(kKeyLeft)) {
-			vp_->Move(-movePxlPerSec * dt * ar::Vec2F(-1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(-1.0f, 0.0f));
 		}
 
 		if (IsKey(kKeyA)) {
-			vp_->IncVisibleZ();
 			ae::SetKey(kKeyA, false);
+			vp_->IncVisibleZ();
 		}
 
 		if (IsKey(kKeyZ)) {
-			vp_->DecVisibleZ();
 			ae::SetKey(kKeyZ, false);
+			vp_->DecVisibleZ();
 		}
+
+		if (IsKey(kKeySpace)) {
+ 			ae::SetKey(kKeySpace, false);
+			simPaused_ = !simPaused_;
+		}
+
+		//ar::Vsec2Si32 mouse = ae::MousePos();
 
 		return true;
 	}
@@ -113,14 +119,21 @@ public:
 	{
 		time_ = Time();
 		if (lastStepTime_ == 0.0) {
-			lastStepTime_ = time_ - secondsPerStep_ + pauseBeforeStart_;
+			lastStepTime_ = time_ - secondsPerStep_;
 		}
 
 		while (true) {
 			double progress = (time_ - lastStepTime_) / secondsPerStep_;
 			if (progress > 1.0) {
-				world_->Simulate();
-				lastStepTime_ = lastStepTime_ + secondsPerStep_;
+				if (simPaused_) {
+					lastStepTime_ = 0;
+					vp_->set_progress(1.0);
+					break;
+				}
+				else {
+					world_->Simulate();
+					lastStepTime_ = lastStepTime_ + secondsPerStep_;
+				}
 				time_ = Time();
 			}
 			else {
@@ -141,15 +154,23 @@ public:
 		ShowFrame();
 	}
 private:
+	// control configuration
+	float movePxlPerSec_ = float(screen::h) * 0.50f;
+
+	// world
 	std::unique_ptr<WorldParams> wparams_;
 	std::unique_ptr<World> world_;
 	std::unique_ptr<ViewPort> vp_;
 
-	double pauseBeforeStart_ = 0.2;
+	// timing
 	double secondsPerStep_ = 0.5;
 	double lastStepTime_ = 0.0;
 	double lastControlTime_ = 0.0;
 	double time_ = 0.0;
+	
+	// simulation 
+	bool simPaused_ = false;
+	double simSpeed_ = 1.0;
 };
 
 void Init()

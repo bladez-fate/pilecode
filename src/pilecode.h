@@ -292,7 +292,7 @@ namespace pilecode {
 		// time-related
 		double lastFrameTime_ = 0.0;
 		double curFrameTime_ = 0.0;
-		double progress_ = 0.0; // 0 - previous world state, 1 - current world state 
+		double progress_ = 1.0; // 0 - previous world state, 1 - current world state 
 
 		// rendering artifacts
 		static constexpr size_t zlBits = 2ull;
