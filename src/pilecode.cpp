@@ -151,6 +151,9 @@ namespace pilecode {
 		ar::Vec2Si32 off = Pos::ToScreen(d_pos());
 		off.x = ar::Si32(off.x * vp->progress());
 		off.y = ar::Si32(off.y * vp->progress());
+
+		int body_off_y = (int)round(4.0 * sin(vp->progress() * 2.0 * M_PI));
+
 		vp->Draw(&image::g_robotShadow,
 			p->worldX(px_),
 			p->worldY(py_),
@@ -162,7 +165,7 @@ namespace pilecode {
 			p->worldY(py_),
 			p->worldZ(0),
 			2,
-			off);
+			ar::Vec2Si32(off.x, off.y + body_off_y));
 	}
 
 	void Robot::Simulate(World* world)

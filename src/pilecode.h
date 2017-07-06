@@ -22,11 +22,14 @@
 
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include "engine/easy.h"
 #include "engine/vec2si32.h"
 #include "engine/vec3si32.h"
 
 #include <vector>
+#include <cmath>
 
 namespace pilecode {
 
