@@ -45,7 +45,7 @@ class Game {
 public:
 	void Start()
 	{
-		wparams_.reset(new WorldParams(200, 200, 2));
+		wparams_.reset(new WorldParams(200, 200, 3));
 		world_.reset(new World());
 		vp_.reset(new ViewPort(*wparams_));
 
@@ -55,7 +55,7 @@ public:
 			{ 0, 0, 1, 1, 1, 1, 0 },
 			{ 0, 1, 1, 0, 1, 1, 1 },
 			{ 0, 1, 1, 1, 1, 1, 1 },
-			{ 0, 1, 1, 2, 1, 1, 1 },
+			{ 0, 1, 1, 1, 1, 1, 1 },
 			{ 1, 1, 1, 1, 1, 1, 1 },
 			{ 0, 1, 1, 0, 1, 0, 0 }
 		});
@@ -70,15 +70,34 @@ public:
 			});
 
 		Platform* plat3 = new Platform(
-			4, 5, 1,
+			2, 2, 1,
 			{
 				{ 0, 1, 1 },
 				{ 1, 1, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
+				{ 0, 0, 1 },
 			});
+
+		Platform* plat4 = new Platform(
+			1, 7, 2,
+			{
+				{ 1, 1, 1, 1, 1, 1, 1 },
+				{ 1, 1, 1, 1, 1, 1, 1 },
+			});
+
 		world_->AddPlatform(plat1);
 		world_->AddPlatform(plat2);
 		world_->AddPlatform(plat3);
-		world_->AddRobot(new Robot(plat1, 4, 4, Robot::kDirUp));
+		world_->AddPlatform(plat4);
+		world_->AddRobot(new Robot(plat1, 6, 3, Robot::kDirLeft));
+		world_->AddRobot(new Robot(plat2, 1, 1, Robot::kDirRight));
+		world_->AddRobot(new Robot(plat3, 2, 5, Robot::kDirDown));
 	}
 
 	bool Control()
@@ -180,7 +199,9 @@ public:
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
-		vp_->Draw(&image::g_frame, wmouse_, 1);
+		for (int wz = 0; wz <= wmouse_.z; wz++) {
+			vp_->Draw(&image::g_frame, ar::Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
+		}
 		vp_->EndRender();
 
 		ShowFrame();

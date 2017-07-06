@@ -29,7 +29,7 @@ namespace pilecode {
 
 	int Pos::dx = 14 * 4;
 	int Pos::dy = 7 * 4;
-	int Pos::dz = 48 * 4;
+	int Pos::dz = 36 * 4;
 
 	namespace screen {
 		int w = 1680;
@@ -81,7 +81,7 @@ namespace pilecode {
 			Tile* t = tile;
 			for (int x : xdata) {
 				t->set_type(TileType(x));
-				if (t->type() != kTlNone) {
+				if (t->type() != kTlNone && rand()%4 == 0) {
 					t->set_letter(Letter(1+rand()%4));
 				}
 				else {
@@ -296,7 +296,7 @@ namespace pilecode {
 
 	void ViewPort::DecVisibleZ()
 	{
-		if (visible_z_ > 0) {
+		if (visible_z_ > 1) {
 			visible_z_--;
 		}
 	}
