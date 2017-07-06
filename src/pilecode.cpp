@@ -104,6 +104,11 @@ namespace pilecode {
 		}
 	}
 
+	Platform* Platform::Clone()
+	{
+		return new Platform(*this);
+	}
+
 	const Tile* Platform::get_tile(int rx, int ry) const
 	{
 		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
@@ -113,7 +118,7 @@ namespace pilecode {
 		}
 	}
 
-	Robot::Robot(Platform* platform, int x, int y, Direction dir)
+	Robot::Robot(int platform, int x, int y, Direction dir)
 		: platform_(platform)
 		, x_(x), y_(y)
 		, px_(x), py_(y)
@@ -122,26 +127,29 @@ namespace pilecode {
 
 	void Robot::Draw(ViewPort * vp)
 	{
+		Platform* p = vp->world()->platform(platform_);
+
 		ar::Vec2Si32 off = Pos::ToScreen(d_pos());
 		off.x = ar::Si32(off.x * vp->progress());
 		off.y = ar::Si32(off.y * vp->progress());
 		vp->Draw(&image::g_robotShadow,
-			platform_->worldX(px_),
-			platform_->worldY(py_),
-			platform_->worldZ(0),
+			p->worldX(px_),
+			p->worldY(py_),
+			p->worldZ(0),
 			2,
 			off);
 		vp->Draw(&image::g_robot,
-			platform_->worldX(px_),
-			platform_->worldY(py_),
-			platform_->worldZ(0),
+			p->worldX(px_),
+			p->worldY(py_),
+			p->worldZ(0),
 			2,
 			off);
 	}
 
-	void Robot::Simulate()
+	void Robot::Simulate(World* world)
 	{
-		switch (platform_->get_tile(x_, y_)->letter()) {
+		Platform* p = world->platform(platform_);
+		switch (p->get_tile(x_, y_)->letter()) {
 		case kLtSpace:
 			break; // just keep moving
 		case kLtUp:
@@ -181,16 +189,25 @@ namespace pilecode {
 		py_ = y_;
 		int newx = x_ + dx;
 		int newy = y_ + dy;
-		if (platform_->get_tile(newx, newy)->isMovable()) {
+		if (p->get_tile(newx, newy)->isMovable()) {
 			x_ = newx;
 			y_ = newy;
 		}
+	}
+
+	Robot* Robot::Clone()
+	{
+		return new Robot(*this);	
 	}
 
 	ar::Vec2Si32 Robot::d_pos()
 	{
 		return ar::Vec2Si32(x_ - px_, y_ - py_);
 	}
+
+	World::World(const WorldParams & wparams)
+		: wparams_(wparams)
+	{}
 
 	void World::Draw(ViewPort* vp)
 	{
@@ -215,8 +232,20 @@ namespace pilecode {
 	void World::Simulate()
 	{
 		for (const auto& robot : robot_) {
-			robot->Simulate();
+			robot->Simulate(this);
 		}
+	}
+
+	World* World::Clone()
+	{
+		World* clone = new World(wparams_);
+		for (const auto& p : platform_) {
+			clone->AddPlatform(p->Clone());
+		}
+		for (const auto& r : robot_) {
+			clone->AddRobot(r->Clone());
+		}
+		return clone;
 	}
 
 	ViewPort::ViewPort(const WorldParams& wparams)

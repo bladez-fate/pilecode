@@ -43,12 +43,10 @@ bool IsKeyOnce(T t)
 
 class Game {
 public:
-	void Start()
+	World* GenerateWorld()
 	{
-		wparams_.reset(new WorldParams(200, 200, 3));
-		world_.reset(new World());
-		vp_.reset(new ViewPort(*wparams_));
-
+		WorldParams wparams(200, 200, 3);
+		World* world = new World(wparams);
 		Platform* plat1 = new Platform(
 			0, 0, 0,
 		{
@@ -91,27 +89,52 @@ public:
 				{ 1, 1, 1, 1, 1, 1, 1 },
 			});
 
-		world_->AddPlatform(plat1);
-		world_->AddPlatform(plat2);
-		world_->AddPlatform(plat3);
-		world_->AddPlatform(plat4);
-		world_->AddRobot(new Robot(plat1, 6, 3, Robot::kDirLeft));
-		world_->AddRobot(new Robot(plat2, 1, 1, Robot::kDirRight));
-		world_->AddRobot(new Robot(plat3, 2, 5, Robot::kDirDown));
+		world->AddPlatform(plat1);
+		world->AddPlatform(plat2);
+		world->AddPlatform(plat3);
+		world->AddPlatform(plat4);
+		world->AddRobot(new Robot(0, 6, 3, Robot::kDirLeft));
+		world->AddRobot(new Robot(1, 1, 1, Robot::kDirRight));
+		world->AddRobot(new Robot(2, 2, 5, Robot::kDirDown));
+	
+		return world;
+	}
+
+	void Restart()
+	{
+		world_.reset(initWorld_->Clone());
+		vp_->set_world(world_.get());
+
+		lastUpdateTime_ = 0.0;
+		lastControlTime_ = 0.0;
+
+		lastProgress_ = 1.0;
+	}
+
+	void Start()
+	{
+		initWorld_.reset(GenerateWorld());
+		vp_.reset(new ViewPort(initWorld_->params()));
+		Restart();
 	}
 
 	bool Control()
 	{
+		if (IsKey(kKeyEscape)) {
+			return false;
+		}
+
+		if (IsKeyOnce(kKeyF5)) {
+			Restart();
+			return true;
+		}
+
 		double time = Time();
 		if (lastControlTime_ == 0.0) {
 			lastControlTime_ = time;
 		}
 		float dt = float(time - lastControlTime_);
 		lastControlTime_ = time;
-
-		if (IsKey(kKeyEscape)) {
-			return false;
-		}
 
 		if (IsKey(kKeyUp)) {
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, 1.0f));
@@ -212,6 +235,7 @@ private:
 
 	// world
 	std::unique_ptr<WorldParams> wparams_;
+	std::unique_ptr<World> initWorld_;
 	std::unique_ptr<World> world_;
 	std::unique_ptr<ViewPort> vp_;
 

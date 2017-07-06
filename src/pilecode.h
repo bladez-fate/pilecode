@@ -94,6 +94,7 @@ namespace pilecode {
 	public:
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
+		Platform* Clone();
 
 		const Tile* get_tile(int rx, int ry) const;
 		
@@ -121,14 +122,15 @@ namespace pilecode {
 			kDirDown,
 		};
 	public:
-		Robot(Platform* platform, int x, int y, Direction dir);
+		Robot(int platform, int x, int y, Direction dir);
 		void Draw(ViewPort* vp);
-		void Simulate();
+		void Simulate(World* world);
+		Robot* Clone();
 
 		ar::Vec2Si32 d_pos();
 	private:
 		// robot is currently on this platform
-		Platform* platform_;
+		int platform_;
 
 		// coordinates are relative to platform
 		int x_;
@@ -164,6 +166,8 @@ namespace pilecode {
 
 	class World {
 	public:
+		explicit World(const WorldParams& wparams);
+
 		// rendering
 		void Draw(ViewPort* vp);
 
@@ -173,7 +177,16 @@ namespace pilecode {
 
 		// simulation
 		void Simulate();
+
+		// utility
+		World* Clone();
+
+		// accessors
+		Platform* platform(int i) const { return platform_[i].get(); }
+		Robot* robot(int i) const { return robot_[i].get(); }
+		const WorldParams& params() const { return wparams_; }
 	private:
+		WorldParams wparams_;
 		std::vector<std::shared_ptr<Platform>> platform_;
 		std::vector<std::shared_ptr<Robot>> robot_;
 	};
@@ -293,11 +306,17 @@ namespace pilecode {
 		// transformations
 		ar::Vec3Si32 ToWorld(ar::Vec2Si32 p) const;
 
+		// world-related
+		World* world() const { return world_; }
+		void set_world(World* world) { world_ = world;  }
+
 	private:
 		Pos GetPos(int wx, int wy, int wz = 0);
 
 	private:
+		// world
 		WorldParams wparams_;
+		World* world_ = nullptr;
 
 		// screen coordinates of origin
 		int cx_ = screen::cx;
