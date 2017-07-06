@@ -195,7 +195,7 @@ namespace pilecode {
 
 		Pos(int _wx, int _wy, int _wz)
 			: x(dx * (_wy - _wx))
-			, y(-dy * (_wx + _wy))
+			, y(-dy * (_wx + _wy) + dz *_wz)
 			, wx(_wx), wy(_wy), wz(_wz)
 		{}
 
@@ -256,21 +256,42 @@ namespace pilecode {
 		{
 			return Pos(w).Screen();
 		}
+
+		static ar::Vec3Si32 ToWorld(ar::Vec2Si32 s, int wz)
+		{
+			s.y -= dz * wz;
+			int wx = int(-(float(s.x) / dx + float(s.y) / dy) / 2);
+			int wy = int((float(s.x) / dx - float(s.y) / dy) / 2);
+
+			return ar::Vec3Si32(wx, wy, wz);
+		}
 	};
 
 	class ViewPort {
 	public:
 		ViewPort(const WorldParams& wparams);
+
+		// drawing
 		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zlayer, ar::Vec2Si32 off);
+		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zlayer);
+		void Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zlayer, ar::Vec2Si32 off);
+		void Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zlayer);
+
+		// rendering
 		void BeginRender(double time);
 		void EndRender();
 
+		// navigation
 		void Move(ar::Vec2F delta);
 		void IncVisibleZ();
 		void DecVisibleZ();
 
+		// simulation support
 		double progress() const { return progress_; }
 		void set_progress(double progress) { progress_ = progress; }
+
+		// transformations
+		ar::Vec3Si32 ToWorld(ar::Vec2Si32 p) const;
 
 	private:
 		Pos GetPos(int wx, int wy, int wz = 0);

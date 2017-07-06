@@ -135,7 +135,7 @@ public:
 			simSpeed_ = 8.0;
 		}
 
-		//ar::Vsec2Si32 mouse = ae::MousePos();
+		wmouse_ = vp_->ToWorld(ae::MousePos());
 
 		return true;
 	}
@@ -180,6 +180,7 @@ public:
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
+		vp_->Draw(&image::g_frame, wmouse_, 1);
 		vp_->EndRender();
 
 		ShowFrame();
@@ -202,6 +203,9 @@ private:
 	double lastProgress_ = 1.0;
 	bool simPaused_ = false;
 	double simSpeed_ = 1.0;
+
+	// gameplay
+	Vec3Si32 wmouse_;
 };
 
 void Init()

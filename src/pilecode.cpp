@@ -235,6 +235,21 @@ namespace pilecode {
 		rlist.emplace_back(RenderCmnd(sprite, off));
 	}
 
+	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zl)
+	{
+		Draw(sprite, wx, wy, wz, zl, ar::Vec2Si32(0, 0));
+	}
+
+	void ViewPort::Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zl, ar::Vec2Si32 off)
+	{
+		Draw(sprite, w.x, w.y, w.z, zl, off);
+	}
+
+	void ViewPort::Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zl)
+	{
+		Draw(sprite, w, zl, ar::Vec2Si32(0, 0));
+	}
+
 	void ViewPort::BeginRender(double time)
 	{
 		curFrameTime_ = time;
@@ -286,10 +301,18 @@ namespace pilecode {
 		}
 	}
 
+	ar::Vec3Si32 ViewPort::ToWorld(ar::Vec2Si32 p) const
+	{
+		p.x -= cx_ + int(x_ + 0.5f);
+		p.y -= cy_ + int(y_ + 0.5f);
+		p.x -= 64;
+		p.y -= 256 - 174;
+		return Pos::ToWorld(p, int(visible_z_) - 1);
+	}
+
 	Pos ViewPort::GetPos(int wx, int wy, int wz)
 	{
 		Pos p(wx, wy, wz);
-
 		p.x += cx_ + int(x_ + 0.5f);
 		p.y += cy_ + int(y_ + 0.5f);
 		return p;
