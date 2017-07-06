@@ -95,13 +95,20 @@ namespace pilecode {
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
 		Platform* Clone();
+		void ChangeLetter(int rx, int ry);
 
+		Tile* changable_tile(int rx, int ry);
 		const Tile* get_tile(int rx, int ry) const;
-		
+
 		// converts coordinates relative to platform to world's frame
 		int worldX(int rx) const { return rx + x_; }
 		int worldY(int ry) const { return ry + y_; }
 		int worldZ(int rz) const { return rz + z_; }
+
+		// converts coordinates relative to platform to world's frame
+		int PlatformX(int rx) const { return rx - x_; }
+		int PlatformY(int ry) const { return ry - y_; }
+		int PlatformZ(int rz) const { return rz - z_; }
 	private:
 		int x_;
 		int y_;
@@ -174,6 +181,7 @@ namespace pilecode {
 		// construction
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
+		void ChangeLetter(ar::Vec3Si32 w);
 
 		// simulation
 		void Simulate();

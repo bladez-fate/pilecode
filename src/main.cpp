@@ -179,6 +179,10 @@ public:
 
 		wmouse_ = vp_->ToWorld(ae::MousePos());
 
+		if (IsKeyOnce(kKeyMouseLeft)) {
+			world_->ChangeLetter(wmouse_);
+		}
+
 		return true;
 	}
 

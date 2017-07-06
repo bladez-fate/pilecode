@@ -29,7 +29,7 @@ namespace pilecode {
 
 	int Pos::dx = 14 * 4;
 	int Pos::dy = 7 * 4;
-	int Pos::dz = 36 * 4;
+	int Pos::dz = 25 * 4;
 
 	namespace screen {
 		int w = 1680;
@@ -109,11 +109,30 @@ namespace pilecode {
 		return new Platform(*this);
 	}
 
-	const Tile* Platform::get_tile(int rx, int ry) const
+	void Platform::ChangeLetter(int rx, int ry)
+	{
+		if (Tile* tile = changable_tile(rx, ry)) {
+			if (tile->isMovable()) {
+				tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
+			}
+		}
+	}
+
+	Tile* Platform::changable_tile(int rx, int ry)
 	{
 		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
 			return &tiles_[ry * w_ + rx];
 		} else {
+			return nullptr;
+		}
+	}
+
+	const Tile* Platform::get_tile(int rx, int ry) const
+	{
+		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
+			return &tiles_[ry * w_ + rx];
+		}
+		else {
 			return Tile::none();
 		}
 	}
@@ -227,6 +246,15 @@ namespace pilecode {
 	void World::AddRobot(Robot * robot)
 	{
 		robot_.emplace_back(robot);
+	}
+
+	void World::ChangeLetter(ar::Vec3Si32 w)
+	{
+		for (const auto& p : platform_) {
+			if (p->worldZ(0) == w.z) {
+				p->ChangeLetter(p->PlatformX(w.x), p->PlatformY(w.y));
+			}
+		}
 	}
 
 	void World::Simulate()
