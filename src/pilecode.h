@@ -73,15 +73,19 @@ namespace pilecode {
 
 	class Tile {
 	public:
-		Tile();
+		// rendering
 		void Draw(ViewPort* vp, int wx, int wy, int wz);
 
-		bool isMovable() const;
+		// simulation
+		Letter ReadLetter();
+
+		bool IsMovable() const;
 
 		TileType type() const { return type_;  }
 		Letter letter() const { return letter_;  }
 		void set_type(TileType type) { type_ = type;  }
 		void set_letter(Letter letter) { letter_ = letter; }
+		bool touched() const { return touched_; }
 
 		static const Tile* none()
 		{
@@ -89,8 +93,9 @@ namespace pilecode {
 			return &noneTile;
 		}
 	private:
-		TileType type_;
-		Letter letter_;
+		TileType type_ = kTlNone;
+		Letter letter_ = kLtSpace;
+		bool touched_ = false;
 	};
 
 	class Platform {
@@ -185,6 +190,7 @@ namespace pilecode {
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
 		void ChangeLetter(ar::Vec3Si32 w);
+		bool IsTouched(ar::Vec3Si32 w);
 
 		// simulation
 		void Simulate();

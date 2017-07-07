@@ -180,7 +180,13 @@ public:
 		wmouse_ = vp_->ToWorld(ae::MousePos());
 
 		if (IsKeyOnce(kKeyMouseLeft)) {
-			world_->ChangeLetter(wmouse_);
+			if (world_->IsTouched(wmouse_)) {
+				// TODO: play forbidden sound and text reason
+			}
+			else {
+				world_->ChangeLetter(wmouse_);
+				initWorld_->ChangeLetter(wmouse_);
+			}
 		}
 
 		return true;
