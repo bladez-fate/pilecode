@@ -179,13 +179,18 @@ namespace pilecode {
 			kDirDown,
 		};
 	public:
-		Robot(int platform, int x, int y, Direction dir);
+		Robot(int platform, int x, int y);
 		void Draw(ViewPort* vp);
 		void SimulateExec(World* world);
 		void SimulateMove(World* world);
 		Robot* Clone();
 
 		ar::Vec2Si32 d_pos();
+
+		// accessors
+		int platform() const { return platform_; }
+		int x() const { return x_; }
+		int y() const { return y_; }
 	private:
 		// robot configuration
 		const int seed_;
@@ -200,7 +205,7 @@ namespace pilecode {
 		int py_; // previous state 
 
 		// simulation state
-		Direction dir_; // direction of motion
+		Direction dir_ = kDirHalt; // direction of motion
 		Letter reg_ = kLtSpace; // robot has one register that can hold a letter
 		bool blocked_ = false; // robot blocks if it cannot execute current instruction
 	};
@@ -216,6 +221,7 @@ namespace pilecode {
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
 		void SwitchLetter(ar::Vec3Si32 w);
+		void SwitchRobot(ar::Vec3Si32 w);
 		bool IsTouched(ar::Vec3Si32 w);
 
 		// simulation

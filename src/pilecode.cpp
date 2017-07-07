@@ -211,12 +211,11 @@ namespace pilecode {
 		}
 	}
 
-	Robot::Robot(int platform, int x, int y, Direction dir)
+	Robot::Robot(int platform, int x, int y)
 		: seed_(rand())
 		, platform_(platform)
 		, x_(x), y_(y)
 		, px_(x), py_(y)
-		, dir_(dir)
 	{}
 
 	void Robot::Draw(ViewPort * vp)
@@ -380,6 +379,25 @@ namespace pilecode {
 				p->SwitchLetter(p->PlatformX(w.x), p->PlatformY(w.y));
 			}
 		}
+	}
+
+	void World::SwitchRobot(ar::Vec3Si32 w)
+	{
+		Platform* p = FindPlatform(w);
+		int rx = p->PlatformX(w.x);
+		int ry = p->PlatformY(w.y);
+
+		// try find robot to remove
+		for (auto i = robot_.begin(), e = robot_.end(); i != e; ++i) {
+			Robot* r = i->get();
+			if (r->platform() == p->index() && rx == r->x() && ry == r->y()) {
+				robot_.erase(i);
+				return;
+			}
+		}
+
+		// if no robot is under cursor - create one
+		AddRobot(new Robot(p->index(), rx, ry));
 	}
 
 	bool World::IsTouched(ar::Vec3Si32 w)
