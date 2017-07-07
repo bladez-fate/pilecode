@@ -98,6 +98,34 @@ namespace pilecode {
 		bool touched_ = false;
 	};
 
+	class WorldData {
+	public:
+		explicit WorldData(size_t zsize);
+		ae::Sprite* TileSprite(int wz, TileType type);
+	private:
+		std::vector<std::vector<ae::Sprite>> tileSprite_; // tile_[wz][tileType]
+	};
+
+	class WorldParams {
+	public:
+		WorldParams(size_t xsize, size_t ysize, size_t zsize);
+
+		size_t xsize() const { return xsize_; }
+		size_t ysize() const { return ysize_; }
+		size_t zsize() const { return zsize_; }
+		WorldData& data() { return *data_; }
+
+		size_t size() const { return xyzsize_; }
+		size_t index(int x, int y, int z) const { return z * xysize_ + y * xsize_ + x; }
+	private:
+		size_t xsize_;
+		size_t ysize_;
+		size_t zsize_;
+		size_t xysize_;
+		size_t xyzsize_;
+		std::shared_ptr<WorldData> data_;
+	};
+
 	class Platform {
 	public:
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
@@ -160,28 +188,6 @@ namespace pilecode {
 		Direction dir_;
 	};
 
-	class WorldParams {
-	public:
-		WorldParams(size_t xsize, size_t ysize, size_t zsize)
-			: xsize_(xsize), ysize_(ysize), zsize_(zsize)
-			, xysize_(xsize * ysize)
-			, xyzsize_(xsize * ysize * zsize)
-		{}
-
-		size_t xsize() const { return xsize_; }
-		size_t ysize() const { return ysize_; }
-		size_t zsize() const { return zsize_; }
-		
-		size_t size() const { return xyzsize_; }
-		size_t index(int x, int y, int z) const { return z * xysize_ + y * xsize_ + x;  }
-	private:
-		size_t xsize_;
-		size_t ysize_;
-		size_t zsize_;
-		size_t xysize_;
-		size_t xyzsize_;
-	};
-
 	class World {
 	public:
 		explicit World(const WorldParams& wparams);
@@ -204,7 +210,7 @@ namespace pilecode {
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
 		Robot* robot(int i) const { return robot_[i].get(); }
-		const WorldParams& params() const { return wparams_; }
+		WorldParams& params() { return wparams_; }
 	private:
 		WorldParams wparams_;
 		std::vector<std::shared_ptr<Platform>> platform_;

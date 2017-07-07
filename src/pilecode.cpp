@@ -42,7 +42,8 @@ namespace pilecode {
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz)
 	{
 		if (type_ != kTlNone) {
-			vp->Draw(&image::g_tile[type_], wx, wy, wz, 1, ar::Vec2Si32(0, 0));
+			ae::Sprite* sprite = vp->world()->params().data().TileSprite(wz, type_);
+			vp->Draw(sprite, wx, wy, wz, 1, ar::Vec2Si32(0, 0));
 		}
 		if (letter_ != kLtSpace) {
 			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, ar::Vec2Si32(0, 0));
@@ -59,6 +60,44 @@ namespace pilecode {
 	{
 		return type_ != kTlNone;
 	}
+
+	WorldData::WorldData(size_t zsize)
+	{
+		tileSprite_.resize(zsize);
+		for (int wz = 0; wz < zsize; wz++) {
+			auto& ts = tileSprite_[wz];
+			ts.resize(kTlMax);
+			float alpha = float(wz) / (zsize - 1);
+			for (int i = 0; i < kTlMax; i++) {
+				TileType t = TileType(i);
+				ae::Sprite& src = image::g_tile[t];
+				ae::Sprite& dst = ts[i];
+				dst.Create(src.Width(), src.Height());
+				ar::Rgba* srcIt = src.RgbaData();
+				ar::Rgba* dstIt = dst.RgbaData();
+				size_t left = src.Width() * src.Height();
+				for (; left > 0; srcIt++, dstIt++, left--) {
+					*dstIt = *srcIt;
+					ar::Si16 gdelta = ar::Si16(dstIt->g * alpha);
+					ar::Si16 bdelta = ar::Si16(dstIt->b * alpha);
+					dstIt->g += bdelta - gdelta;
+					dstIt->b += gdelta - bdelta;
+				}
+			}
+		}
+	}
+
+	ae::Sprite* WorldData::TileSprite(int wz, TileType type)
+	{
+		return &tileSprite_[wz][type];
+	}
+
+	WorldParams::WorldParams(size_t xsize, size_t ysize, size_t zsize)
+		: xsize_(xsize), ysize_(ysize), zsize_(zsize)
+		, xysize_(xsize * ysize)
+		, xyzsize_(xsize * ysize * zsize)
+		, data_(new WorldData(zsize))
+	{}
 
 	Platform::Platform(int x, int y, int z,
 		std::initializer_list<std::initializer_list<int>> data)
