@@ -141,17 +141,24 @@ namespace pilecode {
 		bool ReadLetter(int rx, int ry, Letter& letter);
 		bool WriteLetter(int rx, int ry, Letter letter);
 
-		// converts coordinates relative to platform to world's frame
+		// transforms coordinates relative to platform to world's frame
 		int worldX(int rx) const { return rx + x_; }
 		int worldY(int ry) const { return ry + y_; }
 		int worldZ(int rz) const { return rz + z_; }
 		ar::Vec3Si32 ToWorld(int rx, int ry, int rz) const { return ar::Vec3Si32(rx + x_, ry + y_, rz + z_); }
 
-		// converts coordinates relative to platform to world's frame
-		int PlatformX(int rx) const { return rx - x_; }
-		int PlatformY(int ry) const { return ry - y_; }
-		int PlatformZ(int rz) const { return rz - z_; }
+		// inverse transform
+		int PlatformX(int wx) const { return wx - x_; }
+		int PlatformY(int wy) const { return wy - y_; }
+		int PlatformZ(int wz) const { return wz - z_; }
+
+		// accessors
+		int index() const { return index_; }
+		void set_index(int index) { index_ = index; }
+
 	private:
+		int index_;
+
 		int x_;
 		int y_;
 		int z_;
@@ -165,6 +172,7 @@ namespace pilecode {
 	class Robot {
 	public:
 		enum Direction {
+			kDirHalt,
 			kDirRight,
 			kDirUp,
 			kDirLeft,
@@ -173,7 +181,8 @@ namespace pilecode {
 	public:
 		Robot(int platform, int x, int y, Direction dir);
 		void Draw(ViewPort* vp);
-		void Simulate(World* world);
+		void SimulateExec(World* world);
+		void SimulateMove(World* world);
 		Robot* Clone();
 
 		ar::Vec2Si32 d_pos();
@@ -192,7 +201,8 @@ namespace pilecode {
 
 		// simulation state
 		Direction dir_; // direction of motion
-		Letter reg_ = kLtSpace;
+		Letter reg_ = kLtSpace; // robot has one register that can hold a letter
+		bool blocked_ = false; // robot blocks if it cannot execute current instruction
 	};
 
 	class World {
@@ -212,9 +222,11 @@ namespace pilecode {
 		void Simulate();
 		bool ReadLetter(ar::Vec3Si32 w, Letter& letter);
 		bool WriteLetter(ar::Vec3Si32 w, Letter letter);
+		bool IsMovable(ar::Vec3Si32 w);
 
 		// utility
 		World* Clone();
+		Platform* FindPlatform(ar::Vec3Si32 w);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
