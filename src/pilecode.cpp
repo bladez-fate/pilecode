@@ -402,6 +402,7 @@ namespace pilecode {
 		for (const auto& robot : robot_) {
 			robot->SimulateMove(this);
 		}
+		steps_++;
 	}
 
 	bool World::ReadLetter(ar::Vec3Si32 w, Letter& letter)

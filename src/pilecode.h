@@ -232,10 +232,12 @@ namespace pilecode {
 		Platform* platform(int i) const { return platform_[i].get(); }
 		Robot* robot(int i) const { return robot_[i].get(); }
 		WorldParams& params() { return wparams_; }
+		size_t steps() const { return steps_; }
 	private:
 		WorldParams wparams_;
 		std::vector<std::shared_ptr<Platform>> platform_;
 		std::vector<std::shared_ptr<Robot>> robot_;
+		size_t steps_ = 0;
 	};
 
 	struct Pos {
