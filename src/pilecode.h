@@ -134,7 +134,7 @@ namespace pilecode {
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
 		Platform* Clone();
-		void ChangeLetter(int rx, int ry);
+		void SwitchLetter(int rx, int ry);
 
 		Tile* changable_tile(int rx, int ry);
 		const Tile* get_tile(int rx, int ry) const;
@@ -215,7 +215,7 @@ namespace pilecode {
 		// construction
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
-		void ChangeLetter(ar::Vec3Si32 w);
+		void SwitchLetter(ar::Vec3Si32 w);
 		bool IsTouched(ar::Vec3Si32 w);
 
 		// simulation

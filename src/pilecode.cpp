@@ -156,7 +156,7 @@ namespace pilecode {
 		return new Platform(*this);
 	}
 
-	void Platform::ChangeLetter(int rx, int ry)
+	void Platform::SwitchLetter(int rx, int ry)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsMovable()) {
@@ -373,11 +373,11 @@ namespace pilecode {
 		robot_.emplace_back(robot);
 	}
 
-	void World::ChangeLetter(ar::Vec3Si32 w)
+	void World::SwitchLetter(ar::Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
-				p->ChangeLetter(p->PlatformX(w.x), p->PlatformY(w.y));
+				p->SwitchLetter(p->PlatformX(w.x), p->PlatformY(w.y));
 			}
 		}
 	}

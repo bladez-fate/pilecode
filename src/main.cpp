@@ -184,8 +184,8 @@ public:
 				// TODO: play forbidden sound and text reason
 			}
 			else {
-				world_->ChangeLetter(wmouse_);
-				initWorld_->ChangeLetter(wmouse_);
+				world_->SwitchLetter(wmouse_);
+				initWorld_->SwitchLetter(wmouse_);
 			}
 		}
 
