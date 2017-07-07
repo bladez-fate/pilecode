@@ -142,9 +142,9 @@ namespace pilecode {
 		bool WriteLetter(int rx, int ry, Letter letter);
 
 		// transforms coordinates relative to platform to world's frame
-		int worldX(int rx) const { return rx + x_; }
-		int worldY(int ry) const { return ry + y_; }
-		int worldZ(int rz) const { return rz + z_; }
+		int WorldX(int rx) const { return rx + x_; }
+		int WorldY(int ry) const { return ry + y_; }
+		int WorldZ(int rz) const { return rz + z_; }
 		ar::Vec3Si32 ToWorld(int rx, int ry, int rz) const { return ar::Vec3Si32(rx + x_, ry + y_, rz + z_); }
 
 		// inverse transform

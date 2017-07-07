@@ -144,7 +144,7 @@ namespace pilecode {
 		Tile* tile = &tiles_[0];
 		for (int iy = 0; iy < h_; iy++) {
 			for (int ix = 0; ix < w_; ix++) {
-				tile->Draw(vp, worldX(ix), worldY(iy), z_);
+				tile->Draw(vp, WorldX(ix), WorldY(iy), z_);
 				tile++;
 			}
 		}
@@ -229,15 +229,15 @@ namespace pilecode {
 		int body_off_y = (int)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
 
 		vp->Draw(&image::g_robotShadow,
-			p->worldX(px_),
-			p->worldY(py_),
-			p->worldZ(0),
+			p->WorldX(px_),
+			p->WorldY(py_),
+			p->WorldZ(0),
 			2,
 			off);
 		vp->Draw(&image::g_robot,
-			p->worldX(px_),
-			p->worldY(py_),
-			p->worldZ(0),
+			p->WorldX(px_),
+			p->WorldY(py_),
+			p->WorldZ(0),
 			2,
 			ar::Vec2Si32(off.x, off.y + body_off_y));
 	}
@@ -375,7 +375,7 @@ namespace pilecode {
 	void World::ChangeLetter(ar::Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				p->ChangeLetter(p->PlatformX(w.x), p->PlatformY(w.y));
 			}
 		}
@@ -384,7 +384,7 @@ namespace pilecode {
 	bool World::IsTouched(ar::Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				if (p->get_tile(p->PlatformX(w.x), p->PlatformY(w.y))->touched()) {
 					return true;
 				}
@@ -406,7 +406,7 @@ namespace pilecode {
 	bool World::ReadLetter(ar::Vec3Si32 w, Letter& letter)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				if (p->ReadLetter(p->PlatformX(w.x), p->PlatformY(w.y), letter)) {
 					return true;
 				}
@@ -418,7 +418,7 @@ namespace pilecode {
 	bool World::WriteLetter(ar::Vec3Si32 w, Letter letter)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				if (p->WriteLetter(p->PlatformX(w.x), p->PlatformY(w.y), letter)) {
 					return true;
 				}
@@ -430,7 +430,7 @@ namespace pilecode {
 	bool World::IsMovable(ar::Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				if (Tile* tile = p->changable_tile(p->PlatformX(w.x), p->PlatformY(w.y))) {
 					return tile->IsMovable();
 				}
@@ -454,7 +454,7 @@ namespace pilecode {
 	Platform* World::FindPlatform(ar::Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
-			if (p->worldZ(0) == w.z) {
+			if (p->WorldZ(0) == w.z) {
 				if (Tile* tile = p->changable_tile(p->PlatformX(w.x), p->PlatformY(w.y))) {
 					if (tile->type() != kTlNone) {
 						return p.get();
