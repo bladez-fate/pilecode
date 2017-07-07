@@ -43,6 +43,8 @@ namespace pilecode {
 		image::g_letter[kLtDown].Load("data/letter-down.tga");
 		image::g_letter[kLtRight].Load("data/letter-right.tga");
 		image::g_letter[kLtLeft].Load("data/letter-left.tga");
+		image::g_letter[kLtRead].Load("data/letter-read.tga");
+		image::g_letter[kLtWrite].Load("data/letter-write.tga");
 
 		image::g_frame.Load("data/letter-frame.tga");
 		image::g_robot.Load("data/robot.tga");

@@ -67,6 +67,8 @@ namespace pilecode {
 		kLtDown,           // y-
 		kLtRight,          // x+
 		kLtLeft,           // x-
+		kLtRead,           // read letter from upper platform into register
+		kLtWrite,          // write letter from register to upper platform
 
 		kLtMax		
 	};
@@ -78,6 +80,7 @@ namespace pilecode {
 
 		// simulation
 		Letter ReadLetter();
+		void WriteLetter(Letter letter);
 
 		bool IsMovable() const;
 
@@ -135,11 +138,14 @@ namespace pilecode {
 
 		Tile* changable_tile(int rx, int ry);
 		const Tile* get_tile(int rx, int ry) const;
+		bool ReadLetter(int rx, int ry, Letter& letter);
+		bool WriteLetter(int rx, int ry, Letter letter);
 
 		// converts coordinates relative to platform to world's frame
 		int worldX(int rx) const { return rx + x_; }
 		int worldY(int ry) const { return ry + y_; }
 		int worldZ(int rz) const { return rz + z_; }
+		ar::Vec3Si32 ToWorld(int rx, int ry, int rz) const { return ar::Vec3Si32(rx + x_, ry + y_, rz + z_); }
 
 		// converts coordinates relative to platform to world's frame
 		int PlatformX(int rx) const { return rx - x_; }
@@ -184,8 +190,9 @@ namespace pilecode {
 		int px_; // previous state
 		int py_; // previous state 
 
-		// direction of motion
-		Direction dir_;
+		// simulation state
+		Direction dir_; // direction of motion
+		Letter reg_ = kLtSpace;
 	};
 
 	class World {
@@ -203,6 +210,8 @@ namespace pilecode {
 
 		// simulation
 		void Simulate();
+		bool ReadLetter(ar::Vec3Si32 w, Letter& letter);
+		bool WriteLetter(ar::Vec3Si32 w, Letter letter);
 
 		// utility
 		World* Clone();

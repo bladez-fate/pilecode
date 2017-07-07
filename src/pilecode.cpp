@@ -56,6 +56,12 @@ namespace pilecode {
 		return letter();
 	}
 
+	void Tile::WriteLetter(Letter letter)
+	{
+		touched_ = true;
+		set_letter(letter);
+	}
+
 	bool Tile::IsMovable() const
 	{
 		return type_ != kTlNone;
@@ -177,6 +183,33 @@ namespace pilecode {
 		}
 	}
 
+	bool Platform::ReadLetter(int rx, int ry, Letter& letter)
+	{
+		if (Tile* tile = changable_tile(rx, ry)) {
+			letter = tile->ReadLetter();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool Platform::WriteLetter(int rx, int ry, Letter letter)
+	{
+		if (Tile* tile = changable_tile(rx, ry)) {
+			if (tile->IsMovable()) {
+				tile->WriteLetter(letter);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+
 	Robot::Robot(int platform, int x, int y, Direction dir)
 		: seed_(rand())
 		, platform_(platform)
@@ -212,7 +245,11 @@ namespace pilecode {
 	void Robot::Simulate(World* world)
 	{
 		Platform* p = world->platform(platform_);
+		ar::Vec3Si32 w = p->ToWorld(x_, y_, 0);
+		ar::Vec3Si32 wu = w;
+		wu.z++;
 		if (Tile* cur_tile = p->changable_tile(x_, y_)) {
+			bool success = true;
 			if (cur_tile->IsMovable()) {
 				switch (cur_tile->ReadLetter()) {
 				case kLtSpace:
@@ -229,34 +266,47 @@ namespace pilecode {
 				case kLtLeft:
 					dir_ = kDirLeft;
 					break;
-				}
-				int dx;
-				int dy;
-				switch (dir_) {
-				case kDirRight:
-					dx = 1;
-					dy = 0;
+				case kLtRead:
+					success = world->ReadLetter(wu, reg_);
 					break;
-				case kDirUp:
-					dx = 0;
-					dy = 1;
-					break;
-				case kDirLeft:
-					dx = -1;
-					dy = 0;
-					break;
-				case kDirDown:
-					dx = 0;
-					dy = -1;
+				case kLtWrite:
+					success = world->WriteLetter(wu, reg_);
 					break;
 				}
-				px_ = x_;
-				py_ = y_;
-				int newx = x_ + dx;
-				int newy = y_ + dy;
-				if (p->get_tile(newx, newy)->IsMovable()) {
-					x_ = newx;
-					y_ = newy;
+
+				if (success) {
+					int dx;
+					int dy;
+					switch (dir_) {
+					case kDirRight:
+						dx = 1;
+						dy = 0;
+						break;
+					case kDirUp:
+						dx = 0;
+						dy = 1;
+						break;
+					case kDirLeft:
+						dx = -1;
+						dy = 0;
+						break;
+					case kDirDown:
+						dx = 0;
+						dy = -1;
+						break;
+					}
+					px_ = x_;
+					py_ = y_;
+					int newx = x_ + dx;
+					int newy = y_ + dy;
+					if (p->get_tile(newx, newy)->IsMovable()) {
+						x_ = newx;
+						y_ = newy;
+					}
+				}
+				else {
+					px_ = x_;
+					py_ = y_;
 				}
 			}
 		}
@@ -322,6 +372,30 @@ namespace pilecode {
 		for (const auto& robot : robot_) {
 			robot->Simulate(this);
 		}
+	}
+
+	bool World::ReadLetter(ar::Vec3Si32 w, Letter& letter)
+	{
+		for (const auto& p : platform_) {
+			if (p->worldZ(0) == w.z) {
+				if (p->ReadLetter(p->PlatformX(w.x), p->PlatformY(w.y), letter)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool World::WriteLetter(ar::Vec3Si32 w, Letter letter)
+	{
+		for (const auto& p : platform_) {
+			if (p->worldZ(0) == w.z) {
+				if (p->WriteLetter(p->PlatformX(w.x), p->PlatformY(w.y), letter)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	World* World::Clone()
