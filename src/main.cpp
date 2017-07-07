@@ -45,7 +45,7 @@ class Game {
 public:
 	World* GenerateWorld()
 	{
-		WorldParams wparams(200, 200, 3);
+		WorldParams wparams(200, 200, 3, 4);
 		World* world = new World(wparams);
 		Platform* plat1 = new Platform(
 			0, 0, 0,

@@ -39,10 +39,10 @@ namespace pilecode {
 		size_t size = w*h;
 	}
 
-	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz)
+	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz, int color)
 	{
 		if (type_ != kTlNone) {
-			ae::Sprite* sprite = vp->world()->params().data().TileSprite(wz, type_);
+			ae::Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
 			vp->Draw(sprite, wx, wy, wz, 1, ar::Vec2Si32(0, 0));
 		}
 		if (letter_ != kLtSpace) {
@@ -67,13 +67,13 @@ namespace pilecode {
 		return type_ != kTlNone;
 	}
 
-	WorldData::WorldData(size_t zsize)
+	WorldData::WorldData(size_t colors)
 	{
-		tileSprite_.resize(zsize);
-		for (int wz = 0; wz < zsize; wz++) {
+		tileSprite_.resize(colors);
+		for (int wz = 0; wz < colors; wz++) {
 			auto& ts = tileSprite_[wz];
 			ts.resize(kTlMax);
-			float alpha = float(wz) / (zsize - 1);
+			float alpha = float(wz) / (colors - 1);
 			for (int i = 0; i < kTlMax; i++) {
 				TileType t = TileType(i);
 				ae::Sprite& src = image::g_tile[t];
@@ -93,16 +93,17 @@ namespace pilecode {
 		}
 	}
 
-	ae::Sprite* WorldData::TileSprite(int wz, TileType type)
+	ae::Sprite* WorldData::TileSprite(int color, TileType type)
 	{
-		return &tileSprite_[wz][type];
+		color = color % tileSprite_.size();
+		return &tileSprite_[color][type];
 	}
 
-	WorldParams::WorldParams(size_t xsize, size_t ysize, size_t zsize)
+	WorldParams::WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors)
 		: xsize_(xsize), ysize_(ysize), zsize_(zsize)
 		, xysize_(xsize * ysize)
 		, xyzsize_(xsize * ysize * zsize)
-		, data_(new WorldData(zsize))
+		, data_(new WorldData(colors))
 	{}
 
 	Platform::Platform(int x, int y, int z,
@@ -144,7 +145,7 @@ namespace pilecode {
 		Tile* tile = &tiles_[0];
 		for (int iy = 0; iy < h_; iy++) {
 			for (int ix = 0; ix < w_; ix++) {
-				tile->Draw(vp, WorldX(ix), WorldY(iy), z_);
+				tile->Draw(vp, WorldX(ix), WorldY(iy), z_, index());
 				tile++;
 			}
 		}

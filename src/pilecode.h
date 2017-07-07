@@ -76,7 +76,7 @@ namespace pilecode {
 	class Tile {
 	public:
 		// rendering
-		void Draw(ViewPort* vp, int wx, int wy, int wz);
+		void Draw(ViewPort* vp, int wx, int wy, int wz, int color);
 
 		// simulation
 		Letter ReadLetter();
@@ -103,15 +103,15 @@ namespace pilecode {
 
 	class WorldData {
 	public:
-		explicit WorldData(size_t zsize);
-		ae::Sprite* TileSprite(int wz, TileType type);
+		explicit WorldData(size_t colors);
+		ae::Sprite* TileSprite(int color, TileType type);
 	private:
-		std::vector<std::vector<ae::Sprite>> tileSprite_; // tile_[wz][tileType]
+		std::vector<std::vector<ae::Sprite>> tileSprite_; // tile_[color][tileType]
 	};
 
 	class WorldParams {
 	public:
-		WorldParams(size_t xsize, size_t ysize, size_t zsize);
+		WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors);
 
 		size_t xsize() const { return xsize_; }
 		size_t ysize() const { return ysize_; }
