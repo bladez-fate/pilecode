@@ -139,7 +139,8 @@ namespace pilecode {
 	}
 
 	Robot::Robot(int platform, int x, int y, Direction dir)
-		: platform_(platform)
+		: seed_(rand())
+		, platform_(platform)
 		, x_(x), y_(y)
 		, px_(x), py_(y)
 		, dir_(dir)
@@ -153,7 +154,7 @@ namespace pilecode {
 		off.x = ar::Si32(off.x * vp->progress());
 		off.y = ar::Si32(off.y * vp->progress());
 
-		int body_off_y = (int)round(4.0 * sin(vp->progress() * 2.0 * M_PI));
+		int body_off_y = (int)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
 
 		vp->Draw(&image::g_robotShadow,
 			p->worldX(px_),

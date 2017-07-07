@@ -144,6 +144,9 @@ namespace pilecode {
 
 		ar::Vec2Si32 d_pos();
 	private:
+		// robot configuration
+		const int seed_;
+
 		// robot is currently on this platform
 		int platform_;
 
