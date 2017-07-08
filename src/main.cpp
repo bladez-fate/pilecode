@@ -149,11 +149,11 @@ public:
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(-1.0f, 0.0f));
 		}
 
-		if (IsKeyOnce(kKeyA)) {
+		if (IsKeyOnce(kKeyA) || ae::MouseWheelDelta() > 0) {
 			vp_->IncVisibleZ();
 		}
 
-		if (IsKeyOnce(kKeyZ)) {
+		if (IsKeyOnce(kKeyZ) || ae::MouseWheelDelta() < 0) {
 			vp_->DecVisibleZ();
 		}
 
