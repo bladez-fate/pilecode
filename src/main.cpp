@@ -136,16 +136,16 @@ public:
 		float dt = float(time - lastControlTime_);
 		lastControlTime_ = time;
 
-		if (IsKey(kKeyUp)) {
+		if (IsKey(kKeyUp) || ae::MousePos().y >= screen::h - mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, 1.0f));
 		}
-		if (IsKey(kKeyDown)) {
+		if (IsKey(kKeyDown) || ae::MousePos().y < mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, -1.0f));
 		}
-		if (IsKey(kKeyRight)) {
+		if (IsKey(kKeyRight) || ae::MousePos().x >= screen::w - mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(1.0f, 0.0f));
 		}
-		if (IsKey(kKeyLeft)) {
+		if (IsKey(kKeyLeft) || ae::MousePos().x < mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(-1.0f, 0.0f));
 		}
 
@@ -252,6 +252,8 @@ public:
 private:
 	// control configuration
 	float movePxlPerSec_ = float(screen::h) * 0.50f;
+	Si32 mouseScrollMargin_ = 5;
+
 
 	// world
 	std::unique_ptr<WorldParams> wparams_;
