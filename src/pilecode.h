@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 namespace pilecode {
 
@@ -397,7 +398,8 @@ namespace pilecode {
 
 			enum Filter {
 				kFilterNone = 0,
-				kFilterFog = 1,
+				kFilterFog,
+				kFilterTransparent,
 			};
 
 			Type type_;

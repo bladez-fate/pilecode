@@ -528,12 +528,12 @@ namespace pilecode {
 	{
 		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
-		for (int iz = 0; iz < visible_z_; iz++, p2.Ceil()) {
+		for (int iz = 0, ez = (int)std::min(visible_z_ + 1, wparams_.zsize()); iz < ez; iz++, p2.Ceil()) {
 			for (int zl = 0; zl < zlSize; zl++) {
 				RenderCmnd::Filter filter = (
 					iz == visible_z_ - 1 ?
 					RenderCmnd::kFilterNone :
-					RenderCmnd::kFilterFog
+					(iz < visible_z_ ? RenderCmnd::kFilterFog : RenderCmnd::kFilterTransparent)
 				);
 				Pos p1 = p2;
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
@@ -606,6 +606,11 @@ namespace pilecode {
 				break;
 			case kFilterFog:
 				DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				break;
+			case kFilterTransparent:
+				// TODO: draw this on another sprite with regular draw and then blend
+				// into main backbuffer, otherwise all platform "internals" became visible
+				//DrawWithFixedAlphaBlend(*sprite_, x + off_.x, y + off_.y, 0x60);
 				break;
 			}
 			break;

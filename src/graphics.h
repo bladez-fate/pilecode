@@ -27,5 +27,6 @@
 namespace pilecode {
 
 	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend);
+	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 alpha);
 
 }
