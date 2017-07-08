@@ -42,11 +42,11 @@ namespace pilecode {
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz, int color)
 	{
 		if (type_ != kTlNone) {
-			ae::Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
-			vp->Draw(sprite, wx, wy, wz, 1, ar::Vec2Si32(0, 0));
+			Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
+			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0));
 		}
 		if (letter_ != kLtSpace) {
-			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, ar::Vec2Si32(0, 0));
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0));
 		}
 	}
 
@@ -76,16 +76,16 @@ namespace pilecode {
 			float alpha = float(wz) / (colors - 1);
 			for (int i = 0; i < kTlMax; i++) {
 				TileType t = TileType(i);
-				ae::Sprite& src = image::g_tile[t];
-				ae::Sprite& dst = ts[i];
+				Sprite& src = image::g_tile[t];
+				Sprite& dst = ts[i];
 				dst.Create(src.Width(), src.Height());
-				ar::Rgba* srcIt = src.RgbaData();
-				ar::Rgba* dstIt = dst.RgbaData();
+				Rgba* srcIt = src.RgbaData();
+				Rgba* dstIt = dst.RgbaData();
 				size_t left = src.Width() * src.Height();
 				for (; left > 0; srcIt++, dstIt++, left--) {
 					*dstIt = *srcIt;
-					ar::Si16 gdelta = ar::Si16(dstIt->g * alpha);
-					ar::Si16 bdelta = ar::Si16(dstIt->b * alpha);
+					Si16 gdelta = Si16(dstIt->g * alpha);
+					Si16 bdelta = Si16(dstIt->b * alpha);
 					dstIt->g += bdelta - gdelta;
 					dstIt->b += gdelta - bdelta;
 				}
@@ -93,7 +93,7 @@ namespace pilecode {
 		}
 	}
 
-	ae::Sprite* WorldData::TileSprite(int color, TileType type)
+	Sprite* WorldData::TileSprite(int color, TileType type)
 	{
 		color = color % tileSprite_.size();
 		return &tileSprite_[color][type];
@@ -222,9 +222,9 @@ namespace pilecode {
 	{
 		Platform* p = vp->world()->platform(platform_);
 
-		ar::Vec2Si32 off = Pos::ToScreen(d_pos());
-		off.x = ar::Si32(off.x * vp->progress());
-		off.y = ar::Si32(off.y * vp->progress());
+		Vec2Si32 off = Pos::ToScreen(d_pos());
+		off.x = Si32(off.x * vp->progress());
+		off.y = Si32(off.y * vp->progress());
 
 		int body_off_y = (int)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
 
@@ -239,7 +239,7 @@ namespace pilecode {
 			p->WorldY(py_),
 			p->WorldZ(0),
 			2,
-			ar::Vec2Si32(off.x, off.y + body_off_y));
+			Vec2Si32(off.x, off.y + body_off_y));
 	}
 
 	void Robot::SimulateExec(World* world)
@@ -247,8 +247,8 @@ namespace pilecode {
 		Platform* p = world->platform(platform_);
 		if (Tile* cur_tile = p->changable_tile(x_, y_)) {
 			if (cur_tile->IsMovable()) {
-				ar::Vec3Si32 w = p->ToWorld(x_, y_, 0);
-				ar::Vec3Si32 wu = w;
+				Vec3Si32 w = p->ToWorld(x_, y_, 0);
+				Vec3Si32 wu = w;
 				wu.z++;
 
 				switch (cur_tile->ReadLetter()) {
@@ -322,7 +322,7 @@ namespace pilecode {
 			int newy = y_ + dy;
 
 			Platform* p1 = world->platform(platform_);
-			ar::Vec3Si32 w2 = p1->ToWorld(newx, newy, 0);
+			Vec3Si32 w2 = p1->ToWorld(newx, newy, 0);
 			Platform* p2 = world->FindPlatform(w2);
 
 			if (p2 && world->IsMovable(w2)) {
@@ -342,9 +342,9 @@ namespace pilecode {
 		return new Robot(*this);	
 	}
 
-	ar::Vec2Si32 Robot::d_pos()
+	Vec2Si32 Robot::d_pos()
 	{
-		return ar::Vec2Si32(x_ - px_, y_ - py_);
+		return Vec2Si32(x_ - px_, y_ - py_);
 	}
 
 	World::World(const WorldParams & wparams)
@@ -372,7 +372,7 @@ namespace pilecode {
 		robot_.emplace_back(robot);
 	}
 
-	void World::SwitchLetter(ar::Vec3Si32 w)
+	void World::SwitchLetter(Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -381,7 +381,7 @@ namespace pilecode {
 		}
 	}
 
-	void World::SwitchRobot(ar::Vec3Si32 w)
+	void World::SwitchRobot(Vec3Si32 w)
 	{
 		Platform* p = FindPlatform(w);
 		int rx = p->PlatformX(w.x);
@@ -400,7 +400,7 @@ namespace pilecode {
 		AddRobot(new Robot(p->index(), rx, ry));
 	}
 
-	bool World::IsTouched(ar::Vec3Si32 w)
+	bool World::IsTouched(Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -423,7 +423,7 @@ namespace pilecode {
 		steps_++;
 	}
 
-	bool World::ReadLetter(ar::Vec3Si32 w, Letter& letter)
+	bool World::ReadLetter(Vec3Si32 w, Letter& letter)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -435,7 +435,7 @@ namespace pilecode {
 		return false;
 	}
 
-	bool World::WriteLetter(ar::Vec3Si32 w, Letter letter)
+	bool World::WriteLetter(Vec3Si32 w, Letter letter)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -447,7 +447,7 @@ namespace pilecode {
 		return false;
 	}
 
-	bool World::IsMovable(ar::Vec3Si32 w)
+	bool World::IsMovable(Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -471,7 +471,7 @@ namespace pilecode {
 		return clone;
 	}
 
-	Platform* World::FindPlatform(ar::Vec3Si32 w)
+	Platform* World::FindPlatform(Vec3Si32 w)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
@@ -491,7 +491,7 @@ namespace pilecode {
 		, visible_z_(wparams.zsize())
 	{}
 
-	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zl, ar::Vec2Si32 off)
+	void ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
 		if (!(zl >= 0 && zl < zlSize)) {
 			abort();
@@ -501,19 +501,19 @@ namespace pilecode {
 		rlist.emplace_back(RenderCmnd(sprite, off));
 	}
 
-	void ViewPort::Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zl)
+	void ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl)
 	{
-		Draw(sprite, wx, wy, wz, zl, ar::Vec2Si32(0, 0));
+		Draw(sprite, wx, wy, wz, zl, Vec2Si32(0, 0));
 	}
 
-	void ViewPort::Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zl, ar::Vec2Si32 off)
+	void ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off)
 	{
 		Draw(sprite, w.x, w.y, w.z, zl, off);
 	}
 
-	void ViewPort::Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zl)
+	void ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl)
 	{
-		Draw(sprite, w, zl, ar::Vec2Si32(0, 0));
+		Draw(sprite, w, zl, Vec2Si32(0, 0));
 	}
 
 	void ViewPort::BeginRender(double time)
@@ -552,7 +552,7 @@ namespace pilecode {
 		lastFrameTime_ = curFrameTime_;
 	}
 
-	void ViewPort::Move(ar::Vec2F delta)
+	void ViewPort::Move(Vec2F delta)
 	{
 		x_ += delta.x;
 		y_ += delta.y;
@@ -572,7 +572,7 @@ namespace pilecode {
 		}
 	}
 
-	ar::Vec3Si32 ViewPort::ToWorld(ar::Vec2Si32 p) const
+	Vec3Si32 ViewPort::ToWorld(Vec2Si32 p) const
 	{
 		p.x -= cx_ + int(x_ + 0.5f);
 		p.y -= cy_ + int(y_ + 0.5f);
@@ -589,7 +589,7 @@ namespace pilecode {
 		return p;
 	}
 
-	ViewPort::RenderCmnd::RenderCmnd(ae::Sprite* sprite, ar::Vec2Si32 off)
+	ViewPort::RenderCmnd::RenderCmnd(Sprite* sprite, Vec2Si32 off)
 		: type_(kSpriteRgba)
 		, sprite_(sprite)
 		, off_(off)

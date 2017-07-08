@@ -101,9 +101,9 @@ namespace pilecode {
 	class WorldData {
 	public:
 		explicit WorldData(size_t colors);
-		ae::Sprite* TileSprite(int color, TileType type);
+		Sprite* TileSprite(int color, TileType type);
 	private:
-		std::vector<std::vector<ae::Sprite>> tileSprite_; // tile_[color][tileType]
+		std::vector<std::vector<Sprite>> tileSprite_; // tile_[color][tileType]
 	};
 
 	class WorldParams {
@@ -142,7 +142,7 @@ namespace pilecode {
 		int WorldX(int rx) const { return rx + x_; }
 		int WorldY(int ry) const { return ry + y_; }
 		int WorldZ(int rz) const { return rz + z_; }
-		ar::Vec3Si32 ToWorld(int rx, int ry, int rz) const { return ar::Vec3Si32(rx + x_, ry + y_, rz + z_); }
+		Vec3Si32 ToWorld(int rx, int ry, int rz) const { return Vec3Si32(rx + x_, ry + y_, rz + z_); }
 
 		// inverse transform
 		int PlatformX(int wx) const { return wx - x_; }
@@ -182,7 +182,7 @@ namespace pilecode {
 		void SimulateMove(World* world);
 		Robot* Clone();
 
-		ar::Vec2Si32 d_pos();
+		Vec2Si32 d_pos();
 
 		// accessors
 		int platform() const { return platform_; }
@@ -217,19 +217,19 @@ namespace pilecode {
 		// construction
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
-		void SwitchLetter(ar::Vec3Si32 w);
-		void SwitchRobot(ar::Vec3Si32 w);
-		bool IsTouched(ar::Vec3Si32 w);
+		void SwitchLetter(Vec3Si32 w);
+		void SwitchRobot(Vec3Si32 w);
+		bool IsTouched(Vec3Si32 w);
 
 		// simulation
 		void Simulate();
-		bool ReadLetter(ar::Vec3Si32 w, Letter& letter);
-		bool WriteLetter(ar::Vec3Si32 w, Letter letter);
-		bool IsMovable(ar::Vec3Si32 w);
+		bool ReadLetter(Vec3Si32 w, Letter& letter);
+		bool WriteLetter(Vec3Si32 w, Letter letter);
+		bool IsMovable(Vec3Si32 w);
 
 		// utility
 		World* Clone();
-		Platform* FindPlatform(ar::Vec3Si32 w);
+		Platform* FindPlatform(Vec3Si32 w);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
@@ -264,11 +264,11 @@ namespace pilecode {
 			, wx(_wx), wy(_wy), wz(_wz)
 		{}
 
-		explicit Pos(ar::Vec2Si32 w)
+		explicit Pos(Vec2Si32 w)
 			: Pos(w.x, w.y, 0)
 		{}
 
-		explicit Pos(ar::Vec3Si32 w)
+		explicit Pos(Vec3Si32 w)
 			: Pos(w.x, w.y, w.z)
 		{}
 
@@ -312,23 +312,23 @@ namespace pilecode {
 			y -= dz;
 		}
 
-		ar::Vec2Si32 Screen() const
+		Vec2Si32 Screen() const
 		{
-			return ar::Vec2Si32(x, y);
+			return Vec2Si32(x, y);
 		}
 
-		static ar::Vec2Si32 ToScreen(ar::Vec2Si32 w)
+		static Vec2Si32 ToScreen(Vec2Si32 w)
 		{
 			return Pos(w).Screen();
 		}
 
-		static ar::Vec3Si32 ToWorld(ar::Vec2Si32 s, int wz)
+		static Vec3Si32 ToWorld(Vec2Si32 s, int wz)
 		{
 			s.y -= dz * wz;
 			int wx = int(-(float(s.x) / dx + float(s.y) / dy) / 2);
 			int wy = int((float(s.x) / dx - float(s.y) / dy) / 2);
 
-			return ar::Vec3Si32(wx, wy, wz);
+			return Vec3Si32(wx, wy, wz);
 		}
 	};
 
@@ -337,17 +337,17 @@ namespace pilecode {
 		ViewPort(const WorldParams& wparams);
 
 		// drawing
-		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zlayer, ar::Vec2Si32 off);
-		void Draw(ae::Sprite* sprite, int wx, int wy, int wz, int zlayer);
-		void Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zlayer, ar::Vec2Si32 off);
-		void Draw(ae::Sprite* sprite, ar::Vec3Si32 w, int zlayer);
+		void Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer, Vec2Si32 off);
+		void Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer);
+		void Draw(Sprite* sprite, Vec3Si32 w, int zlayer, Vec2Si32 off);
+		void Draw(Sprite* sprite, Vec3Si32 w, int zlayer);
 
 		// rendering
 		void BeginRender(double time);
 		void EndRender();
 
 		// navigation
-		void Move(ar::Vec2F delta);
+		void Move(Vec2F delta);
 		void IncVisibleZ();
 		void DecVisibleZ();
 
@@ -356,7 +356,7 @@ namespace pilecode {
 		void set_progress(double progress) { progress_ = progress; }
 
 		// transformations
-		ar::Vec3Si32 ToWorld(ar::Vec2Si32 p) const;
+		Vec3Si32 ToWorld(Vec2Si32 p) const;
 
 		// world-related
 		World* world() const { return world_; }
@@ -402,10 +402,10 @@ namespace pilecode {
 
 			Type type_;
 
-			ae::Sprite* sprite_;
-			ar::Vec2Si32 off_;
+			Sprite* sprite_;
+			Vec2Si32 off_;
 
-			RenderCmnd(ae::Sprite* sprite, ar::Vec2Si32 off_);
+			RenderCmnd(Sprite* sprite, Vec2Si32 off_);
 			void Apply(int x, int y, Filter filter);
 		};
 

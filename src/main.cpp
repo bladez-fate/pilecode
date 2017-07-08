@@ -135,16 +135,16 @@ public:
 		lastControlTime_ = time;
 
 		if (IsKey(kKeyUp) || ae::MousePos().y >= screen::h - mouseScrollMargin_) {
-			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, 1.0f));
+			vp_->Move(-movePxlPerSec_ * dt * Vec2F(0.0f, 1.0f));
 		}
 		if (IsKey(kKeyDown) || ae::MousePos().y < mouseScrollMargin_) {
-			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(0.0f, -1.0f));
+			vp_->Move(-movePxlPerSec_ * dt * Vec2F(0.0f, -1.0f));
 		}
 		if (IsKey(kKeyRight) || ae::MousePos().x >= screen::w - mouseScrollMargin_) {
-			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec_ * dt * Vec2F(1.0f, 0.0f));
 		}
 		if (IsKey(kKeyLeft) || ae::MousePos().x < mouseScrollMargin_) {
-			vp_->Move(-movePxlPerSec_ * dt * ar::Vec2F(-1.0f, 0.0f));
+			vp_->Move(-movePxlPerSec_ * dt * Vec2F(-1.0f, 0.0f));
 		}
 
 		if (IsKeyOnce(kKeyA) || ae::MouseWheelDelta() > 0) {
@@ -241,7 +241,7 @@ public:
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
 		for (int wz = 0; wz <= wmouse_.z; wz++) {
-			vp_->Draw(&image::g_frame, ar::Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
+			vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
 		}
 		vp_->EndRender();
 

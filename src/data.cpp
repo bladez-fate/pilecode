@@ -25,11 +25,11 @@
 
 namespace pilecode {
 	namespace image {
-		ae::Sprite g_tile[kTlMax];
-		ae::Sprite g_letter[kLtMax];
-		ae::Sprite g_frame;
-		ae::Sprite g_robot;
-		ae::Sprite g_robotShadow;
+		Sprite g_tile[kTlMax];
+		Sprite g_letter[kLtMax];
+		Sprite g_frame;
+		Sprite g_robot;
+		Sprite g_robotShadow;
 	}
 
 	void InitData()
