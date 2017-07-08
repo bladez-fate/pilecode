@@ -755,7 +755,7 @@ namespace pilecode {
 				AlphaDraw(*sprite_, x + off_.x, y + off_.y);
 				break;
 			case kFilterFog:
-				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
 				break;
 			case kFilterTransparent:
 				// TODO: draw this on another sprite with regular draw and then blend
@@ -776,7 +776,7 @@ namespace pilecode {
 				break;
 			case kFilterFog:
 				if (blend_.a == 0) {
-					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
 				}
 				else {
 					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x60));
