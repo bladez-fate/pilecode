@@ -158,7 +158,30 @@ public:
 	{
 		initWorld_.reset(GenerateLevel1());
 		vp_.reset(new ViewPort(initWorld_->params()));
+		auto initialCoords = Vec2F(-180.0f, 40.0);
+		vp_->Move(initialCoords);
 		Restart();
+
+		Control();
+
+		frameVisibility_ = false;
+
+		int N = 50;
+		auto speed = Vec2F(0.0f, -N * 1.0f);
+		vp_->Move(Vec2F(0, 1.0f * N*(N+1)/2));
+		for (int i = 0; i < N; i++) {
+			Render();
+			if (IsKey(kKeyEscape)) {
+				break;
+			}
+			Sleep(0.01);
+			vp_->Move(speed);
+			speed += Vec2F(0.0f, 1.0f);
+		}
+
+		frameVisibility_ = true;
+
+		vp_->Locate(initialCoords);
 	}
 
 	bool Control()
@@ -286,13 +309,63 @@ public:
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
-		for (int wz = 0; wz <= wmouse_.z; wz++) {
-			vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
+		if (frameVisibility_) {
+			for (int wz = 0; wz <= wmouse_.z; wz++) {
+				vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
+			}
 		}
 		vp_->EndRender();
 
 		ShowFrame();
 	}
+
+	bool IsComplete()
+	{
+		return world_->IsOutputCorrect();
+	}
+
+	void Finish()
+	{
+		int dx0 = Pos::dx;
+		int dy0 = Pos::dy;
+		int dz0 = Pos::dz;
+
+		float dx = (float)Pos::dx;
+		float dy = (float)Pos::dy;
+		float dz = (float)Pos::dz;
+
+		frameVisibility_ = false;
+
+		//float speed = 1.01;
+		for (int i = 0; i < 10; i++) {
+			Render();
+			Sleep(0.01);
+			dx += 4;
+			dy += 2;
+
+			vp_->Move(Vec2F(-16.0f, 8.0f));
+
+			Pos::dx = (int)dx;
+			Pos::dy = (int)dy;
+			Pos::dz = (int)dz;
+		}
+		Sleep(0.1);
+
+		auto speed = Vec2F(0.0f, -1.0f);
+		for (int i = 0; i < 50; i++) {
+			Render();
+			Sleep(0.01);
+			vp_->Move(speed);
+			speed += Vec2F(0.0f, -1.0f);
+		}
+
+		frameVisibility_ = true;
+
+		Pos::dx = dx0;
+		Pos::dy = dy0;
+		Pos::dz = dz0;
+	}
+
 private:
 	// control configuration
 	float movePxlPerSec_ = float(screen::h) * 0.50f;
@@ -316,6 +389,7 @@ private:
 
 	// gameplay
 	Vec3Si32 wmouse_;
+	bool frameVisibility_ = true;
 };
 
 void Init()
@@ -329,14 +403,23 @@ void EasyMain()
 	Init();
 	srand((int)time(nullptr));
 
-	Game game;
+	bool exiting = false;
+	while (!exiting) {
+		Game game;
+		game.Start();
 
-	game.Start();
-	while (true) {
-		if (!game.Control()) {
-			break;
+		while (true) {
+			if (!game.Control()) {
+				exiting = true;
+				break;
+			}
+			game.Update();
+			game.Render();
+			if (game.IsComplete()) {
+				break;
+			}
 		}
-		game.Update();
-		game.Render();
+
+		game.Finish();
 	}
 }

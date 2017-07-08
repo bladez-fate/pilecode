@@ -147,6 +147,7 @@ namespace pilecode {
 		const Tile* get_tile(int rx, int ry) const;
 		bool ReadLetter(int rx, int ry, Letter& letter);
 		bool WriteLetter(int rx, int ry, Letter letter);
+		bool IsOutputCorrect();
 
 		// transforms coordinates relative to platform to world's frame
 		int WorldX(int rx) const { return rx + x_; }
@@ -258,6 +259,7 @@ namespace pilecode {
 		// utility
 		World* Clone() const;
 		Platform* FindPlatform(Vec3Si32 w);
+		bool IsOutputCorrect();
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
@@ -405,6 +407,7 @@ namespace pilecode {
 
 		// navigation
 		void Move(Vec2F delta);
+		void Locate(Vec2F loc);
 		void IncVisibleZ();
 		void DecVisibleZ();
 

@@ -225,6 +225,18 @@ namespace pilecode {
 		}
 	}
 
+	bool Platform::IsOutputCorrect()
+	{
+		for (Tile& tile : tiles_) {
+			if (tile.output() != kLtSpace) {
+				if (tile.letter() != tile.output()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	Robot::Robot()
 		: seed_(rand())
 	{
@@ -593,6 +605,16 @@ namespace pilecode {
 		return nullptr;
 	}
 
+	bool World::IsOutputCorrect()
+	{
+		for (const auto& p : platform_) {
+			if (!p->IsOutputCorrect()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	ViewPort::ViewPort(const WorldParams& wparams)
 		: wparams_(wparams)
 		, cmnds_(wparams.size() * zlSize)
@@ -665,6 +687,12 @@ namespace pilecode {
 	{
 		x_ += delta.x;
 		y_ += delta.y;
+	}
+
+	void ViewPort::Locate(Vec2F loc)
+	{
+		x_ = loc.x;
+		y_ = loc.y;
 	}
 
 	void ViewPort::IncVisibleZ()
