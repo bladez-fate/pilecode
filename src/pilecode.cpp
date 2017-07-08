@@ -295,30 +295,8 @@ namespace pilecode {
 		Platform* p = world->platform(platform_);
 		curr_ = p->ToWorld(x_, y_, 0);
 		if (!blocked_ && dir_ != kDirHalt) {
-			int dx;
-			int dy;
-			switch (dir_) {
-			case kDirHalt:
-				abort();
-				break;
-			case kDirRight:
-				dx = 1;
-				dy = 0;
-				break;
-			case kDirUp:
-				dx = 0;
-				dy = 1;
-				break;
-			case kDirLeft:
-				dx = -1;
-				dy = 0;
-				break;
-			case kDirDown:
-				dx = 0;
-				dy = -1;
-				break;
-			}
-			Vec3Si32 next = p->ToWorld(x_ + dx, y_ + dy, 0);
+			Vec2Si32 delta = dir_delta();
+			Vec3Si32 next = p->ToWorld(x_ + delta.x, y_ + delta.y, 0);
 			next_ = world->IsMovable(next) ? next : curr_;
 		}
 		else {
@@ -326,6 +304,52 @@ namespace pilecode {
 		}
 	}
 	
+	size_t Robot::ResolveMove(Robot* r1, Robot* r2)
+	{
+		// front-to-front deadlock -- block both
+		if (r1->next_ == r2->curr_ && r1->curr_ == r2->next_) {
+			r1->StopMove();
+			r2->StopMove();
+			return 2;
+		}
+
+		if (r1->next_ == r2->next_) {
+			// movement into stopped robot
+			Vec3Si32 d1 = r1->next_ - r1->curr_;
+			if (d1.x == 0 && d1.y == 0) {
+				r2->StopMove();
+				return 1;
+			}
+
+			// movement into stopped robot
+			Vec3Si32 d2 = r2->next_ - r2->curr_;
+			if (d2.x == 0 && d2.y == 0) {
+				r1->StopMove();
+				return 1;
+			}
+
+			// front-to-front -- random wins
+			Vec3Si32 dsum = d1 + d2;
+			if (dsum.x == 0 && dsum.y == 0) {
+				(rand() % 2 ? r1 : r2)->StopMove();
+				return 1;
+			}
+
+			// crossroad sync -- hindrance to the right
+			Si32 dprod = d1.x * d2.y - d1.y * d2.x;
+			(dprod > 0 ? r1 : r2)->StopMove();
+			return 1;
+		}
+
+		return 0;
+	}
+
+	// should be called after PrepareMove() and before SimulateMove()
+	void Robot::StopMove()
+	{
+		next_ = curr_;
+	}
+
 	void Robot::SimulateMove(World* world)
 	{
 		// choose platform robot is on
@@ -347,6 +371,21 @@ namespace pilecode {
 	Vec2Si32 Robot::d_pos()
 	{
 		return Vec2Si32(x_ - px_, y_ - py_);
+	}
+
+	Vec2Si32 Robot::dir_delta()
+	{
+		switch (dir_) {
+		case kDirRight:
+			return Vec2Si32(1, 0);
+		case kDirUp:
+			return Vec2Si32(0, 1);
+		case kDirLeft:
+			return Vec2Si32(-1, 0);
+		case kDirDown:
+			return Vec2Si32(0, -1);
+		}
+		return Vec2Si32(0, 0);
 	}
 
 	World::World(const WorldParams & wparams)
@@ -422,6 +461,20 @@ namespace pilecode {
 		for (const auto& robot : robot_) {
 			robot->PrepareMove(this);
 		}
+
+		// Resolve movements until there are conflicts
+		size_t resolved;
+		do {
+			resolved = 0;
+			for (const auto& r1 : robot_) {
+				for (const auto& r2 : robot_) {
+					if (r1 != r2) {
+						resolved += Robot::ResolveMove(r1.get(), r2.get());
+					}
+				}
+			}
+		} while (resolved);
+
 		for (const auto& robot : robot_) {
 			robot->SimulateMove(this);
 		}

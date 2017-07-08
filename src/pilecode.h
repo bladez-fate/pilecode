@@ -181,10 +181,14 @@ namespace pilecode {
 		void Draw(ViewPort* vp);
 		void SimulateExec(World* world);
 		void PrepareMove(World* world);
+		static size_t ResolveMove(Robot* r1, Robot* r2);
+		void StopMove();
 		void SimulateMove(World* world);
+
 		Robot* Clone();
 
 		Vec2Si32 d_pos();
+		Vec2Si32 dir_delta();
 
 		// accessors
 		int platform() const { return platform_; }
