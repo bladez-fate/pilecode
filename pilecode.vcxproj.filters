@@ -99,6 +99,12 @@
     <ClInclude Include="src\data.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\defs.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\arctic\engine\arctic_input.cpp">
@@ -138,6 +144,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\pilecode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

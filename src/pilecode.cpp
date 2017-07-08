@@ -21,9 +21,9 @@
 // IN THE SOFTWARE.
 
 #include "pilecode.h"
-#include "data.h"
 
-#include "engine/easy.h"
+#include "data.h"
+#include "graphics.h"
 
 namespace pilecode {
 
@@ -530,12 +530,17 @@ namespace pilecode {
 		RenderList* rlist = &cmnds_[0];
 		for (int iz = 0; iz < visible_z_; iz++, p2.Ceil()) {
 			for (int zl = 0; zl < zlSize; zl++) {
+				RenderCmnd::Filter filter = (
+					iz == visible_z_ - 1 ?
+					RenderCmnd::kFilterNone :
+					RenderCmnd::kFilterFog
+				);
 				Pos p1 = p2;
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
 					Pos p0 = p1;
 					for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
 						for (RenderCmnd& cmnd : *rlist) {
-							cmnd.Apply(p0.x, p0.y);
+							cmnd.Apply(p0.x, p0.y, filter);
 						}
 						// note that render lists are cleared after rendering
 						rlist->clear();
@@ -590,14 +595,20 @@ namespace pilecode {
 		, off_(off)
 	{}
 
-	void ViewPort::RenderCmnd::Apply(int x, int y)
+	void ViewPort::RenderCmnd::Apply(int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
 		switch (type_) {
 		case kSprite:
-			sprite_->Draw(x + off_.x, y + off_.y);
-			break;
 		case kSpriteRgba:
-			sprite_->Draw(x + off_.x, y + off_.y);
+			switch (filter) {
+			case kFilterNone:
+				sprite_->Draw(x + off_.x, y + off_.y);
+				break;
+			case kFilterFog:
+				DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				break;
+			}
+			break;
 		}
 	}
 }

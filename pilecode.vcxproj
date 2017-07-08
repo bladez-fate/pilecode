@@ -199,6 +199,8 @@
     <ClInclude Include="..\arctic\engine\vec4f.h" />
     <ClInclude Include="..\arctic\engine\vec4si32.h" />
     <ClInclude Include="src\data.h" />
+    <ClInclude Include="src\defs.h" />
+    <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\pilecode.h" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +215,7 @@
     <ClCompile Include="..\arctic\engine\easy_sprite_instance.cpp" />
     <ClCompile Include="..\arctic\engine\engine.cpp" />
     <ClCompile Include="src\data.cpp" />
+    <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pilecode.cpp" />
   </ItemGroup>

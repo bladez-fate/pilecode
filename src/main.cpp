@@ -23,8 +23,6 @@
 #include "pilecode.h"
 #include "data.h"
 
-#include "engine/easy.h"
-
 using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
 using namespace pilecode; // NOLINT
@@ -253,8 +251,7 @@ private:
 	// control configuration
 	float movePxlPerSec_ = float(screen::h) * 0.50f;
 	Si32 mouseScrollMargin_ = 5;
-
-
+	
 	// world
 	std::unique_ptr<WorldParams> wparams_;
 	std::unique_ptr<World> initWorld_;

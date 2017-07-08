@@ -22,7 +22,7 @@
 
 #pragma once
 
-#define _USE_MATH_DEFINES
+#include "defs.h"
 
 #include "engine/easy.h"
 #include "engine/vec2si32.h"
@@ -40,9 +40,6 @@ namespace pilecode {
 		extern int cy;
 		extern size_t size;
 	}
-
-	namespace ar = arctic;
-	namespace ae = arctic::easy;
 
 	class Robot;
 	class Tile;
@@ -398,13 +395,18 @@ namespace pilecode {
 				kSpriteRgba = 1,
 			};
 
+			enum Filter {
+				kFilterNone = 0,
+				kFilterFog = 1,
+			};
+
 			Type type_;
 
 			ae::Sprite* sprite_;
 			ar::Vec2Si32 off_;
 
 			RenderCmnd(ae::Sprite* sprite, ar::Vec2Si32 off_);
-			void Apply(int x, int y);
+			void Apply(int x, int y, Filter filter);
 		};
 
 		using RenderList = std::vector<RenderCmnd>;
