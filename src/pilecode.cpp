@@ -603,8 +603,22 @@ namespace pilecode {
 	void ViewPort::RenderCmnd::Apply(int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
 		switch (type_) {
-		case kSprite:
 		case kSpriteRgba:
+			switch (filter) {
+			case kFilterNone:
+				AlphaDraw(*sprite_, x + off_.x, y + off_.y);
+				break;
+			case kFilterFog:
+				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				break;
+			case kFilterTransparent:
+				// TODO: draw this on another sprite with regular draw and then blend
+				// into main backbuffer, otherwise all platform "internals" became visible
+				//DrawWithFixedAlphaBlend(*sprite_, x + off_.x, y + off_.y, 0x60);
+				break;
+			}
+			break;
+		case kSprite:
 			switch (filter) {
 			case kFilterNone:
 				sprite_->Draw(x + off_.x, y + off_.y);
