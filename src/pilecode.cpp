@@ -151,7 +151,7 @@ namespace pilecode {
 		}
 	}
 
-	Platform* Platform::Clone()
+	Platform* Platform::Clone() const
 	{
 		return new Platform(*this);
 	}
@@ -211,12 +211,28 @@ namespace pilecode {
 		}
 	}
 
-	Robot::Robot(int platform, int x, int y)
+	Robot::Robot()
 		: seed_(rand())
-		, platform_(platform)
-		, x_(x), y_(y)
-		, px_(x), py_(y)
-	{}
+	{
+		// Note that Place() is required 
+	}
+
+	Robot::Robot(World* world, Vec3Si32 w)
+		: Robot()
+	{
+		Place(world, w);
+	}
+
+	void Robot::Place(World* world, Vec3Si32 w)
+	{
+		Platform* p = world->FindPlatform(w);
+		platform_ = p->index();
+		if (!p) {
+			abort();
+		}
+		px_ = x_ = p->PlatformX(w.x);
+		py_ = y_ = p->PlatformY(w.y);
+	}
 
 	void Robot::Draw(ViewPort * vp)
 	{
@@ -363,7 +379,7 @@ namespace pilecode {
 		y_ = p->PlatformY(next_.y);
 	}
 
-	Robot* Robot::Clone()
+	Robot* Robot::Clone() const
 	{
 		return new Robot(*this);	
 	}
@@ -422,7 +438,7 @@ namespace pilecode {
 		}
 	}
 
-	void World::SwitchRobot(Vec3Si32 w)
+	void World::SwitchRobot(Vec3Si32 w, const Robot& original)
 	{
 		Platform* p = FindPlatform(w);
 		int rx = p->PlatformX(w.x);
@@ -438,7 +454,9 @@ namespace pilecode {
 		}
 
 		// if no robot is under cursor - create one
-		AddRobot(new Robot(p->index(), rx, ry));
+		Robot* clone = original.Clone();
+		clone->Place(this, w);
+		AddRobot(clone);
 	}
 
 	bool World::IsTouched(Vec3Si32 w)
@@ -517,7 +535,7 @@ namespace pilecode {
 		return false;
 	}
 
-	World* World::Clone()
+	World* World::Clone() const
 	{
 		World* clone = new World(wparams_);
 		for (const auto& p : platform_) {

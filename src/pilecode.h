@@ -131,7 +131,7 @@ namespace pilecode {
 	public:
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
-		Platform* Clone();
+		Platform* Clone() const;
 		void SwitchLetter(int rx, int ry);
 
 		Tile* changable_tile(int rx, int ry);
@@ -177,16 +177,23 @@ namespace pilecode {
 			kDirDown,
 		};
 	public:
-		Robot(int platform, int x, int y);
+		// construction
+		Robot();
+		Robot(World* world, Vec3Si32 w);
+		void Place(World* world, Vec3Si32 w);
+
+		// rendering
 		void Draw(ViewPort* vp);
+
+		// simulation
 		void SimulateExec(World* world);
 		void PrepareMove(World* world);
 		static size_t ResolveMove(Robot* r1, Robot* r2);
 		void StopMove();
 		void SimulateMove(World* world);
 
-		Robot* Clone();
-
+		// utility
+		Robot* Clone() const;
 		Vec2Si32 d_pos();
 		Vec2Si32 dir_delta();
 
@@ -228,7 +235,7 @@ namespace pilecode {
 		void AddPlatform(Platform* platform);
 		void AddRobot(Robot* robot);
 		void SwitchLetter(Vec3Si32 w);
-		void SwitchRobot(Vec3Si32 w);
+		void SwitchRobot(Vec3Si32 w, const Robot& original);
 		bool IsTouched(Vec3Si32 w);
 
 		// simulation
@@ -238,7 +245,7 @@ namespace pilecode {
 		bool IsMovable(Vec3Si32 w);
 
 		// utility
-		World* Clone();
+		World* Clone() const;
 		Platform* FindPlatform(Vec3Si32 w);
 
 		// accessors

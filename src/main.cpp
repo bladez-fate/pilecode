@@ -91,9 +91,6 @@ public:
 		world->AddPlatform(plat2);
 		world->AddPlatform(plat3);
 		world->AddPlatform(plat4);
-		world->AddRobot(new Robot(0, 6, 3));
-		world->AddRobot(new Robot(1, 1, 1));
-		world->AddRobot(new Robot(2, 2, 5));
 	
 		return world;
 	}
@@ -192,8 +189,9 @@ public:
 				// TODO: play forbidden sound and text reason
 			}
 			else {
-				world_->SwitchRobot(wmouse_);
-				initWorld_->SwitchRobot(wmouse_);
+				Robot original; // to sync seed in initWorld_ and world_
+				world_->SwitchRobot(wmouse_, original);
+				initWorld_->SwitchRobot(wmouse_, original);
 			}
 		}
 
@@ -265,7 +263,7 @@ private:
 	
 	// simulation 
 	double lastProgress_ = 1.0;
-	bool simPaused_ = false;
+	bool simPaused_ = true;
 	double simSpeed_ = 1.0;
 
 	// gameplay
