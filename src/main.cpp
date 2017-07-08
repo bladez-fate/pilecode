@@ -86,12 +86,13 @@ public:
 				{ 1, 1, 1, 1, 1, 1, 1 },
 				{ 1, 1, 1, 1, 1, 1, 1 },
 			});
+		plat4->changable_tile(0, 0)->set_output(kLtRight);
 
 		world->AddPlatform(plat1);
 		world->AddPlatform(plat2);
 		world->AddPlatform(plat3);
 		world->AddPlatform(plat4);
-	
+
 		return world;
 	}
 

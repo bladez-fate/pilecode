@@ -82,21 +82,28 @@ namespace pilecode {
 
 		bool IsMovable() const;
 
+		// accessors
 		TileType type() const { return type_;  }
-		Letter letter() const { return letter_;  }
 		void set_type(TileType type) { type_ = type;  }
+		Letter letter() const { return letter_;  }
 		void set_letter(Letter letter) { letter_ = letter; }
 		bool touched() const { return touched_; }
-
+		Letter output() const { return output_; }
+		void set_output(Letter letter) { output_ = letter; }
+		
 		static const Tile* none()
 		{
 			static Tile noneTile;
 			return &noneTile;
 		}
 	private:
+		// state
 		TileType type_ = kTlNone;
 		Letter letter_ = kLtSpace;
 		bool touched_ = false;
+
+		// output
+		Letter output_ = kLtSpace;
 	};
 
 	class WorldData {
@@ -351,13 +358,41 @@ namespace pilecode {
 
 	class ViewPort {
 	public:
+		struct RenderCmnd {
+			enum Type {
+				kSprite = 0,
+				kSpriteRgba = 1,
+			};
+
+			enum Filter {
+				kFilterNone = 0,
+				kFilterFog,
+				kFilterTransparent,
+			};
+
+			Type type_;
+
+			Sprite* sprite_;
+			Vec2Si32 off_;
+			Rgba blend_;
+		public:
+			RenderCmnd(Type type, Sprite* sprite, Vec2Si32 off_);
+
+			RenderCmnd& Blend(Rgba rgba);
+			RenderCmnd& Alpha();
+		private:
+			void Apply(int x, int y, Filter filter);
+			friend class ViewPort;
+		};
+
+	public:
 		ViewPort(const WorldParams& wparams);
 
 		// drawing
-		void Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer, Vec2Si32 off);
-		void Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer);
-		void Draw(Sprite* sprite, Vec3Si32 w, int zlayer, Vec2Si32 off);
-		void Draw(Sprite* sprite, Vec3Si32 w, int zlayer);
+		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zlayer, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zlayer);
 
 		// rendering
 		void BeginRender(double time);
@@ -406,27 +441,6 @@ namespace pilecode {
 		// rendering artifacts
 		static constexpr size_t zlBits = 2ull;
 		static constexpr size_t zlSize = 1ull << zlBits;
-		struct RenderCmnd {
-			enum Type {
-				kSprite = 0,
-				kSpriteRgba = 1,
-			};
-
-			enum Filter {
-				kFilterNone = 0,
-				kFilterFog,
-				kFilterTransparent,
-			};
-
-			Type type_;
-
-			Sprite* sprite_;
-			Vec2Si32 off_;
-
-			RenderCmnd(Sprite* sprite, Vec2Si32 off_);
-			void Apply(int x, int y, Filter filter);
-		};
-
 		using RenderList = std::vector<RenderCmnd>;
 		std::vector<RenderList> cmnds_;
 	};

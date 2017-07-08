@@ -45,6 +45,12 @@ namespace pilecode {
 			Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
 			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0));
 		}
+
+		if (output_ != kLtSpace) {
+			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1, Vec2Si32(0, -3))
+				.Blend(Rgba(0, 0, 0, 255));
+		}
+
 		if (letter_ != kLtSpace) {
 			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0));
 		}
@@ -128,12 +134,12 @@ namespace pilecode {
 			Tile* t = tile;
 			for (int x : xdata) {
 				t->set_type(TileType(x));
-				if (t->type() != kTlNone && rand()%4 == 0) {
-					t->set_letter(Letter(1+rand()%4));
-				}
-				else {
-					t->set_letter(kLtSpace);
-				}
+				//if (t->type() != kTlNone && rand()%4 == 0) {
+				//	t->set_letter(Letter(1+rand()%4));
+				//}
+				//else {
+				//	t->set_letter(kLtSpace);
+				//}
 				t++;
 			}
 			tile += w_;
@@ -249,7 +255,7 @@ namespace pilecode {
 			p->WorldY(py_),
 			p->WorldZ(0),
 			2,
-			off);
+			off).Alpha();
 		vp->Draw(&image::g_robot,
 			p->WorldX(px_),
 			p->WorldY(py_),
@@ -567,29 +573,30 @@ namespace pilecode {
 		, visible_z_(wparams.zsize())
 	{}
 
-	void ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
 		if (!(zl >= 0 && zl < zlSize)) {
 			abort();
 		}
 		size_t index = wparams_.index(wx, wy, (wz << zlBits) + zl);
 		RenderList& rlist = cmnds_[index];
-		rlist.emplace_back(RenderCmnd(sprite, off));
+		rlist.emplace_back(RenderCmnd(RenderCmnd::kSprite, sprite, off));
+		return rlist.back();
 	}
 
-	void ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl)
 	{
-		Draw(sprite, wx, wy, wz, zl, Vec2Si32(0, 0));
+		return Draw(sprite, wx, wy, wz, zl, Vec2Si32(0, 0));
 	}
 
-	void ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off)
 	{
-		Draw(sprite, w.x, w.y, w.z, zl, off);
+		return Draw(sprite, w.x, w.y, w.z, zl, off);
 	}
 
-	void ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl)
 	{
-		Draw(sprite, w, zl, Vec2Si32(0, 0));
+		return Draw(sprite, w, zl, Vec2Si32(0, 0));
 	}
 
 	void ViewPort::BeginRender(double time)
@@ -665,11 +672,25 @@ namespace pilecode {
 		return p;
 	}
 
-	ViewPort::RenderCmnd::RenderCmnd(Sprite* sprite, Vec2Si32 off)
-		: type_(kSpriteRgba)
+	ViewPort::RenderCmnd::RenderCmnd(ViewPort::RenderCmnd::Type type,
+		Sprite* sprite, Vec2Si32 off)
+		: type_(type)
 		, sprite_(sprite)
 		, off_(off)
+		, blend_(Ui32(0))
 	{}
+
+	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Blend(Rgba rgba)
+	{
+		blend_ = rgba;
+		return *this;
+	}
+
+	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Alpha()
+	{
+		type_ = kSpriteRgba;
+		return *this;
+	}
 
 	void ViewPort::RenderCmnd::Apply(int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
@@ -692,10 +713,20 @@ namespace pilecode {
 		case kSprite:
 			switch (filter) {
 			case kFilterNone:
-				sprite_->Draw(x + off_.x, y + off_.y);
+				if (blend_.a == 0) {
+					sprite_->Draw(x + off_.x, y + off_.y);
+				}
+				else {
+					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, blend_);
+				}
 				break;
 			case kFilterFog:
-				DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				if (blend_.a == 0) {
+					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x60));
+				}
+				else {
+					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x60));
+				}
 				break;
 			case kFilterTransparent:
 				// TODO: draw this on another sprite with regular draw and then blend
