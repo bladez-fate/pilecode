@@ -290,8 +290,10 @@ namespace pilecode {
 		}
 	}
 
-	void Robot::SimulateMove(World* world)
+	void Robot::PrepareMove(World* world)
 	{
+		Platform* p = world->platform(platform_);
+		curr_ = p->ToWorld(x_, y_, 0);
 		if (!blocked_ && dir_ != kDirHalt) {
 			int dx;
 			int dy;
@@ -316,25 +318,25 @@ namespace pilecode {
 				dy = -1;
 				break;
 			}
-			px_ = x_;
-			py_ = y_;
-			int newx = x_ + dx;
-			int newy = y_ + dy;
-
-			Platform* p1 = world->platform(platform_);
-			Vec3Si32 w2 = p1->ToWorld(newx, newy, 0);
-			Platform* p2 = world->FindPlatform(w2);
-
-			if (p2 && world->IsMovable(w2)) {
-				x_ = p2->PlatformX(w2.x);
-				y_ = p2->PlatformY(w2.y);
-				platform_ = p2->index();
-			}
+			Vec3Si32 next = p->ToWorld(x_ + dx, y_ + dy, 0);
+			next_ = world->IsMovable(next) ? next : curr_;
 		}
 		else {
-			px_ = x_;
-			py_ = y_;
+			next_ = curr_;
 		}
+	}
+	
+	void Robot::SimulateMove(World* world)
+	{
+		// choose platform robot is on
+		Platform* p = world->FindPlatform(next_);
+		platform_ = p->index();
+
+		// propagate robot
+		px_ = x_;
+		py_ = y_;
+		x_ = p->PlatformX(next_.x);
+		y_ = p->PlatformY(next_.y);
 	}
 
 	Robot* Robot::Clone()
@@ -416,6 +418,9 @@ namespace pilecode {
 	{
 		for (const auto& robot : robot_) {
 			robot->SimulateExec(this);
+		}
+		for (const auto& robot : robot_) {
+			robot->PrepareMove(this);
 		}
 		for (const auto& robot : robot_) {
 			robot->SimulateMove(this);

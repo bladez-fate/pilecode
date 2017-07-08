@@ -180,6 +180,7 @@ namespace pilecode {
 		Robot(int platform, int x, int y);
 		void Draw(ViewPort* vp);
 		void SimulateExec(World* world);
+		void PrepareMove(World* world);
 		void SimulateMove(World* world);
 		Robot* Clone();
 
@@ -201,6 +202,10 @@ namespace pilecode {
 		int y_;
 		int px_; // previous state
 		int py_; // previous state 
+
+		// simulation intermediates
+		Vec3Si32 curr_;
+		Vec3Si32 next_;
 
 		// simulation state
 		Direction dir_ = kDirHalt; // direction of motion
