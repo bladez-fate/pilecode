@@ -47,7 +47,8 @@ namespace pilecode {
 		}
 
 		if (output_ != kLtSpace) {
-			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1, Vec2Si32(0, -3))
+			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1,
+				Vec2Si32(0, letter_ != kLtSpace ? -3 : 0))
 				.Blend(Rgba(0, 0, 0, 255));
 		}
 
@@ -167,11 +168,13 @@ namespace pilecode {
 		return new Platform(*this);
 	}
 
-	void Platform::SwitchLetter(int rx, int ry)
+	void Platform::SwitchLetter(World* world, int rx, int ry)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsSwitchable()) {
-				tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
+				do {
+					tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
+				} while (!world->IsLetterAllowed(tile->letter()));
 			}
 		}
 	}
@@ -417,7 +420,12 @@ namespace pilecode {
 
 	World::World(const WorldParams & wparams)
 		: wparams_(wparams)
-	{}
+	{
+		for (int i = 0; i < kLtMax; i++) {
+			isLetterAllowed_[i] = false;
+		}
+		AllowLetter(kLtSpace);
+	}
 
 	void World::Draw(ViewPort* vp)
 	{
@@ -444,7 +452,7 @@ namespace pilecode {
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
-				p->SwitchLetter(p->PlatformX(w.x), p->PlatformY(w.y));
+				p->SwitchLetter(this, p->PlatformX(w.x), p->PlatformY(w.y));
 			}
 		}
 	}
@@ -480,6 +488,16 @@ namespace pilecode {
 			}
 		}
 		return false;
+	}
+
+	bool World::IsLetterAllowed(Letter letter)
+	{
+		return isLetterAllowed_[letter];
+	}
+
+	void World::AllowLetter(Letter letter)
+	{
+		isLetterAllowed_[letter] = true;
 	}
 
 	void World::Simulate()
@@ -554,6 +572,9 @@ namespace pilecode {
 		}
 		for (const auto& r : robot_) {
 			clone->AddRobot(r->Clone());
+		}
+		for (int i = 0; i < kLtMax; i++) {
+			clone->isLetterAllowed_[i] = isLetterAllowed_[i];
 		}
 		return clone;
 	}

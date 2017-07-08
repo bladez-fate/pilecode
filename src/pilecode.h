@@ -62,11 +62,12 @@ namespace pilecode {
 	enum Letter {
 		kLtSpace = 0,      // emptyness
 		kLtUp,             // y+
-		kLtDown,           // y-
 		kLtRight,          // x+
+		kLtDown,           // y-
 		kLtLeft,           // x-
 		kLtRead,           // read letter from upper platform into register
 		kLtWrite,          // write letter from register to upper platform
+		kLtDot,
 
 		kLtMax		
 	};
@@ -140,7 +141,7 @@ namespace pilecode {
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
 		Platform* Clone() const;
-		void SwitchLetter(int rx, int ry);
+		void SwitchLetter(World* world, int rx, int ry);
 
 		Tile* changable_tile(int rx, int ry);
 		const Tile* get_tile(int rx, int ry) const;
@@ -245,6 +246,8 @@ namespace pilecode {
 		void SwitchLetter(Vec3Si32 w);
 		void SwitchRobot(Vec3Si32 w, const Robot& original);
 		bool IsTouched(Vec3Si32 w);
+		bool IsLetterAllowed(Letter letter);
+		void AllowLetter(Letter letter);
 
 		// simulation
 		void Simulate();
@@ -265,6 +268,7 @@ namespace pilecode {
 		WorldParams wparams_;
 		std::vector<std::shared_ptr<Platform>> platform_;
 		std::vector<std::shared_ptr<Robot>> robot_;
+		bool isLetterAllowed_[kLtMax];
 		size_t steps_ = 0;
 	};
 
