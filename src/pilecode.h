@@ -54,7 +54,7 @@ namespace pilecode {
 	enum TileType {
 		kTlNone = 0,
 		kTlBrick,
-		kTlExit,
+		kTlInactive,
 
 		kTlMax
 	};
@@ -81,6 +81,7 @@ namespace pilecode {
 		void WriteLetter(Letter letter);
 
 		bool IsMovable() const;
+		bool IsSwitchable() const;
 
 		// accessors
 		TileType type() const { return type_;  }

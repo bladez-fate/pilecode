@@ -36,7 +36,7 @@ namespace pilecode {
 	{
 		image::g_tile[kTlNone].Load("data/empty.tga");
 		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
-		image::g_tile[kTlExit].Load("data/tile-brick.tga");
+		image::g_tile[kTlInactive].Load("data/tile-inactive-brick.tga");
 
 		image::g_letter[kLtSpace].Load("data/empty.tga");
 		image::g_letter[kLtUp].Load("data/letter-up.tga");

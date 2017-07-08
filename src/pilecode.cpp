@@ -73,6 +73,11 @@ namespace pilecode {
 		return type_ != kTlNone;
 	}
 
+	bool Tile::IsSwitchable() const
+	{
+		return type_ == kTlBrick;
+	}
+
 	WorldData::WorldData(size_t colors)
 	{
 		tileSprite_.resize(colors);
@@ -165,7 +170,7 @@ namespace pilecode {
 	void Platform::SwitchLetter(int rx, int ry)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
-			if (tile->IsMovable()) {
+			if (tile->IsSwitchable()) {
 				tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
 			}
 		}
