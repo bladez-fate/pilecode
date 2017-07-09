@@ -32,8 +32,8 @@ namespace pilecode {
 	int Pos::dz = 25 * 4;
 
 	namespace screen {
-		int w = 1680;
-		int h = 1050;
+		int w = 1280;
+		int h = 720;
 		int cx = w/2;
 		int cy = h/2;
 		size_t size = w*h;

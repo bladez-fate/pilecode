@@ -22,6 +22,7 @@
 
 #include "pilecode.h"
 #include "data.h"
+#include "graphics.h"
 
 using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
@@ -525,6 +526,50 @@ public:
 		vp_->set_progress(lastProgress_);
 	}
 
+	// Draws panel of given width and height in squares 256x256 units at bottom left corner
+	void DrawPanel(Si32 width)
+	{
+		Si32 dx = image::g_panel.Width();
+		Si32 dy = image::g_panel.Height();
+
+		for (int ix = 0; ix < width; ix++) {
+			AlphaDraw(image::g_panel, ix * dx, 0);
+			AlphaDraw(image::g_panel_top, ix * dx, dy);
+		}
+
+		AlphaDraw(image::g_panel_right, width * dx, 0);
+		AlphaDraw(image::g_panel_topright, width * dx, dy);
+	}
+
+	void DrawButton(Si32 ix, Si32 iy, Sprite sprite)
+	{
+		Si32 dx = image::g_panel.Width() / 2;
+		Si32 dy = image::g_panel.Height() / 2;
+
+		Si32 x0 = 0;
+		Si32 y0 = 0;
+
+		auto blend = Rgba(0, 0, 0, 0x20);
+
+		AlphaDrawAndBlend(image::g_button_frame, dx * ix + x0, dy * iy + y0, blend);
+		AlphaDrawAndBlend(sprite, dx * ix + x0, dy * iy + y0, blend);
+	}
+
+	void DrawTools()
+	{
+		DrawPanel(3);
+		DrawButton(0, 0, image::g_button_play);
+		DrawButton(0, 1, image::g_button_pause);
+		DrawButton(1, 0, image::g_button_stop);
+		DrawButton(1, 1, image::g_button_robot);
+		DrawButton(2, 0, image::g_button_letter[kLtRight]);
+		DrawButton(2, 1, image::g_button_letter[kLtDown]);
+		DrawButton(3, 0, image::g_button_letter[kLtUp]);
+		DrawButton(3, 1, image::g_button_letter[kLtLeft]);
+		DrawButton(4, 0, image::g_button_letter[kLtRead]);
+		DrawButton(4, 1, image::g_button_letter[kLtWrite]);
+	}
+
 	void Render()
 	{
 		Clear();
@@ -537,6 +582,8 @@ public:
 			}
 		}
 		vp_->EndRender();
+
+		DrawTools();
 
 		ShowFrame();
 	}
