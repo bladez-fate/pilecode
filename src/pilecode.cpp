@@ -49,11 +49,11 @@ namespace pilecode {
 		if (output_ != kLtSpace) {
 			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1,
 				Vec2Si32(0, letter_ != kLtSpace ? -3 : 0))
-				.Blend(Rgba(0, 0, 0, 255));
+				.Blend(Rgba(0, 0, 0, 255)).Alpha();
 		}
 
 		if (letter_ != kLtSpace) {
-			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0));
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0)).Alpha();
 		}
 	}
 
@@ -753,10 +753,20 @@ namespace pilecode {
 		case kSpriteRgba:
 			switch (filter) {
 			case kFilterNone:
-				AlphaDraw(*sprite_, x + off_.x, y + off_.y);
+				if (blend_.a == 0) {
+					AlphaDraw(*sprite_, x + off_.x, y + off_.y);
+				}
+				else {
+					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, blend_);
+				}
 				break;
 			case kFilterFog:
-				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
+				if (blend_.a == 0) {
+					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
+				}
+				else {
+					AlphaDrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x20));
+				}
 				break;
 			case kFilterTransparent:
 				// TODO: draw this on another sprite with regular draw and then blend
@@ -780,7 +790,7 @@ namespace pilecode {
 					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
 				}
 				else {
-					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x60));
+					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x20));
 				}
 				break;
 			case kFilterTransparent:

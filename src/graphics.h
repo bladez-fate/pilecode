@@ -32,5 +32,6 @@ namespace pilecode {
 
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y);
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend);
+	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2);
 
 }

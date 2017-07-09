@@ -222,4 +222,34 @@ namespace pilecode {
 		AlphaDrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
 			0, 0, sprite.Width(), sprite.Height(), blend);
 	}
+
+	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y,
+		const Si32 to_width, const Si32 to_height,
+		const Si32 from_x, const Si32 from_y,
+		const Si32 from_width, const Si32 from_height, Rgba blend1, Rgba blend2)
+	{
+		FilterDraw(sprite, to_x, to_y, to_width, to_height,
+			from_x, from_y, from_width, from_height,
+			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba* bg) {
+			Rgba fg2 = RgbaSum(
+				RgbaMult(*fg, 256 - blend1.a),
+				RgbaMult(blend1, blend1.a)
+			);
+			fg2 = RgbaSum(
+				RgbaMult(fg2, 256 - blend2.a),
+				RgbaMult(blend2, blend2.a)
+			);
+			fg2.a = fg->a;
+			return RgbaSum(
+				RgbaMult(fg2, fg2.a),
+				RgbaMult(*bg, 256 - fg2.a)
+			);
+		});
+	}
+
+	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2)
+	{
+		AlphaDrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), blend1, blend2);
+	}
 }

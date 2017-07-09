@@ -29,6 +29,9 @@
 #include "engine/easy.h"
 
 namespace pilecode {
+	constexpr Si32 g_xcell = 64;
+	constexpr Si32 g_ycell = 64;
+
 	namespace image {
 		extern Sprite g_tile[kTlMax];
 		extern Sprite g_letter[kLtMax];
@@ -37,6 +40,7 @@ namespace pilecode {
 		extern Sprite g_robotShadow;
 
 		extern Sprite g_panel;
+		extern Sprite g_panel_bottomright;
 		extern Sprite g_panel_right;
 		extern Sprite g_panel_top;
 		extern Sprite g_panel_topright;

@@ -32,6 +32,7 @@ namespace pilecode {
 		Sprite g_robotShadow;
 
 		Sprite g_panel;
+		Sprite g_panel_bottomright;
 		Sprite g_panel_right;
 		Sprite g_panel_top;
 		Sprite g_panel_topright;
@@ -64,6 +65,7 @@ namespace pilecode {
 		image::g_robotShadow.Load("data/robot-shadow.tga");
 	
 		image::g_panel.Load("data/panel.tga");
+		image::g_panel_bottomright.Load("data/panel-bottomright.tga");
 		image::g_panel_right.Load("data/panel-right.tga");
 		image::g_panel_top.Load("data/panel-top.tga");
 		image::g_panel_topright.Load("data/panel-topright.tga");

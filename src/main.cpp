@@ -24,6 +24,8 @@
 #include "data.h"
 #include "graphics.h"
 
+#include <functional>
+
 using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
 using namespace pilecode; // NOLINT
@@ -388,6 +390,7 @@ public:
 		Control();
 
 		frameVisibility_ = false;
+		panelVisibility_ = false;
 
 		int N = 50;
 		auto speed = Vec2F(0.0f, -N * 1.0f);
@@ -403,8 +406,11 @@ public:
 		}
 
 		frameVisibility_ = true;
+		panelVisibility_ = true;
 
 		vp_->Locate(initialCoords);
+
+		MakeTools();
 	}
 
 	bool Control()
@@ -415,6 +421,7 @@ public:
 
 		if (IsKeyOnce(kKeyF5)) {
 			Restart();
+			simPaused_ = true;
 			return true;
 		}
 
@@ -489,6 +496,8 @@ public:
 			}
 		}
 
+		ControlTools();
+
 		return true;
 	}
 
@@ -524,50 +533,149 @@ public:
 		}
 
 		vp_->set_progress(lastProgress_);
+
+		UpdateTools();
 	}
 
-	// Draws panel of given width and height in squares 256x256 units at bottom left corner
-	void DrawPanel(Si32 width)
+	void DrawPanel(Si32 width, Si32 height)
 	{
 		Si32 dx = image::g_panel.Width();
 		Si32 dy = image::g_panel.Height();
 
+		for (int iy = 0; iy < height; iy++) {
+			for (int ix = 0; ix < width; ix++) {
+				AlphaDraw(image::g_panel, ix * dx, iy * dy);
+			}
+		}
+		
 		for (int ix = 0; ix < width; ix++) {
-			AlphaDraw(image::g_panel, ix * dx, 0);
-			AlphaDraw(image::g_panel_top, ix * dx, dy);
+			AlphaDraw(image::g_panel_top, ix * dx, height * dy);
 		}
 
-		AlphaDraw(image::g_panel_right, width * dx, 0);
-		AlphaDraw(image::g_panel_topright, width * dx, dy);
+		AlphaDraw(image::g_panel_bottomright, width * dx, 0);
+
+		for (int iy = 1; iy < height; iy++) {
+			AlphaDraw(image::g_panel_right, width * dx, iy * dy);
+		}
+
+		AlphaDraw(image::g_panel_topright, width * dx, height * dy);
 	}
 
-	void DrawButton(Si32 ix, Si32 iy, Sprite sprite)
+	class Button {
+	public:
+		Button(Si32 ix, Si32 iy, Sprite sprite)
+			: ix_(ix), iy_(iy), sprite_(sprite)
+		{
+			x1_ = g_xcell * ix_;
+			y1_ = g_ycell * iy_;
+			x2_ = g_xcell * (ix_ + 1) - 1;
+			y2_ = g_ycell * (iy_ + 1) - 1;
+		}
+
+		Button& Click(std::function<void(Button*)> onClick)
+		{
+			onClick_ = onClick;
+			return *this;
+		}
+
+		void Control()
+		{
+			hover_ =
+				ae::MousePos().x >= x1_ + margin_ &&
+				ae::MousePos().y >= y1_ + margin_ &&
+				ae::MousePos().x <= x2_ - margin_ &&
+				ae::MousePos().y <= y2_ - margin_;
+
+			if (hover_ && IsKeyOnce(kKeyMouseLeft)) {
+				if (onClick_) {
+					onClick_(this);
+				}
+			}
+		}
+
+		void Update()
+		{
+		}
+
+		void Render()
+		{
+			auto blend = hover_ ? Rgba(0, 0, 0, 0) : Rgba(0, 0, 0, 0x20);
+			if (frame_) {
+				AlphaDrawAndBlend(image::g_button_frame, x1_, y1_, blend);
+			}
+			AlphaDrawAndBlend(sprite_, x1_, y1_, blend);
+		}
+
+		// accessors
+		bool frame() const { return frame_; }
+		void set_frame(bool frame) { frame_ = frame; }
+		Sprite sprite() const { return sprite_; }
+		void set_sprite(Sprite sprite) { sprite_ = sprite; }
+
+	private:
+		Si32 ix_;
+		Si32 iy_;
+		Si32 x1_;
+		Si32 y1_;
+		Si32 x2_;
+		Si32 y2_;
+		Sprite sprite_;
+		std::function<void(Button*)> onClick_;
+		bool hover_ = false;
+		bool frame_ = false;
+
+		static constexpr Si32 margin_ = 8;
+	};
+
+	Button& AddButton(Si32 ix, Si32 iy, Sprite sprite)
 	{
-		Si32 dx = image::g_panel.Width() / 2;
-		Si32 dy = image::g_panel.Height() / 2;
-
-		Si32 x0 = 0;
-		Si32 y0 = 0;
-
-		auto blend = Rgba(0, 0, 0, 0x20);
-
-		AlphaDrawAndBlend(image::g_button_frame, dx * ix + x0, dy * iy + y0, blend);
-		AlphaDrawAndBlend(sprite, dx * ix + x0, dy * iy + y0, blend);
+		buttons_.emplace_back(ix, iy, sprite);
+		return buttons_.back();
 	}
 
-	void DrawTools()
+	void ControlTools()
 	{
-		DrawPanel(3);
-		DrawButton(0, 0, image::g_button_play);
-		DrawButton(0, 1, image::g_button_pause);
-		DrawButton(1, 0, image::g_button_stop);
-		DrawButton(1, 1, image::g_button_robot);
-		DrawButton(2, 0, image::g_button_letter[kLtRight]);
-		DrawButton(2, 1, image::g_button_letter[kLtDown]);
-		DrawButton(3, 0, image::g_button_letter[kLtUp]);
-		DrawButton(3, 1, image::g_button_letter[kLtLeft]);
-		DrawButton(4, 0, image::g_button_letter[kLtRead]);
-		DrawButton(4, 1, image::g_button_letter[kLtWrite]);
+		for (Button& button : buttons_) {
+			button.Control();
+		}
+	}
+
+	void UpdateTools()
+	{
+		if (ae::MousePos().x < g_xcell * panelWidth_ && ae::MousePos().y < g_ycell * panelHeight_) {
+			frameVisibility_ = false;
+		}
+		else {
+			frameVisibility_ = true;
+		}
+		for (Button& button : buttons_) {
+			button.Update();
+		}
+	}
+
+	void RenderTools()
+	{
+		DrawPanel(panelWidth_, panelHeight_);
+		for (Button& button : buttons_) {
+			button.Render();
+		}
+	}
+
+	void MakeTools()
+	{
+		buttons_.clear();
+		panelWidth_ = 5;
+		panelHeight_ = 2;
+		AddButton(0, 0, image::g_button_play);
+		AddButton(0, 1, image::g_button_pause);
+		AddButton(1, 0, image::g_button_stop);
+		AddButton(1, 1, image::g_button_robot);
+		AddButton(2, 0, image::g_button_letter[kLtRight]);
+		AddButton(2, 1, image::g_button_letter[kLtDown]);
+		AddButton(3, 0, image::g_button_letter[kLtUp]);
+		AddButton(3, 1, image::g_button_letter[kLtLeft]);
+		AddButton(4, 0, image::g_button_letter[kLtRead]);
+		AddButton(4, 1, image::g_button_letter[kLtWrite]);
 	}
 
 	void Render()
@@ -583,7 +691,10 @@ public:
 		}
 		vp_->EndRender();
 
-		DrawTools();
+		if (panelVisibility_) {
+			RenderTools();
+		}
+
 
 		ShowFrame();
 	}
@@ -604,6 +715,7 @@ public:
 		float dz = (float)Pos::dz;
 
 		frameVisibility_ = false;
+		panelVisibility_ = false;
 
 		//float speed = 1.01;
 		for (int i = 0; i < 10; i++) {
@@ -629,6 +741,7 @@ public:
 		}
 
 		frameVisibility_ = true;
+		panelVisibility_ = true;
 
 		Pos::dx = dx0;
 		Pos::dy = dy0;
@@ -659,6 +772,10 @@ private:
 	// gameplay
 	Vec3Si32 wmouse_;
 	bool frameVisibility_ = true;
+	bool panelVisibility_ = true;
+	std::vector<Button> buttons_;
+	Si32 panelWidth_ = 1;
+	Si32 panelHeight_ = 1;
 };
 
 void Init()
