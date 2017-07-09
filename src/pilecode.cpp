@@ -471,23 +471,24 @@ namespace pilecode {
 
 	void World::SwitchRobot(Vec3Si32 w, const Robot& original)
 	{
-		Platform* p = FindPlatform(w);
-		int rx = p->PlatformX(w.x);
-		int ry = p->PlatformY(w.y);
+		if (Platform* p = FindPlatform(w)) {
+			int rx = p->PlatformX(w.x);
+			int ry = p->PlatformY(w.y);
 
-		// try find robot to remove
-		for (auto i = robot_.begin(), e = robot_.end(); i != e; ++i) {
-			Robot* r = i->get();
-			if (r->platform() == p->index() && rx == r->x() && ry == r->y()) {
-				robot_.erase(i);
-				return;
+			// try find robot to remove
+			for (auto i = robot_.begin(), e = robot_.end(); i != e; ++i) {
+				Robot* r = i->get();
+				if (r->platform() == p->index() && rx == r->x() && ry == r->y()) {
+					robot_.erase(i);
+					return;
+				}
 			}
-		}
 
-		// if no robot is under cursor - create one
-		Robot* clone = original.Clone();
-		clone->Place(this, w);
-		AddRobot(clone);
+			// if no robot is under cursor - create one
+			Robot* clone = original.Clone();
+			clone->Place(this, w);
+			AddRobot(clone);
+		}
 	}
 
 	bool World::IsTouched(Vec3Si32 w)
