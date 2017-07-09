@@ -25,6 +25,7 @@
 #include "graphics.h"
 
 #include <functional>
+#include <list>
 
 using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
@@ -361,6 +362,7 @@ public:
 		lastControlTime_ = 0.0;
 
 		lastProgress_ = 1.0;
+		simPaused_ = true;
 	}
 
 	void Start(int level)
@@ -389,24 +391,26 @@ public:
 
 		Control();
 
-		frameVisibility_ = false;
-		panelVisibility_ = false;
+		if (!disableAnimation_) {
+			frameVisibility_ = false;
+			panelVisibility_ = false;
 
-		int N = 50;
-		auto speed = Vec2F(0.0f, -N * 1.0f);
-		vp_->Move(Vec2F(0, 1.0f * N*(N+1)/2));
-		for (int i = 0; i < N; i++) {
-			Render();
-			if (IsKey(kKeyEscape)) {
-				break;
+			int N = 50;
+			auto speed = Vec2F(0.0f, -N * 1.0f);
+			vp_->Move(Vec2F(0, 1.0f * N*(N + 1) / 2));
+			for (int i = 0; i < N; i++) {
+				Render();
+				if (IsKey(kKeyEscape)) {
+					break;
+				}
+				Sleep(0.01);
+				vp_->Move(speed);
+				speed += Vec2F(0.0f, 1.0f);
 			}
-			Sleep(0.01);
-			vp_->Move(speed);
-			speed += Vec2F(0.0f, 1.0f);
-		}
 
-		frameVisibility_ = true;
-		panelVisibility_ = true;
+			frameVisibility_ = true;
+			panelVisibility_ = true;
+		}
 
 		vp_->Locate(initialCoords);
 
@@ -421,7 +425,6 @@ public:
 
 		if (IsKeyOnce(kKeyF5)) {
 			Restart();
-			simPaused_ = true;
 			return true;
 		}
 
@@ -454,7 +457,7 @@ public:
 		}
 
 		if (IsKeyOnce(kKeySpace)) {
-			simPaused_ = !simPaused_;
+			PlayOrPause();
 		}
 
 		if (IsKeyOnce(kKey1)) {
@@ -472,6 +475,8 @@ public:
 		if (IsKeyOnce(kKey4)) {
 			simSpeed_ = 8.0;
 		}
+
+		ControlTools();
 
 		wmouse_ = vp_->ToWorld(ae::MousePos());
 
@@ -495,9 +500,7 @@ public:
 				initWorld_->SwitchRobot(wmouse_, original);
 			}
 		}
-
-		ControlTools();
-
+		
 		return true;
 	}
 
@@ -572,10 +575,10 @@ public:
 			y2_ = g_ycell * (iy_ + 1) - 1;
 		}
 
-		Button& Click(std::function<void(Button*)> onClick)
+		Button* Click(std::function<void(Button*)> onClick)
 		{
 			onClick_ = onClick;
-			return *this;
+			return this;
 		}
 
 		void Control()
@@ -627,10 +630,10 @@ public:
 		static constexpr Si32 margin_ = 8;
 	};
 
-	Button& AddButton(Si32 ix, Si32 iy, Sprite sprite)
+	Button* AddButton(Si32 ix, Si32 iy, Sprite sprite)
 	{
 		buttons_.emplace_back(ix, iy, sprite);
-		return buttons_.back();
+		return &buttons_.back();
 	}
 
 	void ControlTools()
@@ -651,6 +654,8 @@ public:
 		for (Button& button : buttons_) {
 			button.Update();
 		}
+		btnPlay_->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
+		btnStop_->set_sprite(world_->steps() == 0 ? image::g_empty : image::g_button_stop);
 	}
 
 	void RenderTools()
@@ -661,14 +666,22 @@ public:
 		}
 	}
 
+	void PlayOrPause()
+	{
+		simPaused_ = !simPaused_;
+	}
+
 	void MakeTools()
 	{
 		buttons_.clear();
 		panelWidth_ = 5;
 		panelHeight_ = 2;
-		AddButton(0, 0, image::g_button_play);
-		AddButton(0, 1, image::g_button_pause);
-		AddButton(1, 0, image::g_button_stop);
+		btnPlay_ = AddButton(0, 0, image::g_button_play)->Click([=](Button* btn) {
+			PlayOrPause();
+		});
+		btnStop_ = AddButton(1, 0, image::g_button_stop)->Click([=](Button* btn) {
+			Restart();
+		});
 		AddButton(1, 1, image::g_button_robot);
 		AddButton(2, 0, image::g_button_letter[kLtRight]);
 		AddButton(2, 1, image::g_button_letter[kLtDown]);
@@ -706,46 +719,48 @@ public:
 
 	void Finish()
 	{
-		int dx0 = Pos::dx;
-		int dy0 = Pos::dy;
-		int dz0 = Pos::dz;
+		if (!disableAnimation_) {
+			int dx0 = Pos::dx;
+			int dy0 = Pos::dy;
+			int dz0 = Pos::dz;
 
-		float dx = (float)Pos::dx;
-		float dy = (float)Pos::dy;
-		float dz = (float)Pos::dz;
+			float dx = (float)Pos::dx;
+			float dy = (float)Pos::dy;
+			float dz = (float)Pos::dz;
 
-		frameVisibility_ = false;
-		panelVisibility_ = false;
+			frameVisibility_ = false;
+			panelVisibility_ = false;
 
-		//float speed = 1.01;
-		for (int i = 0; i < 10; i++) {
-			Render();
-			Sleep(0.01);
-			dx += 4;
-			dy += 2;
+			//float speed = 1.01;
+			for (int i = 0; i < 10; i++) {
+				Render();
+				Sleep(0.01);
+				dx += 4;
+				dy += 2;
 
-			vp_->Move(Vec2F(-16.0f, 8.0f));
+				vp_->Move(Vec2F(-16.0f, 8.0f));
 
-			Pos::dx = (int)dx;
-			Pos::dy = (int)dy;
-			Pos::dz = (int)dz;
+				Pos::dx = (int)dx;
+				Pos::dy = (int)dy;
+				Pos::dz = (int)dz;
+			}
+			Sleep(0.1);
+
+			auto speed = Vec2F(0.0f, -1.0f);
+			for (int i = 0; i < 50; i++) {
+				Render();
+				Sleep(0.01);
+				vp_->Move(speed);
+				speed += Vec2F(0.0f, -1.0f);
+			}
+
+			frameVisibility_ = true;
+			panelVisibility_ = true;
+
+			Pos::dx = dx0;
+			Pos::dy = dy0;
+			Pos::dz = dz0;
 		}
-		Sleep(0.1);
-
-		auto speed = Vec2F(0.0f, -1.0f);
-		for (int i = 0; i < 50; i++) {
-			Render();
-			Sleep(0.01);
-			vp_->Move(speed);
-			speed += Vec2F(0.0f, -1.0f);
-		}
-
-		frameVisibility_ = true;
-		panelVisibility_ = true;
-
-		Pos::dx = dx0;
-		Pos::dy = dy0;
-		Pos::dz = dz0;
 	}
 
 private:
@@ -773,9 +788,18 @@ private:
 	Vec3Si32 wmouse_;
 	bool frameVisibility_ = true;
 	bool panelVisibility_ = true;
-	std::vector<Button> buttons_;
 	Si32 panelWidth_ = 1;
-	Si32 panelHeight_ = 1;
+	Si32 panelHeight_ = 1;	
+	std::list<Button> buttons_;
+	Button* btnPlay_ = nullptr;
+	Button* btnStop_ = nullptr;
+
+	// debug
+#if NDEBUG
+	bool disableAnimation_ = false;
+#else
+	bool disableAnimation_ = true;
+#endif
 };
 
 void Init()
