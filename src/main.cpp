@@ -522,9 +522,8 @@ public:
 				break;
 			}
 		}
-		else {
-			ControlTools();
-		}
+
+		ControlTools();
 		
 		return true;
 	}
@@ -612,6 +611,12 @@ public:
 			return this;
 		}
 
+		Button* HotKey(char hotkey)
+		{
+			hotkey_ = hotkey;
+			return this;
+		}
+
 		void Control()
 		{
 			hover_ =
@@ -620,8 +625,9 @@ public:
 				ae::MousePos().x <= x2_ - margin_ &&
 				ae::MousePos().y <= y2_ - margin_;
 
-			if (enabled_ && hover_ && IsKeyOnce(kKeyMouseLeft)) {
-				if (onClick_) {
+			if (enabled_ && onClick_) {
+				if ((hover_ && IsKeyOnce(kKeyMouseLeft))
+					|| (hotkey_ && IsKeyOnce(hotkey_))) {
 					onClick_(this);
 				}
 			}
@@ -667,6 +673,7 @@ public:
 		bool hover_ = false;
 		bool frame_ = false;
 		bool enabled_ = true;
+		char hotkey_ = 0;
 
 		static constexpr Si32 margin_ = 8;
 	};
@@ -674,7 +681,16 @@ public:
 	Button* AddButton(Si32 pos, Sprite sprite)
 	{
 		buttons_.emplace_back(pos / panelHeight_, pos % panelHeight_, sprite);
-		return &buttons_.back();
+		Button* btn = &buttons_.back();
+
+		char gridHotkeys[] = {
+			'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', 'G', 'T', 'H', 'Y', 'J', 'U', 'K', 'I', 'L', 'O', ';', 'P'
+		};
+		if (pos < sizeof(gridHotkeys) / sizeof(*gridHotkeys)) {
+			btn->HotKey(gridHotkeys[pos]);
+		}
+
+		return btn;
 	}
 
 	void ControlTools()
