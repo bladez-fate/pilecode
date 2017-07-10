@@ -44,6 +44,13 @@ bool IsKeyOnce(T t)
 }
 
 class Game {
+private:
+	enum PlaceMode {
+		kPmSelect = 0,
+		kPmRobot,
+		kPmLetter,
+	};
+
 public:
 	World* GenerateWorld()
 	{
@@ -388,6 +395,7 @@ public:
 		auto initialCoords = Vec2F(-180.0f, 40.0);
 		vp_->Move(initialCoords);
 		Restart();
+		DefaultPlaceMode();
 
 		Control();
 
@@ -478,28 +486,38 @@ public:
 
 		ControlTools();
 
+		wmouse_ = vp_->ToWorld(ae::MousePos());
+		
 		if (!IsMouseInPanel()) {
-			wmouse_ = vp_->ToWorld(ae::MousePos());
-
-			if (IsKeyOnce(kKeyMouseLeft)) {
-				if (world_->IsTouched(wmouse_)) {
-					// TODO: play forbidden sound and text reason
+			switch (placeMode_) {
+			case kPmSelect:
+				// TODO: rectangular selection with copy/cut/paste and delete support
+				// TODO: show help popups in this mode if single letter/robot is selected
+				break;
+			case kPmRobot:
+				if (IsKeyOnce(kKeyMouseLeft)) {
+					if (world_->steps() > 0) {
+						// TODO: play forbidden sound and text reason
+						// TODO: disable robot placement button iff world_->steps() > 0
+					}
+					else {
+						Robot original; // to sync seed in initWorld_ and world_
+						world_->SwitchRobot(wmouse_, original);
+						initWorld_->SwitchRobot(wmouse_, original);
+					}
 				}
-				else {
-					world_->SwitchLetter(wmouse_);
-					initWorld_->SwitchLetter(wmouse_);
+				break;
+			case kPmLetter:
+				if (IsKeyOnce(kKeyMouseLeft)) {
+					if (world_->IsTouched(wmouse_)) {
+						// TODO: play forbidden sound and text reason
+					}
+					else {
+						world_->SetLetter(wmouse_, placeLetter_);
+						initWorld_->SetLetter(wmouse_, placeLetter_);
+					}
 				}
-			}
-
-			if (IsKeyOnce(kKeyMouseRight)) {
-				if (world_->steps() > 0) {
-					// TODO: play forbidden sound and text reason
-				}
-				else {
-					Robot original; // to sync seed in initWorld_ and world_
-					world_->SwitchRobot(wmouse_, original);
-					initWorld_->SwitchRobot(wmouse_, original);
-				}
+				break;
 			}
 		}
 		
@@ -583,6 +601,12 @@ public:
 			return this;
 		}
 
+		Button* OnUpdate(std::function<void(Button*)> onUpdate)
+		{
+			onUpdate_ = onUpdate;
+			return this;
+		}
+
 		void Control()
 		{
 			hover_ =
@@ -600,6 +624,9 @@ public:
 
 		void Update()
 		{
+			if (onUpdate_) {
+				onUpdate_(this);
+			}
 		}
 
 		void Render()
@@ -626,15 +653,16 @@ public:
 		Si32 y2_;
 		Sprite sprite_;
 		std::function<void(Button*)> onClick_;
+		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
 		bool frame_ = false;
 
 		static constexpr Si32 margin_ = 8;
 	};
 
-	Button* AddButton(Si32 ix, Si32 iy, Sprite sprite)
+	Button* AddButton(Si32 pos, Sprite sprite)
 	{
-		buttons_.emplace_back(ix, iy, sprite);
+		buttons_.emplace_back(pos / panelHeight_, pos % panelHeight_, sprite);
 		return &buttons_.back();
 	}
 
@@ -656,8 +684,6 @@ public:
 		for (Button& button : buttons_) {
 			button.Update();
 		}
-		btnPlay_->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
-		btnStop_->set_sprite(world_->steps() == 0 ? image::g_empty : image::g_button_stop);
 	}
 
 	void RenderTools()
@@ -673,24 +699,61 @@ public:
 		simPaused_ = !simPaused_;
 	}
 
+	void DefaultPlaceMode()
+	{
+		placeMode_ = kPmSelect;
+		placeLetter_ = kLtSpace;
+	}
+
+	void SwitchPlaceMode(PlaceMode mode, Letter letter)
+	{
+		if (placeMode_ != mode || placeLetter_ != letter) {
+			// Enter new mode
+			placeMode_ = mode;
+			placeLetter_ = letter;
+		}
+		else { // trying to switch mode we are currently in -- exit to default mode
+			DefaultPlaceMode();
+		}
+	}
+
 	void MakeTools()
 	{
 		buttons_.clear();
 		panelWidth_ = 5;
 		panelHeight_ = 2;
-		btnPlay_ = AddButton(0, 0, image::g_button_play)->Click([=](Button* btn) {
+
+		// Add playback buttons
+		AddButton(0, image::g_button_play)->Click([=](Button* btn) {
 			PlayOrPause();
+		})->OnUpdate([=](Button* btn) {
+			btn->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
-		btnStop_ = AddButton(1, 0, image::g_button_stop)->Click([=](Button* btn) {
+		
+		AddButton(2, image::g_button_stop)->Click([=](Button* btn) {
 			Restart();
+		})->OnUpdate([=](Button* btn) {
+			btn->set_sprite(world_->steps() == 0 ? image::g_empty : image::g_button_stop);
 		});
-		AddButton(1, 1, image::g_button_robot);
-		AddButton(2, 0, image::g_button_letter[kLtRight]);
-		AddButton(2, 1, image::g_button_letter[kLtDown]);
-		AddButton(3, 0, image::g_button_letter[kLtUp]);
-		AddButton(3, 1, image::g_button_letter[kLtLeft]);
-		AddButton(4, 0, image::g_button_letter[kLtRead]);
-		AddButton(4, 1, image::g_button_letter[kLtWrite]);
+
+		// Add robot button
+		AddButton(3, image::g_button_robot)->Click([=](Button* btn) {
+			SwitchPlaceMode(kPmRobot, kLtSpace);
+		})->OnUpdate([=](Button* btn) {
+			btn->set_frame(placeMode_ == kPmRobot);
+		});
+
+		Si32 btnPos = 4;
+
+		// Add letter buttons
+		for (int k = kLtSpace + 1; k < kLtMax; k++) {
+			auto letter = Letter(k);
+			AddButton(btnPos++, image::g_button_letter[letter])->Click([=](Button* btn) {
+				SwitchPlaceMode(kPmLetter, letter);
+			})->OnUpdate([=](Button* btn) {
+				btn->set_frame(placeMode_ == kPmLetter && placeLetter_ == letter);
+			});
+		}
 	}
 
 	void Render()
@@ -790,11 +853,11 @@ private:
 	Vec3Si32 wmouse_;
 	bool frameVisibility_ = true;
 	bool panelVisibility_ = true;
-	Si32 panelWidth_ = 1;
-	Si32 panelHeight_ = 1;	
+	Si32 panelWidth_;
+	Si32 panelHeight_;	
 	std::list<Button> buttons_;
-	Button* btnPlay_ = nullptr;
-	Button* btnStop_ = nullptr;
+	PlaceMode placeMode_;
+	Letter placeLetter_;
 
 	// debug
 #if NDEBUG

@@ -74,7 +74,7 @@ namespace pilecode {
 		return type_ != kTlNone;
 	}
 
-	bool Tile::IsSwitchable() const
+	bool Tile::IsModifiable() const
 	{
 		return type_ == kTlBrick;
 	}
@@ -168,10 +168,19 @@ namespace pilecode {
 		return new Platform(*this);
 	}
 
+	void Platform::SetLetter(World* world, int rx, int ry, Letter letter)
+	{
+		if (Tile* tile = changable_tile(rx, ry)) {
+			if (tile->IsModifiable()) {
+				tile->set_letter(letter);
+			}
+		}
+	}
+
 	void Platform::SwitchLetter(World* world, int rx, int ry)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
-			if (tile->IsSwitchable()) {
+			if (tile->IsModifiable()) {
 				do {
 					tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
 				} while (!world->IsLetterAllowed(tile->letter()));
@@ -458,6 +467,15 @@ namespace pilecode {
 	void World::AddRobot(Robot * robot)
 	{
 		robot_.emplace_back(robot);
+	}
+
+	void World::SetLetter(Vec3Si32 w, Letter letter)
+	{
+		for (const auto& p : platform_) {
+			if (p->WorldZ(0) == w.z) {
+				p->SetLetter(this, p->PlatformX(w.x), p->PlatformY(w.y), letter);
+			}
+		}
 	}
 
 	void World::SwitchLetter(Vec3Si32 w)
