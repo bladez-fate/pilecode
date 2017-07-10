@@ -456,11 +456,11 @@ public:
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(-1.0f, 0.0f));
 		}
 
-		if (IsKeyOnce(kKeyA) || ae::MouseWheelDelta() > 0) {
+		if (ae::MouseWheelDelta() > 0) {
 			vp_->IncVisibleZ();
 		}
 
-		if (IsKeyOnce(kKeyZ) || ae::MouseWheelDelta() < 0) {
+		if (ae::MouseWheelDelta() < 0) {
 			vp_->DecVisibleZ();
 		}
 
