@@ -620,7 +620,7 @@ public:
 				ae::MousePos().x <= x2_ - margin_ &&
 				ae::MousePos().y <= y2_ - margin_;
 
-			if (hover_ && IsKeyOnce(kKeyMouseLeft)) {
+			if (enabled_ && hover_ && IsKeyOnce(kKeyMouseLeft)) {
 				if (onClick_) {
 					onClick_(this);
 				}
@@ -636,7 +636,10 @@ public:
 
 		void Render()
 		{
-			auto blend = hover_ ? Rgba(0, 0, 0, 0) : Rgba(0, 0, 0, 0x20);
+			auto blend = (enabled_ ?
+				(hover_ ? Rgba(0, 0, 0, 0) : Rgba(0, 0, 0, 0x20)) :
+				Rgba(0, 0, 0, 0x50));
+
 			if (frame_) {
 				AlphaDrawAndBlend(image::g_button_frame, x1_, y1_, blend);
 			}
@@ -648,6 +651,8 @@ public:
 		void set_frame(bool frame) { frame_ = frame; }
 		Sprite sprite() const { return sprite_; }
 		void set_sprite(Sprite sprite) { sprite_ = sprite; }
+		bool enabled() const { return enabled_; }
+		void set_enabled(bool enabled) { enabled_ = enabled; }
 
 	private:
 		Si32 ix_;
@@ -661,6 +666,7 @@ public:
 		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
 		bool frame_ = false;
+		bool enabled_ = true;
 
 		static constexpr Si32 margin_ = 8;
 	};
@@ -738,7 +744,7 @@ public:
 		AddButton(2, image::g_button_stop)->Click([=](Button* btn) {
 			Restart();
 		})->OnUpdate([=](Button* btn) {
-			btn->set_sprite(world_->steps() == 0 ? image::g_empty : image::g_button_stop);
+			btn->set_enabled(world_->steps() != 0);
 		});
 
 		// Add robot button
