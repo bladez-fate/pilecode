@@ -172,7 +172,12 @@ namespace pilecode {
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsModifiable()) {
-				tile->set_letter(letter);
+				if (tile->letter() != letter) {
+					tile->set_letter(letter);
+				}
+				else {
+					tile->set_letter(kLtSpace);
+				}
 			}
 		}
 	}
