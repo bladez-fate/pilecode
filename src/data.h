@@ -32,6 +32,9 @@ namespace pilecode {
 	constexpr Si32 g_xcell = 64;
 	constexpr Si32 g_ycell = 64;
 
+	constexpr Si32 g_xtileorigin = 64;
+	constexpr Si32 g_ytileorigin = 256 - 174;
+
 	namespace image {
 		extern Sprite g_empty;
 

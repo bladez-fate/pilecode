@@ -251,6 +251,18 @@ namespace pilecode {
 		return true;
 	}
 
+	Tile* Platform::At(Vec3Si32 w)
+	{
+		if (w.z == z_) {
+			if (Tile* tile = changable_tile(PlatformX(w.x), PlatformY(w.y))) {
+				if (tile->type() != kTlNone) {
+					return tile;
+				}
+			}
+		}
+		return nullptr;
+	}
+
 	Robot::Robot()
 		: seed_(rand())
 	{
@@ -639,6 +651,16 @@ namespace pilecode {
 		return true;
 	}
 
+	Tile* World::At(Vec3Si32 w)
+	{
+		for (const auto& p : platform_) {
+			if (Tile* tile = p->At(w)) {
+				return tile;
+			}
+		}
+		return nullptr;
+	}
+
 	ViewPort::ViewPort(const WorldParams& wparams)
 		: wparams_(wparams)
 		, cmnds_(wparams.size() * zlSize)
@@ -733,13 +755,24 @@ namespace pilecode {
 		}
 	}
 
-	Vec3Si32 ViewPort::ToWorld(Vec2Si32 p) const
+	Vec3Si32 ViewPort::ToWorldAtZ(int wz, Vec2Si32 p) const
 	{
 		p.x -= cx_ + int(x_ + 0.5f);
 		p.y -= cy_ + int(y_ + 0.5f);
-		p.x -= 64;
-		p.y -= 256 - 174;
-		return Pos::ToWorld(p, int(visible_z_) - 1);
+		p.x -= g_xtileorigin;
+		p.y -= g_ytileorigin;
+		return Pos::ToWorld(p, wz);
+	}
+
+	Vec3Si32 ViewPort::ToWorld(Vec2Si32 p) const
+	{
+		for (int wz = int(visible_z_) - 1; wz > 0; wz--) {
+			Vec3Si32 w = ToWorldAtZ(wz, p);
+			if (Tile* tile = world_->At(w)) {
+				return w;
+			}
+		}
+		return ToWorldAtZ(0, p);
 	}
 
 	Pos ViewPort::GetPos(int wx, int wy, int wz)

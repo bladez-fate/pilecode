@@ -155,6 +155,7 @@ namespace pilecode {
 		int WorldY(int ry) const { return ry + y_; }
 		int WorldZ(int rz) const { return rz + z_; }
 		Vec3Si32 ToWorld(int rx, int ry, int rz) const { return Vec3Si32(rx + x_, ry + y_, rz + z_); }
+		Tile* At(Vec3Si32 w);
 
 		// inverse transform
 		int PlatformX(int wx) const { return wx - x_; }
@@ -262,6 +263,7 @@ namespace pilecode {
 		World* Clone() const;
 		Platform* FindPlatform(Vec3Si32 w);
 		bool IsOutputCorrect();
+		Tile* At(Vec3Si32 w);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
@@ -418,6 +420,7 @@ namespace pilecode {
 		void set_progress(double progress) { progress_ = progress; }
 
 		// transformations
+		Vec3Si32 ToWorldAtZ(int wz, Vec2Si32 p) const;
 		Vec3Si32 ToWorld(Vec2Si32 p) const;
 
 		// world-related
