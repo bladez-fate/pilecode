@@ -478,26 +478,28 @@ public:
 
 		ControlTools();
 
-		wmouse_ = vp_->ToWorld(ae::MousePos());
+		if (!IsMouseInPanel()) {
+			wmouse_ = vp_->ToWorld(ae::MousePos());
 
-		if (IsKeyOnce(kKeyMouseLeft)) {
-			if (world_->IsTouched(wmouse_)) {
-				// TODO: play forbidden sound and text reason
+			if (IsKeyOnce(kKeyMouseLeft)) {
+				if (world_->IsTouched(wmouse_)) {
+					// TODO: play forbidden sound and text reason
+				}
+				else {
+					world_->SwitchLetter(wmouse_);
+					initWorld_->SwitchLetter(wmouse_);
+				}
 			}
-			else {
-				world_->SwitchLetter(wmouse_);
-				initWorld_->SwitchLetter(wmouse_);
-			}
-		}
 
-		if (IsKeyOnce(kKeyMouseRight)) {
-			if (world_->steps() > 0) {
-				// TODO: play forbidden sound and text reason
-			}
-			else {
-				Robot original; // to sync seed in initWorld_ and world_
-				world_->SwitchRobot(wmouse_, original);
-				initWorld_->SwitchRobot(wmouse_, original);
+			if (IsKeyOnce(kKeyMouseRight)) {
+				if (world_->steps() > 0) {
+					// TODO: play forbidden sound and text reason
+				}
+				else {
+					Robot original; // to sync seed in initWorld_ and world_
+					world_->SwitchRobot(wmouse_, original);
+					initWorld_->SwitchRobot(wmouse_, original);
+				}
 			}
 		}
 		
@@ -643,14 +645,14 @@ public:
 		}
 	}
 
+	bool IsMouseInPanel()
+	{
+		return ae::MousePos().x < g_xcell * panelWidth_ && ae::MousePos().y < g_ycell * panelHeight_;
+	}
+
 	void UpdateTools()
 	{
-		if (ae::MousePos().x < g_xcell * panelWidth_ && ae::MousePos().y < g_ycell * panelHeight_) {
-			frameVisibility_ = false;
-		}
-		else {
-			frameVisibility_ = true;
-		}
+		frameVisibility_ = !IsMouseInPanel();
 		for (Button& button : buttons_) {
 			button.Update();
 		}

@@ -33,6 +33,8 @@ namespace pilecode {
 	constexpr Si32 g_ycell = 64;
 
 	namespace image {
+		extern Sprite g_empty;
+
 		extern Sprite g_tile[kTlMax];
 		extern Sprite g_letter[kLtMax];
 		extern Sprite g_frame;

@@ -25,6 +25,8 @@
 
 namespace pilecode {
 	namespace image {
+		Sprite g_empty;
+
 		Sprite g_tile[kTlMax];
 		Sprite g_letter[kLtMax];
 		Sprite g_frame;
@@ -47,11 +49,13 @@ namespace pilecode {
 
 	void InitData()
 	{
-		image::g_tile[kTlNone].Load("data/empty.tga");
+		image::g_empty.Load("data/empty.tga");
+
+		image::g_tile[kTlNone] = image::g_empty;
 		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
 		image::g_tile[kTlInactive].Load("data/tile-inactive-brick.tga");
 
-		image::g_letter[kLtSpace].Load("data/empty.tga");
+		image::g_letter[kLtSpace] = image::g_empty;
 		image::g_letter[kLtUp].Load("data/letter-up.tga");
 		image::g_letter[kLtDown].Load("data/letter-down.tga");
 		image::g_letter[kLtRight].Load("data/letter-right.tga");
@@ -75,13 +79,13 @@ namespace pilecode {
 		image::g_button_pause.Load("data/button-pause.tga");
 		image::g_button_stop.Load("data/button-stop.tga");
 		image::g_button_robot.Load("data/button-robot.tga");
-		image::g_button_letter[kLtSpace].Load("data/empty.tga"); // never used
+		image::g_button_letter[kLtSpace] = image::g_empty;
 		image::g_button_letter[kLtUp].Load("data/button-up.tga");
 		image::g_button_letter[kLtDown].Load("data/button-down.tga");
 		image::g_button_letter[kLtRight].Load("data/button-right.tga");
 		image::g_button_letter[kLtLeft].Load("data/button-left.tga");
 		image::g_button_letter[kLtRead].Load("data/button-read.tga");
 		image::g_button_letter[kLtWrite].Load("data/button-write.tga");
-		image::g_button_letter[kLtDot].Load("data/empty.tga"); // never used
+		image::g_button_letter[kLtDot] = image::g_empty;
 	}
 }

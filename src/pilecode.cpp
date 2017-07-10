@@ -33,7 +33,7 @@ namespace pilecode {
 
 	namespace screen {
 		int w = 1280;
-		int h = 720;
+		int h = 800;
 		int cx = w/2;
 		int cy = h/2;
 		size_t size = w*h;
