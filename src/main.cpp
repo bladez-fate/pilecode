@@ -427,7 +427,7 @@ public:
 
 	bool Control()
 	{
-		if (IsKey(kKeyEscape)) {
+		if (IsKey(kKeyQ) && IsKey(kKeyControl)) {
 			return false;
 		}
 
@@ -484,10 +484,12 @@ public:
 			simSpeed_ = 8.0;
 		}
 
-		ControlTools();
-
 		wmouse_ = vp_->ToWorld(ae::MousePos());
-		
+
+		if (IsKeyOnce(kKeyEscape)) {
+			DefaultPlaceMode();
+		}
+
 		if (!IsMouseInPanel()) {
 			switch (placeMode_) {
 			case kPmSelect:
@@ -519,6 +521,9 @@ public:
 				}
 				break;
 			}
+		}
+		else {
+			ControlTools();
 		}
 		
 		return true;
@@ -861,7 +866,7 @@ private:
 
 	// debug
 #if NDEBUG
-	bool disableAnimation_ = false;
+	bool disableAnimation_ = true;
 #else
 	bool disableAnimation_ = true;
 #endif
