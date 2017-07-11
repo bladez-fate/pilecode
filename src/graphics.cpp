@@ -106,15 +106,17 @@ namespace pilecode {
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
 	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height,
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite,
 		Rgba blend)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
-			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba*) {
+			to_sprite, [=](const Rgba* fg, const Rgba*) {
 			return RgbaSum(
 				RgbaMult(*fg, 256 - blend.a),
 				RgbaMult(blend, blend.a)
@@ -125,18 +127,26 @@ namespace pilecode {
 	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend)
 	{
 		DrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), blend);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend);
 	}
+
+	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend)
+	{
+		DrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void DrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height,
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite,
 		Rgba blend1, Rgba blend2)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
-			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba*) {
+			to_sprite, [=](const Rgba* fg, const Rgba*) {
 			Rgba fg2 = RgbaSum(
 				RgbaMult(*fg, 256 - blend1.a),
 				RgbaMult(blend1, blend1.a)
@@ -151,18 +161,26 @@ namespace pilecode {
 	void DrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2)
 	{
 		DrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), blend1, blend2);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend1, blend2);
 	}
+
+	void DrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend1, Rgba blend2)
+	{
+		DrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend1, blend2);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height,
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite,
 		Ui8 alpha)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
-			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba* bg) {
+			to_sprite, [=](const Rgba* fg, const Rgba* bg) {
 			return RgbaSum(
 				RgbaMult(*fg, alpha),
 				RgbaMult(*bg, 256 - alpha)
@@ -173,17 +191,25 @@ namespace pilecode {
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 alpha)
 	{
 		DrawWithFixedAlphaBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), alpha);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), alpha);
 	}
+
+	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 alpha)
+	{
+		DrawWithFixedAlphaBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, alpha);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height)
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
-			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba* bg) {
+			to_sprite, [=](const Rgba* fg, const Rgba* bg) {
 			return RgbaSum(
 				RgbaMult(*fg, fg->a),
 				RgbaMult(*bg, 256 - fg->a)
@@ -194,17 +220,25 @@ namespace pilecode {
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y)
 	{
 		AlphaDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height());
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer());
 	}
+
+	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite)
+	{
+		AlphaDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height, Rgba blend)
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Rgba blend)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
-			ae::GetEngine()->GetBackbuffer(), [=](const Rgba* fg, const Rgba* bg) {
+			to_sprite, [=](const Rgba* fg, const Rgba* bg) {
 			Rgba fg2 = RgbaSum(
 				RgbaMult(*fg, 256 - blend.a),
 				RgbaMult(blend, blend.a)
@@ -220,13 +254,21 @@ namespace pilecode {
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend)
 	{
 		AlphaDrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), blend);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend);
 	}
+
+	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend)
+	{
+		AlphaDrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height, Rgba blend1, Rgba blend2)
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Rgba blend1, Rgba blend2)
 	{
 		FilterDraw(sprite, to_x, to_y, to_width, to_height,
 			from_x, from_y, from_width, from_height,
@@ -250,6 +292,13 @@ namespace pilecode {
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2)
 	{
 		AlphaDrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), blend1, blend2);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend1, blend2);
 	}
+
+	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend1, Rgba blend2)
+	{
+		AlphaDrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend1, blend2);
+	}
+
 }
