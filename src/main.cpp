@@ -800,7 +800,6 @@ public:
 			RenderTools();
 		}
 
-
 		ShowFrame();
 	}
 
