@@ -665,7 +665,9 @@ namespace pilecode {
 		: wparams_(wparams)
 		, cmnds_(wparams.size() * zlSize)
 		, visible_z_(wparams.zsize())
-	{}
+	{
+		transparent_.Create(screen::w, screen::h);
+	}
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
@@ -699,6 +701,7 @@ namespace pilecode {
 		if (lastFrameTime_ == 0.0) {
 			lastFrameTime_ = curFrameTime_ - 1.0;
 		}
+		transparent_.Clear();
 	}
 
 	void ViewPort::EndRender()
@@ -717,7 +720,7 @@ namespace pilecode {
 					Pos p0 = p1;
 					for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
 						for (RenderCmnd& cmnd : *rlist) {
-							cmnd.Apply(p0.x, p0.y, filter);
+							cmnd.Apply(this, p0.x, p0.y, filter);
 						}
 						// note that render lists are cleared after rendering
 						rlist->clear();
@@ -726,6 +729,7 @@ namespace pilecode {
 				}
 			}
 		}
+		DrawWithFixedAlphaBlend(transparent_, 0, 0, 128);
 		lastFrameTime_ = curFrameTime_;
 	}
 
@@ -803,56 +807,51 @@ namespace pilecode {
 		return *this;
 	}
 
-	void ViewPort::RenderCmnd::Apply(int x, int y, ViewPort::RenderCmnd::Filter filter)
+	void ViewPort::RenderCmnd::Apply(ViewPort* vp, int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
+		Sprite to_sprite = ae::GetEngine()->GetBackbuffer();
 		switch (type_) {
 		case kSpriteRgba:
 			switch (filter) {
+			case kFilterTransparent:
+				to_sprite = vp->transparent();
 			case kFilterNone:
 				if (blend_.a == 0) {
-					AlphaDraw(*sprite_, x + off_.x, y + off_.y);
+					AlphaDraw(*sprite_, x + off_.x, y + off_.y, to_sprite);
 				}
 				else {
-					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, blend_);
+					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
 				}
 				break;
 			case kFilterFog:
 				if (blend_.a == 0) {
-					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
+					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, Rgba(0, 0, 0, 0x20));
 				}
 				else {
-					AlphaDrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x20));
+					AlphaDrawAndBlend2(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_, Rgba(0, 0, 0, 0x20));
 				}
-				break;
-			case kFilterTransparent:
-				// TODO: draw this on another sprite with regular draw and then blend
-				// into main backbuffer, otherwise all platform "internals" became visible
-				//DrawWithFixedAlphaBlend(*sprite_, x + off_.x, y + off_.y, 0x60);
 				break;
 			}
 			break;
 		case kSprite:
 			switch (filter) {
+			case kFilterTransparent:
+				to_sprite = vp->transparent();
 			case kFilterNone:
 				if (blend_.a == 0) {
-					sprite_->Draw(x + off_.x, y + off_.y);
+					DrawSprite(*sprite_, x + off_.x, y + off_.y, to_sprite);
 				}
 				else {
-					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, blend_);
+					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
 				}
 				break;
 			case kFilterFog:
 				if (blend_.a == 0) {
-					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, Rgba(0, 0, 0, 0x20));
+					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, Rgba(0, 0, 0, 0x20));
 				}
 				else {
-					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, blend_, Rgba(0, 0, 0, 0x20));
+					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_, Rgba(0, 0, 0, 0x20));
 				}
-				break;
-			case kFilterTransparent:
-				// TODO: draw this on another sprite with regular draw and then blend
-				// into main backbuffer, otherwise all platform "internals" became visible
-				//DrawWithFixedAlphaBlend(*sprite_, x + off_.x, y + off_.y, 0x60);
 				break;
 			}
 			break;

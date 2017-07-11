@@ -369,6 +369,8 @@ namespace pilecode {
 
 	class ViewPort {
 	public:
+		struct RenderCmnd;
+		friend struct RenderCmnd;
 		struct RenderCmnd {
 			enum Type {
 				kSprite = 0,
@@ -392,7 +394,7 @@ namespace pilecode {
 			RenderCmnd& Blend(Rgba rgba);
 			RenderCmnd& Alpha();
 		private:
-			void Apply(int x, int y, Filter filter);
+			void Apply(ViewPort* vp, int x, int y, Filter filter);
 			friend class ViewPort;
 		};
 
@@ -429,6 +431,7 @@ namespace pilecode {
 
 	private:
 		Pos GetPos(int wx, int wy, int wz = 0);
+		Sprite transparent() { return transparent_; }
 
 	private:
 		// world
@@ -456,5 +459,6 @@ namespace pilecode {
 		static constexpr size_t zlSize = 1ull << zlBits;
 		using RenderList = std::vector<RenderCmnd>;
 		std::vector<RenderList> cmnds_;
+		Sprite transparent_;
 	};
 }

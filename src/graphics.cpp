@@ -108,6 +108,19 @@ namespace pilecode {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
+	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y)
+	{
+		sprite.Draw(to_x, to_y);
+	}
+
+	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite)
+	{
+		sprite.Draw(to_x, to_y, sprite.Width(), sprite.Height(),
+			0, 0, sprite.Width(), sprite.Height(), to_sprite);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
 	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
