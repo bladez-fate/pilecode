@@ -35,6 +35,8 @@ namespace pilecode {
 	constexpr Si32 g_xtileorigin = 64;
 	constexpr Si32 g_ytileorigin = 82;
 
+	constexpr Si32 g_yrobotReg = 64;
+
 	extern const Vec2Si32 g_tileCenter;
 
 	namespace image {

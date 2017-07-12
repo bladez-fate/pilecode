@@ -297,17 +297,22 @@ namespace pilecode {
 		int body_off_y = (int)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
 
 		vp->Draw(&image::g_robotShadow,
-			p->WorldX(px_),
-			p->WorldY(py_),
-			p->WorldZ(0),
+			p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
 			2,
-			off).Alpha();
+			off)
+			.Alpha();
 		vp->Draw(&image::g_robot,
-			p->WorldX(px_),
-			p->WorldY(py_),
-			p->WorldZ(0),
+			p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
 			2,
 			Vec2Si32(off.x, off.y + body_off_y));
+
+		if (reg_ != kLtSpace) {
+			vp->Draw(&image::g_letter[reg_],
+				p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
+				2,
+				Vec2Si32(off.x, off.y + body_off_y + g_yrobotReg))
+				.Alpha();
+		}
 	}
 
 	void Robot::SimulateExec(World* world)

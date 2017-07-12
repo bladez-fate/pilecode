@@ -374,22 +374,27 @@ public:
 
 	void Start(int level)
 	{
-		switch (level % 5) {
-		case 0:
-			initWorld_.reset(GenerateLevel1());
-			break;
-		case 1:
-			initWorld_.reset(GenerateLevel2());
-			break;
-		case 2:
-			initWorld_.reset(GenerateLevel3());
-			break;
-		case 3:
-			initWorld_.reset(GenerateLevel4());
-			break;
-		case 4:
-			initWorld_.reset(GenerateLevel5());
-			break;
+		if (level >= 0) {
+			switch (level % 5) {
+			case 0:
+				initWorld_.reset(GenerateLevel1());
+				break;
+			case 1:
+				initWorld_.reset(GenerateLevel2());
+				break;
+			case 2:
+				initWorld_.reset(GenerateLevel3());
+				break;
+			case 3:
+				initWorld_.reset(GenerateLevel4());
+				break;
+			case 4:
+				initWorld_.reset(GenerateLevel5());
+				break;
+			}
+		}
+		else {
+			initWorld_.reset(GenerateWorld());
 		}
 		vp_.reset(new ViewPort(initWorld_->params()));
 		auto initialCoords = Vec2F(-180.0f, 40.0);
@@ -716,13 +721,15 @@ public:
 	void RenderTools()
 	{
 		if (placeMode_ == kPmRobot) {
-			image::g_robot.Draw(ae::MousePos() - g_tileCenter);
+			AlphaDraw(image::g_robot,
+				ae::MousePos().x - g_tileCenter.x,
+				ae::MousePos().y - g_tileCenter.y);
 		}
 		else if (placeMode_ == kPmLetter) {
-			image::g_letter[placeLetter_].Draw(ae::MousePos() - g_tileCenter);
+			AlphaDraw(image::g_letter[placeLetter_],
+				ae::MousePos().x - g_tileCenter.x,
+				ae::MousePos().y - g_tileCenter.y);
 		}
-
-
 
 		DrawPanel(panelWidth_, panelHeight_);
 		for (Button& button : buttons_) {
@@ -926,14 +933,20 @@ void EasyMain()
 				exiting = true;
 				break;
 			}
+
+			if (IsKeyOnce(kKeyF1)) {
+				level = -1;
+				break;
+			}
+
 			game.Update();
 			game.Render();
 			if (game.IsComplete()) {
+				level++;
 				break;
 			}
 		}
 
 		game.Finish();
-		level++;
 	}
 }
