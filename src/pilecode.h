@@ -234,7 +234,7 @@ namespace pilecode {
 		Direction dir_ = kDirHalt; // direction of motion
 		Letter reg_ = kLtSpace; // robot has one register that can hold a letter
 		bool blocked_ = false; // robot blocks if it cannot execute current instruction
-		Si32 executing_ = 0;
+		Si32 executing_;
 	};
 
 	class World {

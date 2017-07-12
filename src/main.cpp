@@ -259,25 +259,27 @@ public:
 		Platform* plat1 = new Platform(
 			0, 0, 0,
 			{
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, },
 			});
 
 		Platform* plat2 = new Platform(
-			1, 1, 1,
+			2, 2, 1,
 			{
 				{ 2, 2, 2, 2 },
 			});
 
 		Platform* plat3 = new Platform(
-			1, 7, 1,
+			2, 8, 1,
 			{
 				{ 2, 2, 2, 2 },
 			});
@@ -287,10 +289,10 @@ public:
 		plat2->changable_tile(2, 0)->set_letter(kLtLeft);
 		plat2->changable_tile(3, 0)->set_letter(kLtDown);
 
-		plat3->changable_tile(0, 0)->set_output(kLtUp);
-		plat3->changable_tile(1, 0)->set_output(kLtRight);
-		plat3->changable_tile(2, 0)->set_output(kLtLeft);
-		plat3->changable_tile(3, 0)->set_output(kLtDown);
+		plat3->changable_tile(0, 0)->set_output(kLtDown);
+		plat3->changable_tile(1, 0)->set_output(kLtLeft);
+		plat3->changable_tile(2, 0)->set_output(kLtRight);
+		plat3->changable_tile(3, 0)->set_output(kLtUp);
 
 		world->AddPlatform(plat1);
 		world->AddPlatform(plat2);
@@ -308,44 +310,106 @@ public:
 
 	World* GenerateLevel5()
 	{
-		WorldParams wparams(200, 200, 2, 3);
+		WorldParams wparams(200, 200, 4, 4);
 		World* world = new World(wparams);
+		Platform* plat3 = new Platform(
+			0, 0, 3,
+			{
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+			});
+		Platform* plat2 = new Platform(
+			0, 0, 2,
+			{
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+			});
 		Platform* plat1 = new Platform(
+			0, 0, 1,
+			{
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+			});
+		Platform* plat0 = new Platform(
 			0, 0, 0,
 			{
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
-				{ 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
 			});
+		plat3->changable_tile(0, 1)->set_letter(kLtDot);
+		plat3->changable_tile(2, 1)->set_output(kLtDot);
 
-		Platform* plat2 = new Platform(
-			1, 1, 1,
-			{
-				{ 2, 2, 2, 2 },
-			});
+		plat2->changable_tile(0, 1)->set_letter(kLtWrite);
+		plat2->changable_tile(2, 1)->set_letter(kLtRead);
 
+		plat2->changable_tile(0, 0)->set_letter(kLtRight);
+		plat2->changable_tile(2, 0)->set_letter(kLtUp);
+		plat2->changable_tile(0, 2)->set_letter(kLtDown);
+		plat2->changable_tile(2, 2)->set_letter(kLtLeft);
+
+		world->AddPlatform(plat0);
+		world->AddPlatform(plat1);
+		world->AddPlatform(plat2);
+		world->AddPlatform(plat3);
+
+		world->AllowLetter(kLtUp);
+		world->AllowLetter(kLtRight);
+		world->AllowLetter(kLtDown);
+		world->AllowLetter(kLtLeft);
+		world->AllowLetter(kLtRead);
+		world->AllowLetter(kLtWrite);
+
+		return world;
+	}
+
+	World* GenerateLevel6()
+	{
+		WorldParams wparams(200, 200, 2, 3);
+		World* world = new World(wparams);
 		Platform* plat3 = new Platform(
-			1, 7, 1,
+			0, 0, 3,
 			{
-				{ 2, 2, 2, 2 },
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
 			});
+		Platform* plat2 = new Platform(
+			0, 0, 2,
+			{
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+				{ 2, 2, 2, },
+			});
+		Platform* plat1 = new Platform(
+			0, 0, 1,
+			{
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+			});
+		Platform* plat0 = new Platform(
+			0, 0, 0,
+			{
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+				{ 1, 1, 1, },
+			});
+		plat3->changable_tile(0, 1)->set_letter(kLtDot);
+		plat3->changable_tile(2, 1)->set_output(kLtDot);
 
-		plat2->changable_tile(0, 0)->set_letter(kLtUp);
-		plat2->changable_tile(1, 0)->set_letter(kLtRight);
-		plat2->changable_tile(2, 0)->set_letter(kLtLeft);
-		plat2->changable_tile(3, 0)->set_letter(kLtDown);
+		plat2->changable_tile(0, 1)->set_letter(kLtWrite);
+		plat2->changable_tile(2, 1)->set_letter(kLtRead);
 
-		plat3->changable_tile(0, 0)->set_output(kLtDown);
-		plat3->changable_tile(1, 0)->set_output(kLtLeft);
-		plat3->changable_tile(2, 0)->set_output(kLtRight);
-		plat3->changable_tile(3, 0)->set_output(kLtUp);
+		plat2->changable_tile(0, 0)->set_letter(kLtRight);
+		plat2->changable_tile(2, 0)->set_letter(kLtDown);
+		plat2->changable_tile(0, 2)->set_letter(kLtUp);
+		plat2->changable_tile(2, 2)->set_letter(kLtLeft);
 
+		world->AddPlatform(plat0);
 		world->AddPlatform(plat1);
 		world->AddPlatform(plat2);
 		world->AddPlatform(plat3);
@@ -390,6 +454,9 @@ public:
 				break;
 			case 4:
 				initWorld_.reset(GenerateLevel5());
+				break;
+			case 5:
+				initWorld_.reset(GenerateLevel6());
 				break;
 			}
 		}
@@ -904,10 +971,10 @@ private:
 	Letter placeLetter_;
 
 	// debug
-#if NDEBUG
+#ifdef DEV_MODE
 	bool disableAnimation_ = true;
 #else
-	bool disableAnimation_ = true;
+	bool disableAnimation_ = false;
 #endif
 };
 
@@ -945,6 +1012,16 @@ void EasyMain()
 				level++;
 				break;
 			}
+#ifdef DEV_MODE
+			if (IsKeyOnce(kKeyF3)) {
+				level++;
+				break;
+			}
+			if (IsKeyOnce(kKeyF2)) {
+				level--;
+				break;
+			}
+#endif
 		}
 
 		game.Finish();

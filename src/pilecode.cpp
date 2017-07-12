@@ -350,16 +350,26 @@ namespace pilecode {
 						dir_ = kDirLeft;
 						blocked_ = false;
 						break;
-					case kLtRead:
-						blocked_ = !world->ReadLetter(wu, reg_);
+					case kLtRead: {
+						Letter letter;
+						blocked_ = !world->ReadLetter(wu, letter);
+						if (letter != kLtSpace) {
+							reg_ = letter;
+						}
 						if (!blocked_) {
 							executing_ = 1;
 						}
 						break;
+					}
 					case kLtWrite:
-						blocked_ = !world->WriteLetter(wu, reg_);
-						if (!blocked_) {
-							executing_ = 1;
+						if (reg_ != kLtSpace) {
+							blocked_ = !world->WriteLetter(wu, reg_);
+							if (!blocked_) {
+								executing_ = 1;
+							}
+						}
+						else {
+							blocked_ = false;
 						}
 						break;
 					}
