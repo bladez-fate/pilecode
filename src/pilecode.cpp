@@ -713,7 +713,7 @@ namespace pilecode {
 				RenderCmnd::Filter filter = (
 					iz == visible_z_ - 1 ?
 					RenderCmnd::kFilterNone :
-					(iz < visible_z_ ? RenderCmnd::kFilterFog : RenderCmnd::kFilterTransparent)
+					(iz < visible_z_ ? RenderCmnd::kFilterNone : RenderCmnd::kFilterTransparent)
 				);
 				Pos p1 = p2;
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
