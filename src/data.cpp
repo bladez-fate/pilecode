@@ -24,6 +24,9 @@
 #include "data.h"
 
 namespace pilecode {
+
+	const Vec2Si32 g_tileCenter(64, 54);
+
 	namespace image {
 		Sprite g_empty;
 

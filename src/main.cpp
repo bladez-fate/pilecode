@@ -715,6 +715,15 @@ public:
 
 	void RenderTools()
 	{
+		if (placeMode_ == kPmRobot) {
+			image::g_robot.Draw(ae::MousePos() - g_tileCenter);
+		}
+		else if (placeMode_ == kPmLetter) {
+			image::g_letter[placeLetter_].Draw(ae::MousePos() - g_tileCenter);
+		}
+
+
+
 		DrawPanel(panelWidth_, panelHeight_);
 		for (Button& button : buttons_) {
 			button.Render();
@@ -789,11 +798,13 @@ public:
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
+
 		if (frameVisibility_) {
 			for (int wz = 0; wz <= wmouse_.z; wz++) {
 				vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
 			}
 		}
+
 		vp_->EndRender();
 
 		if (panelVisibility_) {
