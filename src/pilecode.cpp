@@ -317,39 +317,56 @@ namespace pilecode {
 
 	void Robot::SimulateExec(World* world)
 	{
-		Platform* p = world->platform(platform_);
-		if (Tile* cur_tile = p->changable_tile(x_, y_)) {
-			if (cur_tile->IsMovable()) {
-				Vec3Si32 w = p->ToWorld(x_, y_, 0);
-				Vec3Si32 wu = w;
-				wu.z++;
+		if (executing_ > 0) {
+			// simulate command execution
+			executing_--;
+		}
+		else {
+			// read command
+			Platform* p = world->platform(platform_);
+			if (Tile* cur_tile = p->changable_tile(x_, y_)) {
+				if (cur_tile->IsMovable()) {
+					Vec3Si32 w = p->ToWorld(x_, y_, 0);
+					Vec3Si32 wu = w;
+					wu.z++;
 
-				switch (cur_tile->ReadLetter()) {
-				case kLtSpace:
-					blocked_ = false;
-					break; // just keep moving
-				case kLtUp:
-					dir_ = kDirUp;
-					blocked_ = false;
-					break;
-				case kLtDown:
-					dir_ = kDirDown;
-					blocked_ = false;
-					break;
-				case kLtRight:
-					dir_ = kDirRight;
-					blocked_ = false;
-					break;
-				case kLtLeft:
-					dir_ = kDirLeft;
-					blocked_ = false;
-					break;
-				case kLtRead:
-					blocked_ = !world->ReadLetter(wu, reg_);
-					break;
-				case kLtWrite:
-					blocked_ = !world->WriteLetter(wu, reg_);
-					break;
+					switch (cur_tile->ReadLetter()) {
+					case kLtSpace:
+						blocked_ = false;
+						break; // just keep moving
+					case kLtUp:
+						dir_ = kDirUp;
+						blocked_ = false;
+						break;
+					case kLtDown:
+						dir_ = kDirDown;
+						blocked_ = false;
+						break;
+					case kLtRight:
+						dir_ = kDirRight;
+						blocked_ = false;
+						break;
+					case kLtLeft:
+						dir_ = kDirLeft;
+						blocked_ = false;
+						break;
+					case kLtRead:
+						blocked_ = !world->ReadLetter(wu, reg_);
+						if (!blocked_) {
+							executing_ = 1;
+						}
+						break;
+					case kLtWrite:
+						blocked_ = !world->WriteLetter(wu, reg_);
+						if (!blocked_) {
+							executing_ = 1;
+						}
+						break;
+					}
+				}
+				else {
+					dir_ = kDirHalt;
+					blocked_ = true;
 				}
 			}
 			else {
@@ -357,17 +374,13 @@ namespace pilecode {
 				blocked_ = true;
 			}
 		}
-		else {
-			dir_ = kDirHalt;
-			blocked_ = true;
-		}
 	}
 
 	void Robot::PrepareMove(World* world)
 	{
 		Platform* p = world->platform(platform_);
 		curr_ = p->ToWorld(x_, y_, 0);
-		if (!blocked_ && dir_ != kDirHalt) {
+		if (!blocked_ && !executing_ && dir_ != kDirHalt) {
 			Vec2Si32 delta = dir_delta();
 			Vec3Si32 next = p->ToWorld(x_ + delta.x, y_ + delta.y, 0);
 			next_ = world->IsMovable(next) ? next : curr_;
