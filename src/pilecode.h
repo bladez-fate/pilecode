@@ -210,12 +210,15 @@ namespace pilecode {
 		Vec2Si32 dir_delta();
 
 		// accessors
+		int priority() const { return priority_; }
+		int set_priority() const { return priority_; }
 		int platform() const { return platform_; }
 		int x() const { return x_; }
 		int y() const { return y_; }
 	private:
 		// robot configuration
 		const int seed_;
+		int priority_;
 
 		// robot is currently on this platform
 		int platform_;

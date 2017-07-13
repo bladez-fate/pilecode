@@ -424,16 +424,8 @@ namespace pilecode {
 				return 1;
 			}
 
-			// front-to-front -- random wins
-			Vec3Si32 dsum = d1 + d2;
-			if (dsum.x == 0 && dsum.y == 0) {
-				(rand() % 2 ? r1 : r2)->StopMove();
-				return 1;
-			}
-
-			// crossroad sync -- hindrance to the right
-			Si32 dprod = d1.x * d2.y - d1.y * d2.x;
-			(dprod > 0 ? r1 : r2)->StopMove();
+			// use priority
+			(r1->priority() < r2->priority() ? r1 : r2)->StopMove();
 			return 1;
 		}
 
