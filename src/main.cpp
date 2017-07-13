@@ -107,6 +107,60 @@ public:
 		return world;
 	}
 
+	World* GenerateIntroLevel1()
+	{
+		WorldParams wparams(200, 200, 2, 3);
+		World* world = new World(wparams);
+		Platform* plat1 = new Platform(
+			0, 0, 0,
+			{
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+				{ 1, },
+			});
+
+		Platform* plat2 = new Platform(
+			0, 1, 1,
+			{
+				{ 2 },
+			});
+
+		Platform* plat3 = new Platform(
+			0, 7, 1,
+			{
+				{ 2 },
+			});
+
+		plat1->changable_tile(0, 0)->set_letter(kLtUp);
+		plat1->changable_tile(0, 1)->set_letter(kLtRead);
+		plat1->changable_tile(0, 7)->set_letter(kLtWrite);
+
+		plat2->changable_tile(0, 0)->set_letter(kLtDot);
+		plat3->changable_tile(0, 0)->set_output(kLtDot);
+
+		world->AddPlatform(plat1);
+		world->AddPlatform(plat2);
+		world->AddPlatform(plat3);
+
+		Robot* r = new Robot(world, Vec3Si32(0, 0, 0));
+		world->AddRobot(r);
+
+		world->AllowLetter(kLtUp);
+		world->AllowLetter(kLtRight);
+		world->AllowLetter(kLtDown);
+		world->AllowLetter(kLtLeft);
+		world->AllowLetter(kLtRead);
+		world->AllowLetter(kLtWrite);
+
+		return world;
+	}
+
 	World* GenerateLevel1()
 	{
 		WorldParams wparams(200, 200, 2, 3);
@@ -444,23 +498,26 @@ public:
 	void Start(int level)
 	{
 		if (level >= 0) {
-			switch (level % 6) {
+			switch (level % 7) {
 			case 0:
-				initWorld_.reset(GenerateLevel1());
+				initWorld_.reset(GenerateIntroLevel1());
 				break;
 			case 1:
-				initWorld_.reset(GenerateLevel2());
+				initWorld_.reset(GenerateLevel1());
 				break;
 			case 2:
-				initWorld_.reset(GenerateLevel3());
+				initWorld_.reset(GenerateLevel2());
 				break;
 			case 3:
-				initWorld_.reset(GenerateLevel4());
+				initWorld_.reset(GenerateLevel3());
 				break;
 			case 4:
-				initWorld_.reset(GenerateLevel5());
+				initWorld_.reset(GenerateLevel4());
 				break;
 			case 5:
+				initWorld_.reset(GenerateLevel5());
+				break;
+			case 6:
 				initWorld_.reset(GenerateLevel6());
 				break;
 			}
