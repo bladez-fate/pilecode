@@ -368,51 +368,56 @@ public:
 
 	World* GenerateLevel6()
 	{
-		WorldParams wparams(200, 200, 2, 3);
+		WorldParams wparams(200, 200, 3, 2);
 		World* world = new World(wparams);
-		Platform* plat3 = new Platform(
-			0, 0, 3,
+		Platform* plat21 = new Platform(
+			2, 2, 2,
 			{
-				{ 2, 2, 2, },
-				{ 2, 2, 2, },
-				{ 2, 2, 2, },
+				{ 2, },
+				{ 2, },
+				{ 2, },
 			});
-		Platform* plat2 = new Platform(
-			0, 0, 2,
+		Platform* plat22 = new Platform(
+			9, 2, 2,
 			{
-				{ 2, 2, 2, },
-				{ 2, 2, 2, },
-				{ 2, 2, 2, },
+				{ 2, },
+				{ 2, },
+				{ 2, },
 			});
 		Platform* plat1 = new Platform(
 			0, 0, 1,
 			{
-				{ 1, 1, 1, },
-				{ 1, 1, 1, },
-				{ 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
 			});
 		Platform* plat0 = new Platform(
 			0, 0, 0,
 			{
-				{ 1, 1, 1, },
-				{ 1, 1, 1, },
-				{ 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, },
+				{ 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, },
 			});
-		plat3->changable_tile(0, 1)->set_letter(kLtDot);
-		plat3->changable_tile(2, 1)->set_output(kLtDot);
+		plat21->changable_tile(0, 0)->set_letter(kLtDown);
+		plat21->changable_tile(0, 1)->set_letter(kLtLeft);
+		plat21->changable_tile(0, 2)->set_letter(kLtUp);
 
-		plat2->changable_tile(0, 1)->set_letter(kLtWrite);
-		plat2->changable_tile(2, 1)->set_letter(kLtRead);
-
-		plat2->changable_tile(0, 0)->set_letter(kLtRight);
-		plat2->changable_tile(2, 0)->set_letter(kLtDown);
-		plat2->changable_tile(0, 2)->set_letter(kLtUp);
-		plat2->changable_tile(2, 2)->set_letter(kLtLeft);
+		plat22->changable_tile(0, 0)->set_output(kLtDown);
+		plat22->changable_tile(0, 1)->set_output(kLtLeft);
+		plat22->changable_tile(0, 2)->set_output(kLtUp);
 
 		world->AddPlatform(plat0);
 		world->AddPlatform(plat1);
-		world->AddPlatform(plat2);
-		world->AddPlatform(plat3);
+		world->AddPlatform(plat21);
+		world->AddPlatform(plat22);
 
 		world->AllowLetter(kLtUp);
 		world->AllowLetter(kLtRight);
@@ -439,7 +444,7 @@ public:
 	void Start(int level)
 	{
 		if (level >= 0) {
-			switch (level % 5) {
+			switch (level % 6) {
 			case 0:
 				initWorld_.reset(GenerateLevel1());
 				break;
