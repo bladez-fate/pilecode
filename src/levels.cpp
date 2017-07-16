@@ -297,6 +297,54 @@ namespace pilecode {
 				Platform* plat1 = new Platform(
 					0, 0, 0,
 					{
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+						{ 1, 1, 1, 1, },
+					});
+
+				Platform* plat2 = new Platform(
+					1, 2, 1,
+					{
+						{ 2, 2 },
+					});
+
+				Platform* plat3 = new Platform(
+					1, 6, 1,
+					{
+						{ 2, 2 },
+					});
+
+				plat2->changable_tile(0, 0)->set_letter(kLtLeft);
+				plat2->changable_tile(1, 0)->set_letter(kLtRight);
+				plat3->changable_tile(0, 0)->set_output(kLtRight);
+				plat3->changable_tile(1, 0)->set_output(kLtLeft);
+
+				world->AddPlatform(plat1);
+				world->AddPlatform(plat2);
+				world->AddPlatform(plat3);
+
+				world->AllowLetter(kLtUp);
+				world->AllowLetter(kLtRight);
+				world->AllowLetter(kLtDown);
+				world->AllowLetter(kLtLeft);
+				world->AllowLetter(kLtRead);
+				world->AllowLetter(kLtWrite);
+
+				AddLevel(world);
+			}
+
+			{
+				WorldParams wparams(200, 200, 2, 3);
+				World* world = new World(wparams);
+				Platform* plat1 = new Platform(
+					0, 0, 0,
+					{
 						{ 1, 1, 1, 1, 1, 1, 1, 1, },
 						{ 1, 1, 1, 1, 1, 1, 1, 1, },
 						{ 1, 1, 1, 1, 1, 1, 1, 1, },
