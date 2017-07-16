@@ -434,6 +434,9 @@ namespace pilecode {
 		void set_world(World* world) { world_ = world;  }
 
 	private:
+		void ApplyCommands();
+		void DrawTransparentFloor();
+
 		Pos GetPos(int wx, int wy, int wz = 0);
 		Sprite transparent() { return transparent_; }
 

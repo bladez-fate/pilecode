@@ -727,7 +727,7 @@ namespace pilecode {
 		transparent_.Clear();
 	}
 
-	void ViewPort::EndRender()
+	void ViewPort::ApplyCommands()
 	{
 		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
@@ -737,7 +737,7 @@ namespace pilecode {
 					iz == visible_z_ - 1 ?
 					RenderCmnd::kFilterNone :
 					(iz < visible_z_ ? RenderCmnd::kFilterNone : RenderCmnd::kFilterTransparent)
-				);
+					);
 				Pos p1 = p2;
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
 					Pos p0 = p1;
@@ -752,8 +752,10 @@ namespace pilecode {
 				}
 			}
 		}
+	}
 
-		// draw transparent higer floor over cursor
+	void ViewPort::DrawTransparentFloor()
+	{
 		// TODO: start/finish animation???
 		int xRadius = Pos::dx;
 		int yRadius = Pos::dy;
@@ -770,9 +772,9 @@ namespace pilecode {
 		Si32 y2 = cy + 2 * yRadius + 1;
 
 		x1 = (x1 < 0 ? 0 : x1);
-		x2 = (x2 > bb.Width()? bb.Width() : x2);
+		x2 = (x2 > bb.Width() ? bb.Width() : x2);
 		y1 = (y1 < 0 ? 0 : y1);
-		y2 = (y2 < bb.Height()? bb.Height() : y2);
+		y2 = (y2 < bb.Height() ? bb.Height() : y2);
 
 		Si32 pos = y1 * bb.Width() + x1;
 		Rgba* bg = bb.RgbaData() + pos;
@@ -798,7 +800,12 @@ namespace pilecode {
 			fg = fg0 + bb.Width();
 		}
 		//DrawWithFixedAlphaBlend(transparent_, 0, 0, 128);
-		
+	}
+
+	void ViewPort::EndRender()
+	{
+		ApplyCommands();
+		DrawTransparentFloor();
 		lastFrameTime_ = curFrameTime_;
 	}
 
