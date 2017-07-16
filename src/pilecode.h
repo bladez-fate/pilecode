@@ -77,8 +77,8 @@ namespace pilecode {
 	public:
 		Shadow();
 		Shadow(World* world, Vec3Si32 w);
-	private:
 		bool& ceiling(Si32 dx, Si32 dy);
+		bool ceiling(Si32 dx, Si32 dy) const;
 	private:
 		bool ceiling_[9]; // 3x3 ceiling bitmask (0=sky; 1=ceiling)
 	};
@@ -410,7 +410,7 @@ namespace pilecode {
 			Rgba blend_ = Rgba(Ui32(0));
 
 			// for kShadow
-			Shadow shadow;
+			Shadow shadow_;
 		public:
 			RenderCmnd(Type type, Sprite* sprite, Vec2Si32 off_);
 			explicit RenderCmnd(const Shadow& shadow);
@@ -463,6 +463,8 @@ namespace pilecode {
 		void DrawCeiling(Vec3Si32 w);
 
 		Pos GetPos(int wx, int wy, int wz = 0);
+		Sprite ShadowMask(Sprite& surfaceMask, const Shadow& shadow);
+
 		Sprite transparent() { return transparent_; }
 		RenderList& renderList(int wx, int wy, int wz, int zl)
 		{

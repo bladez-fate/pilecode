@@ -65,6 +65,14 @@ namespace pilecode {
 		return ceiling_[dy * 3 + dx];
 	}
 
+	bool Shadow::ceiling(Si32 dx, Si32 dy) const
+	{
+		// transform ranges: [-1, 0, 1] ---> [0, 1, 2]
+		dx++;
+		dy++;
+		return ceiling_[dy * 3 + dx];
+	}
+
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz, int color)
 	{
 		// tile brick
@@ -975,6 +983,28 @@ namespace pilecode {
 		return p;
 	}
 
+	Sprite ViewPort::ShadowMask(Sprite& surfaceMask, const Shadow& shadow)
+	{
+		if (shadow.ceiling(0, 0)) {
+			Sprite shadowMask;
+			shadowMask.Create(surfaceMask.Width(), surfaceMask.Height());
+			shadowMask.SetPivot(Vec2Si32(0, 0));
+			Rgba* shad = shadowMask.RgbaData();
+			Rgba* surf = surfaceMask.RgbaData();
+			for (Si32 y = 0; y < shadowMask.Height(); y++) {
+				for (Si32 x = 0; x < shadowMask.Width(); x++, shad++, surf++) {
+					if (surf->a > 0) {
+						shad->a = surf->a / 8;
+					}
+				}
+			}
+			return shadowMask;
+		}
+		else {
+			return image::g_empty;
+		}
+	}
+
 	ViewPort::RenderCmnd::RenderCmnd(ViewPort::RenderCmnd::Type type,
 		Sprite* sprite, Vec2Si32 off)
 		: type_(type)
@@ -984,8 +1014,8 @@ namespace pilecode {
 
 	ViewPort::RenderCmnd::RenderCmnd(const Shadow& shadow)
 		: type_(kShadow)
-	{
-	}
+		, shadow_(shadow)
+	{}
 
 	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Blend(Rgba rgba)
 	{
@@ -1002,24 +1032,27 @@ namespace pilecode {
 	void ViewPort::RenderCmnd::Apply(ViewPort* vp, int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
 		Sprite to_sprite = filter == kFilterTransparent? vp->transparent(): ae::GetEngine()->GetBackbuffer();
+		x += off_.x;
+		y += off_.y;
 		switch (type_) {
 		case kSprite:
 			if (blend_.a == 0) {
-				DrawSprite(*sprite_, x + off_.x, y + off_.y, to_sprite);
+				DrawSprite(*sprite_, x, y, to_sprite);
 			}
 			else {
-				DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
+				DrawAndBlend(*sprite_, x, y, to_sprite, blend_);
 			}
 			break;
 		case kSpriteRgba:
 			if (blend_.a == 0) {
-				AlphaDraw(*sprite_, x + off_.x, y + off_.y, to_sprite);
+				AlphaDraw(*sprite_, x, y, to_sprite);
 			}
 			else {
-				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
+				AlphaDrawAndBlend(*sprite_, x, y, to_sprite, blend_);
 			}
 			break;
 		case kShadow:
+			AlphaDrawAndBlend(vp->ShadowMask(image::g_tileMask, shadow_), x, y, to_sprite, Rgba(0, 0, 0, 255));
 			break;
 		}
 	}
