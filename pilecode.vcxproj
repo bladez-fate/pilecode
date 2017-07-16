@@ -201,6 +201,7 @@
     <ClInclude Include="src\data.h" />
     <ClInclude Include="src\defs.h" />
     <ClInclude Include="src\graphics.h" />
+    <ClInclude Include="src\levels.h" />
     <ClInclude Include="src\pilecode.h" />
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +217,7 @@
     <ClCompile Include="..\arctic\engine\engine.cpp" />
     <ClCompile Include="src\data.cpp" />
     <ClCompile Include="src\graphics.cpp" />
+    <ClCompile Include="src\levels.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pilecode.cpp" />
   </ItemGroup>
