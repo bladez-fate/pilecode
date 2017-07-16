@@ -751,7 +751,7 @@ namespace pilecode {
 		ymin_ -= g_ytileorigin;
 		ymax_ -= g_ytileorigin;
 
-		Locate(Vec2F((xmin_ + xmax_) / 2, (ymin_ + ymax_) / 2));
+		Center();
 	}
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
@@ -894,10 +894,9 @@ namespace pilecode {
 		y_ = loc.y;
 	}
 
-	void ViewPort::Center(Vec2F loc)
+	void ViewPort::Center()
 	{
-		x_ = loc.x + screen::cx;
-		y_ = loc.y + screen::cy;
+		Locate(Vec2F((xmin_ + xmax_) / 2, (ymin_ + ymax_) / 2));
 	}
 
 	void ViewPort::IncVisibleZ()

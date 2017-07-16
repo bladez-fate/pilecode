@@ -65,9 +65,11 @@ public:
 		simPaused_ = true;
 	}
 
-	void Start(int level)
+	void Start(int level, int prevLevel)
 	{
-		initWorld_.reset(GenerateLevel(level));
+		level_ = level;
+		prevLevel_ = prevLevel;
+		initWorld_.reset(GenerateLevel(level_));
 		vp_.reset(new ViewPort(initWorld_.get()));
 		Restart();
 		DefaultPlaceMode();
@@ -79,17 +81,21 @@ public:
 			panelVisibility_ = false;
 
 			int N = 50;
+			bgTransition_ = 1.0f;
 			auto speed = Vec2F(0.0f, -N * 1.0f);
 			vp_->MoveNoClamp(Vec2F(0, 1.0f * N*(N + 1) / 2));
 			for (int i = 0; i < N; i++) {
 				Render();
-				if (IsKey(kKeyEscape)) {
+				if (IsKey(kKeyMouseLeft)) {
 					break;
 				}
 				Sleep(0.01);
 				vp_->MoveNoClamp(speed);
 				speed += Vec2F(0.0f, 1.0f);
+				bgTransition_ -= 1.0f / N;
 			}
+			bgTransition_ = 0.0f;
+			vp_->Center();
 
 			frameVisibility_ = true;
 			panelVisibility_ = true;
@@ -467,9 +473,17 @@ public:
 		}
 	}
 
+	Sprite& BgForLevel(int level)
+	{
+		return image::g_background[abs(level) % image::g_backgroundCount];
+	}
+
 	void Render()
 	{
-		image::g_background.Draw(0, 0);
+		BgForLevel(level_).Draw(0, 0);
+		if (bgTransition_ > 0.0f) {
+			DrawWithFixedAlphaBlend(BgForLevel(prevLevel_), 0, 0, Ui8(bgTransition_ * 255));
+		}
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
@@ -511,6 +525,8 @@ public:
 			//float speed = 1.01;
 			for (int i = 0; i < 10; i++) {
 				Render();
+				// TODO: interrupt on mouse click
+
 				Sleep(0.01);
 				dx += 4;
 				dy += 2;
@@ -546,6 +562,9 @@ private:
 	Si32 mouseScrollMargin_ = 5;
 	
 	// world
+	int level_ = 0;
+	int prevLevel_ = 0;
+	float bgTransition_ = 0.0f;
 	std::unique_ptr<WorldParams> wparams_;
 	std::unique_ptr<World> initWorld_;
 	std::unique_ptr<World> world_;
@@ -574,7 +593,7 @@ private:
 
 	// debug
 #ifdef DEV_MODE
-	bool disableAnimation_ = true;
+	bool disableAnimation_ = false; // true;
 #else
 	bool disableAnimation_ = false;
 #endif
@@ -593,9 +612,11 @@ void EasyMain()
 
 	bool exiting = false;
 	int level = 0;
+	int prevLevel = 0;
 	while (!exiting) {
 		Game game;
-		game.Start(level);
+		game.Start(level, prevLevel);
+		prevLevel = level;
 
 		while (true) {
 			if (!game.Control()) {

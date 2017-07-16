@@ -50,18 +50,16 @@ namespace pilecode {
 		Sprite g_button_robot;
 		Sprite g_button_letter[kLtMax];
 
-		Sprite g_background;
+		Sprite g_background[g_backgroundCount];
 	}
 
-	void CreateBackground()
+	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
 	{
-		image::g_background.Create(screen::w, screen::h);
-		image::g_background.SetPivot(Vec2Si32(0, 0));
+		bgSprite.Create(screen::w, screen::h);
+		bgSprite.SetPivot(Vec2Si32(0, 0));
 
-		Rgba* p = image::g_background.RgbaData();
+		Rgba* p = bgSprite.RgbaData();
 		Si64 rsqMax = 0;
-		Rgba c1(0xff, 0xee, 0xaa);
-		Rgba c2(0xff, 0xee, 0x99);
 		for (Si32 y = 0; y < screen::h; y++) {
 			for (Si32 x = 0; x < screen::w; x++, p++) {
 				Si64 rsq = (x - screen::cx)*(x - screen::cx) + (y - screen::cy)*(y - screen::cy);
@@ -118,6 +116,8 @@ namespace pilecode {
 		image::g_button_letter[kLtWrite].Load("data/button-write.tga");
 		image::g_button_letter[kLtDot] = image::g_empty;
 
-		CreateBackground();
+		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+		CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
+		CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
 	}
 }

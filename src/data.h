@@ -61,7 +61,8 @@ namespace pilecode {
 		extern Sprite g_button_robot;
 		extern Sprite g_button_letter[kLtMax];
 
-		extern Sprite g_background;
+		constexpr int g_backgroundCount = 3;
+		extern Sprite g_background[g_backgroundCount];
 	}
 
 	void InitData();

@@ -424,7 +424,7 @@ namespace pilecode {
 		void Move(Vec2F delta);
 		void MoveNoClamp(Vec2F delta);
 		void Locate(Vec2F loc);
-		void Center(Vec2F loc);
+		void Center();
 		void IncVisibleZ();
 		void DecVisibleZ();
 
