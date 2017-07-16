@@ -25,6 +25,8 @@
 #include "data.h"
 #include "graphics.h"
 
+#include "engine/arctic_math.h"
+
 namespace pilecode {
 
 	int Pos::dx = 14 * 4;
@@ -33,7 +35,7 @@ namespace pilecode {
 
 	namespace screen {
 		int w = 1280;
-		int h = 800;
+		int h = 720;
 		int cx = w/2;
 		int cy = h/2;
 		size_t size = w*h;
@@ -750,7 +752,53 @@ namespace pilecode {
 				}
 			}
 		}
-		DrawWithFixedAlphaBlend(transparent_, 0, 0, 128);
+
+		// draw transparent higer floor over cursor
+		// TODO: start/finish animation???
+		int xRadius = Pos::dx;
+		int yRadius = Pos::dy;
+		int aspect = Pos::dx / Pos::dy;
+		int aspectSq = aspect*aspect;
+
+		Si32 rsqMax = xRadius*xRadius + yRadius*yRadius*aspectSq;
+		Sprite bb = ae::GetEngine()->GetBackbuffer();
+		Si32 cx = ae::MousePos().x;
+		Si32 cy = ae::MousePos().y + Pos::dz;
+		Si32 x1 = cx - 2 * xRadius;
+		Si32 x2 = cx + 2 * xRadius + 1;
+		Si32 y1 = cy - 2 * yRadius;
+		Si32 y2 = cy + 2 * yRadius + 1;
+
+		x1 = (x1 < 0 ? 0 : x1);
+		x2 = (x2 > bb.Width()? bb.Width() : x2);
+		y1 = (y1 < 0 ? 0 : y1);
+		y2 = (y2 < bb.Height()? bb.Height() : y2);
+
+		Si32 pos = y1 * bb.Width() + x1;
+		Rgba* bg = bb.RgbaData() + pos;
+		Rgba* fg = transparent_.RgbaData() + pos;
+
+		for (Si32 y = y1; y < y2; y++) {
+			Ui64 ysq = (y - cy)*(y - cy)*aspectSq;
+			Rgba* bg0 = bg;
+			Rgba* fg0 = fg;
+			for (Si32 x = x1; x < x2; x++) {
+				Ui64 rsq = (x - cx)*(x - cx) + ysq;
+				Ui32 alpha = Ui32(arctic::Clamp(float(rsq) / rsqMax, 0.0f, 1.0f) * 256.0f + 0.5f);
+				if (fg->a > 0) {
+					*bg = RgbaSum(
+						RgbaMult(*fg, 256 - alpha),
+						RgbaMult(*bg, alpha)
+					);
+				}
+				fg++;
+				bg++;
+			}
+			bg = bg0 + bb.Width();
+			fg = fg0 + bb.Width();
+		}
+		//DrawWithFixedAlphaBlend(transparent_, 0, 0, 128);
+		
 		lastFrameTime_ = curFrameTime_;
 	}
 
@@ -789,15 +837,16 @@ namespace pilecode {
 		return Pos::ToWorld(p, wz);
 	}
 
-	Vec3Si32 ViewPort::ToWorld(Vec2Si32 p) const
+	bool ViewPort::ToWorld(Vec2Si32 p, Vec3Si32& w) const
 	{
-		for (int wz = int(visible_z_) - 1; wz > 0; wz--) {
-			Vec3Si32 w = ToWorldAtZ(wz, p);
-			if (Tile* tile = world_->At(w)) {
-				return w;
+		for (int wz = int(visible_z_) - 1; wz >= 0; wz--) {
+			Vec3Si32 w0 = ToWorldAtZ(wz, p);
+			if (Tile* tile = world_->At(w0)) {
+				w = w0;
+				return true;
 			}
 		}
-		return ToWorldAtZ(0, p);
+		return false;
 	}
 
 	Pos ViewPort::GetPos(int wx, int wy, int wz)
