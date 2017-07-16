@@ -34,6 +34,8 @@ namespace pilecode {
 		Sprite g_tile[kTlMax];
 		Sprite g_letter[kLtMax];
 		Sprite g_frame;
+		Sprite g_tileMask;
+
 		Sprite g_robot;
 		Sprite g_robotShadow;
 
@@ -93,6 +95,8 @@ namespace pilecode {
 		image::g_letter[kLtDot].Load("data/letter-dot.tga");
 
 		image::g_frame.Load("data/letter-frame.tga");
+		image::g_tileMask.Load("data/tile-mask.tga");
+
 		image::g_robot.Load("data/robot.tga");
 		image::g_robotShadow.Load("data/robot-shadow.tga");
 	
