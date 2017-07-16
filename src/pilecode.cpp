@@ -41,22 +41,52 @@ namespace pilecode {
 		size_t size = w*h;
 	}
 
+	Shadow::Shadow()
+	{
+		for (bool& v : ceiling_) {
+			v = false;
+		}
+	}
+
+	Shadow::Shadow(World* world, Vec3Si32 w)
+	{
+		for (Si32 dx = -1; dx <= 1; dx++) {
+			for (Si32 dy = -1; dy <= 1; dy++) {
+				ceiling(dx, dy) = world->At(w + Vec3Si32(dx, dy, 1));
+			}
+		}
+	}
+
+	bool& Shadow::ceiling(Si32 dx, Si32 dy)
+	{
+		// transform ranges: [-1, 0, 1] ---> [0, 1, 2]
+		dx++;
+		dy++;
+		return ceiling_[dy * 3 + dx];
+	}
+
 	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz, int color)
 	{
+		// tile brick
 		if (type_ != kTlNone) {
 			Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
 			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0));
 		}
 
+		// output
 		if (output_ != kLtSpace) {
 			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1,
 				Vec2Si32(0, letter_ != kLtSpace ? -3 : 0))
 				.Blend(Rgba(0, 0, 0, 255)).Alpha();
 		}
 
+		// letter
 		if (letter_ != kLtSpace) {
 			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0)).Alpha();
 		}
+
+		// shadow
+		vp->DrawShadow(wx, wy, wz, 1);
 	}
 
 	Letter Tile::ReadLetter()
@@ -756,11 +786,7 @@ namespace pilecode {
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
-		if (!(zl >= 0 && zl < zlSize)) {
-			abort();
-		}
-		size_t index = wparams_.index(wx, wy, (wz << zlBits) + zl);
-		RenderList& rlist = cmnds_[index];
+		RenderList& rlist = renderList(wx, wy, wz, zl);
 		rlist.emplace_back(RenderCmnd(RenderCmnd::kSprite, sprite, off));
 		return rlist.back();
 	}
@@ -778,6 +804,13 @@ namespace pilecode {
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl)
 	{
 		return Draw(sprite, w, zl, Vec2Si32(0, 0));
+	}
+
+	ViewPort::RenderCmnd& ViewPort::DrawShadow(int wx, int wy, int wz, int zl)
+	{
+		RenderList& rlist = renderList(wx, wy, wz, zl);
+		rlist.emplace_back(RenderCmnd(Shadow(world_, Vec3Si32(wx, wy, wz))));
+		return rlist.back();
 	}
 
 	void ViewPort::BeginRender(double time)
@@ -947,8 +980,12 @@ namespace pilecode {
 		: type_(type)
 		, sprite_(sprite)
 		, off_(off)
-		, blend_(Ui32(0))
 	{}
+
+	ViewPort::RenderCmnd::RenderCmnd(const Shadow& shadow)
+		: type_(kShadow)
+	{
+	}
 
 	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Blend(Rgba rgba)
 	{
@@ -964,51 +1001,25 @@ namespace pilecode {
 
 	void ViewPort::RenderCmnd::Apply(ViewPort* vp, int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
-		Sprite to_sprite = ae::GetEngine()->GetBackbuffer();
+		Sprite to_sprite = filter == kFilterTransparent? vp->transparent(): ae::GetEngine()->GetBackbuffer();
 		switch (type_) {
-		case kSpriteRgba:
-			switch (filter) {
-			case kFilterTransparent:
-				to_sprite = vp->transparent();
-			case kFilterNone:
-				if (blend_.a == 0) {
-					AlphaDraw(*sprite_, x + off_.x, y + off_.y, to_sprite);
-				}
-				else {
-					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
-				}
-				break;
-			case kFilterFog:
-				if (blend_.a == 0) {
-					AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, Rgba(0, 0, 0, 0x20));
-				}
-				else {
-					AlphaDrawAndBlend2(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_, Rgba(0, 0, 0, 0x20));
-				}
-				break;
+		case kSprite:
+			if (blend_.a == 0) {
+				DrawSprite(*sprite_, x + off_.x, y + off_.y, to_sprite);
+			}
+			else {
+				DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
 			}
 			break;
-		case kSprite:
-			switch (filter) {
-			case kFilterTransparent:
-				to_sprite = vp->transparent();
-			case kFilterNone:
-				if (blend_.a == 0) {
-					DrawSprite(*sprite_, x + off_.x, y + off_.y, to_sprite);
-				}
-				else {
-					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
-				}
-				break;
-			case kFilterFog:
-				if (blend_.a == 0) {
-					DrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, Rgba(0, 0, 0, 0x20));
-				}
-				else {
-					DrawAndBlend2(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_, Rgba(0, 0, 0, 0x20));
-				}
-				break;
+		case kSpriteRgba:
+			if (blend_.a == 0) {
+				AlphaDraw(*sprite_, x + off_.x, y + off_.y, to_sprite);
 			}
+			else {
+				AlphaDrawAndBlend(*sprite_, x + off_.x, y + off_.y, to_sprite, blend_);
+			}
+			break;
+		case kShadow:
 			break;
 		}
 	}

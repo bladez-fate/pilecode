@@ -73,6 +73,16 @@ namespace pilecode {
 		kLtMax		
 	};
 
+	class Shadow {
+	public:
+		Shadow();
+		Shadow(World* world, Vec3Si32 w);
+	private:
+		bool& ceiling(Si32 dx, Si32 dy);
+	private:
+		bool ceiling_[9]; // 3x3 ceiling bitmask (0=sky; 1=ceiling)
+	};
+
 	class Tile {
 	public:
 		// rendering
@@ -384,21 +394,26 @@ namespace pilecode {
 			enum Type {
 				kSprite = 0,
 				kSpriteRgba = 1,
+				kShadow = 2,
 			};
 
 			enum Filter {
 				kFilterNone = 0,
-				kFilterFog,
 				kFilterTransparent,
 			};
 
 			Type type_;
 
-			Sprite* sprite_;
-			Vec2Si32 off_;
-			Rgba blend_;
+			// for kSprite and kSpriteRgba
+			Sprite* sprite_ = nullptr;
+			Vec2Si32 off_ = Vec2Si32(0, 0);
+			Rgba blend_ = Rgba(Ui32(0));
+
+			// for kShadow
+			Shadow shadow;
 		public:
 			RenderCmnd(Type type, Sprite* sprite, Vec2Si32 off_);
+			explicit RenderCmnd(const Shadow& shadow);
 
 			RenderCmnd& Blend(Rgba rgba);
 			RenderCmnd& Alpha();
@@ -407,14 +422,17 @@ namespace pilecode {
 			friend class ViewPort;
 		};
 
+		using RenderList = std::vector<RenderCmnd>;
+
 	public:
 		explicit ViewPort(World* world);
 
 		// drawing
-		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer, Vec2Si32 off);
-		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer);
-		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zlayer, Vec2Si32 off);
-		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zlayer);
+		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zl);
+		RenderCmnd& DrawShadow(int wx, int wy, int wz, int zl);
 
 		// rendering
 		void BeginRender(double time);
@@ -438,7 +456,7 @@ namespace pilecode {
 
 		// world-related
 		World* world() const { return world_; }
-		void set_world(World* world) { world_ = world;  }
+		void set_world(World* world) { world_ = world; }
 
 	private:
 		void ApplyCommands();
@@ -446,6 +464,13 @@ namespace pilecode {
 
 		Pos GetPos(int wx, int wy, int wz = 0);
 		Sprite transparent() { return transparent_; }
+		RenderList& renderList(int wx, int wy, int wz, int zl)
+		{
+			if (!(zl >= 0 && zl < zlSize)) {
+				abort();
+			}
+			return cmnds_[wparams_.index(wx, wy, (wz << zlBits) + zl)];
+		}
 
 	private:
 		// world
@@ -471,7 +496,6 @@ namespace pilecode {
 		// rendering artifacts
 		static constexpr size_t zlBits = 2ull;
 		static constexpr size_t zlSize = 1ull << zlBits;
-		using RenderList = std::vector<RenderCmnd>;
 		std::vector<RenderList> cmnds_;
 		Sprite transparent_;
 	};
