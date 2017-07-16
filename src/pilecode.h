@@ -413,7 +413,7 @@ namespace pilecode {
 
 		// rendering
 		void BeginRender(double time);
-		void EndRender();
+		void EndRender(bool drawCeiling, Vec3Si32 w);
 
 		// navigation
 		void Move(Vec2F delta);
@@ -435,7 +435,7 @@ namespace pilecode {
 
 	private:
 		void ApplyCommands();
-		void DrawTransparentFloor();
+		void DrawCeiling(Vec3Si32 w);
 
 		Pos GetPos(int wx, int wy, int wz = 0);
 		Sprite transparent() { return transparent_; }

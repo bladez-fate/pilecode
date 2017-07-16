@@ -484,7 +484,7 @@ public:
 			}
 		}
 
-		vp_->EndRender();
+		vp_->EndRender(tileHover_, wmouse_);
 
 		if (panelVisibility_) {
 			RenderTools();

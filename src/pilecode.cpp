@@ -754,7 +754,7 @@ namespace pilecode {
 		}
 	}
 
-	void ViewPort::DrawTransparentFloor()
+	void ViewPort::DrawCeiling(Vec3Si32 w)
 	{
 		// TODO: start/finish animation???
 		int xRadius = Pos::dx;
@@ -764,8 +764,11 @@ namespace pilecode {
 
 		Si32 rsqMax = xRadius*xRadius + yRadius*yRadius*aspectSq;
 		Sprite bb = ae::GetEngine()->GetBackbuffer();
-		Si32 cx = ae::MousePos().x;
-		Si32 cy = ae::MousePos().y + Pos::dz;
+		
+		Pos pos = GetPos(w.x, w.y, w.z);
+		Si32 cx = pos.x + g_tileCenter.x;
+		Si32 cy = pos.y + g_tileCenter.y + Pos::dz;
+
 		Si32 x1 = cx - 2 * xRadius;
 		Si32 x2 = cx + 2 * xRadius + 1;
 		Si32 y1 = cy - 2 * yRadius;
@@ -776,9 +779,9 @@ namespace pilecode {
 		y1 = (y1 < 0 ? 0 : y1);
 		y2 = (y2 < bb.Height() ? bb.Height() : y2);
 
-		Si32 pos = y1 * bb.Width() + x1;
-		Rgba* bg = bb.RgbaData() + pos;
-		Rgba* fg = transparent_.RgbaData() + pos;
+		Si32 offs = y1 * bb.Width() + x1;
+		Rgba* bg = bb.RgbaData() + offs;
+		Rgba* fg = transparent_.RgbaData() + offs;
 
 		for (Si32 y = y1; y < y2; y++) {
 			Ui64 ysq = (y - cy)*(y - cy)*aspectSq;
@@ -802,10 +805,12 @@ namespace pilecode {
 		//DrawWithFixedAlphaBlend(transparent_, 0, 0, 128);
 	}
 
-	void ViewPort::EndRender()
+	void ViewPort::EndRender(bool drawCeiling, Vec3Si32 w)
 	{
 		ApplyCommands();
-		DrawTransparentFloor();
+		if (drawCeiling) {
+			DrawCeiling(w);
+		}
 		lastFrameTime_ = curFrameTime_;
 	}
 
