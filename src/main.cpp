@@ -619,7 +619,7 @@ public:
 
 	bool Control()
 	{
-		if (IsKey(kKeyQ) && IsKey(kKeyControl)) {
+		if (IsKey(kKeyEscape)) {
 			return false;
 		}
 
@@ -678,7 +678,7 @@ public:
 
 		wmouse_ = vp_->ToWorld(ae::MousePos());
 
-		if (IsKeyOnce(kKeyEscape)) {
+		if (IsKeyOnce(kKeyMouseRight)) {
 			DefaultPlaceMode();
 		}
 
