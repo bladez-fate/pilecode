@@ -777,7 +777,7 @@ namespace pilecode {
 		x1 = (x1 < 0 ? 0 : x1);
 		x2 = (x2 > bb.Width() ? bb.Width() : x2);
 		y1 = (y1 < 0 ? 0 : y1);
-		y2 = (y2 < bb.Height() ? bb.Height() : y2);
+		y2 = (y2 > bb.Height() ? bb.Height() : y2);
 
 		Si32 offs = y1 * bb.Width() + x1;
 		Rgba* bg = bb.RgbaData() + offs;
