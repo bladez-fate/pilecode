@@ -161,7 +161,7 @@ public:
 			simSpeed_ = 8.0;
 		}
 
-		wmouse_ = vp_->ToWorld(ae::MousePos());
+		tileHover_ = vp_->ToWorld(ae::MousePos(), wmouse_);
 
 		if (IsKeyOnce(kKeyMouseRight)) {
 			DefaultPlaceMode();
@@ -174,7 +174,7 @@ public:
 				// TODO: show help popups in this mode if single letter/robot is selected
 				break;
 			case kPmRobot:
-				if (IsKeyOnce(kKeyMouseLeft)) {
+				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
 					if (world_->steps() > 0) {
 						// TODO: play forbidden sound and text reason
 						// TODO: disable robot placement button iff world_->steps() > 0
@@ -187,7 +187,7 @@ public:
 				}
 				break;
 			case kPmLetter:
-				if (IsKeyOnce(kKeyMouseLeft)) {
+				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
 					if (world_->IsTouched(wmouse_)) {
 						// TODO: play forbidden sound and text reason
 					}
@@ -478,7 +478,7 @@ public:
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());
 
-		if (frameVisibility_) {
+		if (tileHover_ && frameVisibility_) {
 			for (int wz = 0; wz <= wmouse_.z; wz++) {
 				vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
 			}
@@ -566,6 +566,7 @@ private:
 	double simSpeed_ = 1.0;
 
 	// gameplay
+	bool tileHover_ = false;
 	Vec3Si32 wmouse_;
 	bool frameVisibility_ = true;
 	bool panelVisibility_ = true;

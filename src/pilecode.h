@@ -427,7 +427,7 @@ namespace pilecode {
 
 		// transformations
 		Vec3Si32 ToWorldAtZ(int wz, Vec2Si32 p) const;
-		Vec3Si32 ToWorld(Vec2Si32 p) const;
+		bool ToWorld(Vec2Si32 p, Vec3Si32& w) const;
 
 		// world-related
 		World* world() const { return world_; }
