@@ -687,6 +687,7 @@ namespace pilecode {
 		, visible_z_(wparams.zsize())
 	{
 		transparent_.Create(screen::w, screen::h);
+		transparent_.SetPivot(Vec2Si32(0, 0));
 	}
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
