@@ -473,7 +473,7 @@ public:
 
 	void Render()
 	{
-		Clear();
+		image::g_background.Draw(0, 0);
 
 		vp_->BeginRender(Time());
 		world_->Draw(vp_.get());

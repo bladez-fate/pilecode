@@ -22,6 +22,7 @@
 
 #include "pilecode.h"
 #include "data.h"
+#include "graphics.h"
 
 namespace pilecode {
 
@@ -48,6 +49,32 @@ namespace pilecode {
 		Sprite g_button_stop;
 		Sprite g_button_robot;
 		Sprite g_button_letter[kLtMax];
+
+		Sprite g_background;
+	}
+
+	void CreateBackground()
+	{
+		image::g_background.Create(screen::w, screen::h);
+		image::g_background.SetPivot(Vec2Si32(0, 0));
+
+		Rgba* p = image::g_background.RgbaData();
+		Si64 rsqMax = 0;
+		Rgba c1(0xff, 0xee, 0xaa);
+		Rgba c2(0xff, 0xee, 0x99);
+		for (Si32 y = 0; y < screen::h; y++) {
+			for (Si32 x = 0; x < screen::w; x++, p++) {
+				Si64 rsq = (x - screen::cx)*(x - screen::cx) + (y - screen::cy)*(y - screen::cy);
+				if (!rsqMax) {
+					rsqMax = rsq;
+				}
+				Ui32 alpha = Ui32(rsq * 256 / rsqMax);
+				*p = RgbaSum(
+					RgbaMult(c2, alpha),
+					RgbaMult(c1, 256 - alpha)
+				);
+			}
+		}
 	}
 
 	void InitData()
@@ -90,5 +117,7 @@ namespace pilecode {
 		image::g_button_letter[kLtRead].Load("data/button-read.tga");
 		image::g_button_letter[kLtWrite].Load("data/button-write.tga");
 		image::g_button_letter[kLtDot] = image::g_empty;
+
+		CreateBackground();
 	}
 }

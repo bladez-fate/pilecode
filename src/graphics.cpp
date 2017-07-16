@@ -26,35 +26,6 @@
 
 namespace pilecode {
 
-	inline Rgba RgbaMult(Rgba c, Ui32 m)
-	{
-		Ui32 rb = c.rgba & 0x00ff00ff;
-		Ui32 rbm = ((rb * m) >> 8) & 0x00ff00ff;
-		Ui32 ga = (c.rgba >> 8) & 0x00ff00ff;
-		Ui32 gam = ((ga * m)) & 0xff00ff00;
-		return Rgba(rbm | gam);
-	}
-
-	inline Rgba RgbSum(Rgba x, Rgba y)
-	{
-		return Rgba(
-			Ui16(x.r) + Ui16(y.r) > 255 ? 255 : x.r + y.r,
-			Ui16(x.g) + Ui16(y.g) > 255 ? 255 : x.g + y.g,
-			Ui16(x.b) + Ui16(y.b) > 255 ? 255 : x.b + y.b,
-			0
-		);
-	}
-
-	inline Rgba RgbaSum(Rgba x, Rgba y)
-	{
-		return Rgba(
-			Ui16(x.r) + Ui16(y.r) > 255 ? 255 : x.r + y.r,
-			Ui16(x.g) + Ui16(y.g) > 255 ? 255 : x.g + y.g,
-			Ui16(x.b) + Ui16(y.b) > 255 ? 255 : x.b + y.b,
-			Ui16(x.a) + Ui16(y.a) > 255 ? 255 : x.a + y.a
-		);
-	}
-
 	template <class FilterFunc>
 	void FilterDraw(Sprite sprite, const Si32 to_x_pivot, const Si32 to_y_pivot,
 		const Si32 to_width, const Si32 to_height,

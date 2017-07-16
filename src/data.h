@@ -60,6 +60,8 @@ namespace pilecode {
 		extern Sprite g_button_stop;
 		extern Sprite g_button_robot;
 		extern Sprite g_button_letter[kLtMax];
+
+		extern Sprite g_background;
 	}
 
 	void InitData();
