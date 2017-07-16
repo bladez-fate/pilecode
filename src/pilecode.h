@@ -31,6 +31,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <functional>
 
 namespace pilecode {
 
@@ -162,6 +163,9 @@ namespace pilecode {
 		int PlatformY(int wy) const { return wy - y_; }
 		int PlatformZ(int wz) const { return wz - z_; }
 
+		// utility
+		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
+
 		// accessors
 		int index() const { return index_; }
 		void set_index(int index) { index_ = index; }
@@ -268,6 +272,7 @@ namespace pilecode {
 		Platform* FindPlatform(Vec3Si32 w);
 		bool IsOutputCorrect();
 		Tile* At(Vec3Si32 w);
+		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
@@ -403,7 +408,7 @@ namespace pilecode {
 		};
 
 	public:
-		ViewPort(const WorldParams& wparams);
+		explicit ViewPort(World* world);
 
 		// drawing
 		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zlayer, Vec2Si32 off);
@@ -417,7 +422,9 @@ namespace pilecode {
 
 		// navigation
 		void Move(Vec2F delta);
+		void MoveNoClamp(Vec2F delta);
 		void Locate(Vec2F loc);
+		void Center(Vec2F loc);
 		void IncVisibleZ();
 		void DecVisibleZ();
 
@@ -445,14 +452,14 @@ namespace pilecode {
 		WorldParams wparams_;
 		World* world_ = nullptr;
 
-		// screen coordinates of origin
-		int cx_ = screen::cx;
-		int cy_ = screen::cy;
-
 		// screen offset in pixels
 		float x_ = 0;
 		float y_ = 0;
-		
+		float xmin_ = 0;
+		float ymin_ = 0;
+		float xmax_ = 0;
+		float ymax_ = 0;
+
 		// world rendering parameters
 		size_t visible_z_ = 0;
 

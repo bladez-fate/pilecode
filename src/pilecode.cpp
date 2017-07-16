@@ -265,6 +265,20 @@ namespace pilecode {
 		return nullptr;
 	}
 
+	void Platform::ForEachTile(std::function<void(Vec3Si32, Tile*)> func)
+	{
+		Tile* tile = &tiles_[0];
+		Vec3Si32 w(x_, y_, z_);
+		for (int ry = 0; ry < h_; ry++, w.y++) {
+			w.x = x_;
+			for (int rx = 0; rx < w_; rx++, w.x++, tile++) {
+				if (tile->type() != kTlNone) {
+					func(w, tile);
+				}
+			}
+		}
+	}
+
 	Robot::Robot()
 		: seed_(rand())
 	{
@@ -683,13 +697,61 @@ namespace pilecode {
 		return nullptr;
 	}
 
-	ViewPort::ViewPort(const WorldParams& wparams)
-		: wparams_(wparams)
-		, cmnds_(wparams.size() * zlSize)
-		, visible_z_(wparams.zsize())
+	void World::ForEachTile(std::function<void(Vec3Si32, Tile*)> func)
+	{
+		for (const auto& p : platform_) {
+			p->ForEachTile(func);
+		}
+	}
+
+	ViewPort::ViewPort(World* world)
+		: wparams_(world->params())
+		, cmnds_(wparams_.size() * zlSize)
+		, visible_z_(wparams_.zsize())
 	{
 		transparent_.Create(screen::w, screen::h);
 		transparent_.SetPivot(Vec2Si32(0, 0));
+		xmin_ = std::numeric_limits<float>::max();
+		ymin_ = std::numeric_limits<float>::max();
+		xmax_ = std::numeric_limits<float>::min();
+		ymax_ = std::numeric_limits<float>::min();
+		world->ForEachTile([=](Vec3Si32 w, Tile*) {
+			Pos p(w);
+			if (xmin_ > -p.x) {
+				xmin_ = -(float)p.x;
+			}
+			if (ymin_ > -p.y) {
+				ymin_ = -(float)p.y;
+			}
+			if (xmax_ < -p.x) {
+				xmax_ = -(float)p.x;
+			}
+			if (ymax_ < -p.y) {
+				ymax_ = -(float)p.y;
+			}
+		});
+		
+		//xmin_ = xmax_ = ymin_ = ymax_ = 0;
+
+		// adjustments for the fact that Pos gives coords of the top corner of tile
+		xmin_ -= Pos::dx;
+		xmax_ += Pos::dx;
+		ymin_ -= 2*Pos::dy;
+		ymax_ += Pos::dz;
+
+		// adjustment for screen size
+		xmin_ += screen::cx;
+		xmax_ += screen::cx;
+		ymin_ += screen::cy;
+		ymax_ += screen::cy;
+
+		// adjustment for tile position
+		xmin_ -= g_xtileorigin;
+		xmax_ -= g_xtileorigin;
+		ymin_ -= g_ytileorigin;
+		ymax_ -= g_ytileorigin;
+
+		Locate(Vec2F((xmin_ + xmax_) / 2, (ymin_ + ymax_) / 2));
 	}
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
@@ -816,6 +878,12 @@ namespace pilecode {
 
 	void ViewPort::Move(Vec2F delta)
 	{
+		x_ = ae::Clamp(x_ + delta.x, xmin_, xmax_);
+		y_ = ae::Clamp(y_ + delta.y, ymin_, ymax_);
+	}
+
+	void ViewPort::MoveNoClamp(Vec2F delta)
+	{
 		x_ += delta.x;
 		y_ += delta.y;
 	}
@@ -824,6 +892,12 @@ namespace pilecode {
 	{
 		x_ = loc.x;
 		y_ = loc.y;
+	}
+
+	void ViewPort::Center(Vec2F loc)
+	{
+		x_ = loc.x + screen::cx;
+		y_ = loc.y + screen::cy;
 	}
 
 	void ViewPort::IncVisibleZ()
@@ -842,8 +916,8 @@ namespace pilecode {
 
 	Vec3Si32 ViewPort::ToWorldAtZ(int wz, Vec2Si32 p) const
 	{
-		p.x -= cx_ + int(x_ + 0.5f);
-		p.y -= cy_ + int(y_ + 0.5f);
+		p.x -= int(x_ + 0.5f);
+		p.y -= int(y_ + 0.5f);
 		p.x -= g_xtileorigin;
 		p.y -= g_ytileorigin;
 		return Pos::ToWorld(p, wz);
@@ -864,8 +938,8 @@ namespace pilecode {
 	Pos ViewPort::GetPos(int wx, int wy, int wz)
 	{
 		Pos p(wx, wy, wz);
-		p.x += cx_ + int(x_ + 0.5f);
-		p.y += cy_ + int(y_ + 0.5f);
+		p.x += int(x_ + 0.5f);
+		p.y += int(y_ + 0.5f);
 		return p;
 	}
 

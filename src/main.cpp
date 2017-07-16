@@ -68,9 +68,7 @@ public:
 	void Start(int level)
 	{
 		initWorld_.reset(GenerateLevel(level));
-		vp_.reset(new ViewPort(initWorld_->params()));
-		auto initialCoords = Vec2F(-180.0f, 40.0);
-		vp_->Move(initialCoords);
+		vp_.reset(new ViewPort(initWorld_.get()));
 		Restart();
 		DefaultPlaceMode();
 
@@ -82,22 +80,20 @@ public:
 
 			int N = 50;
 			auto speed = Vec2F(0.0f, -N * 1.0f);
-			vp_->Move(Vec2F(0, 1.0f * N*(N + 1) / 2));
+			vp_->MoveNoClamp(Vec2F(0, 1.0f * N*(N + 1) / 2));
 			for (int i = 0; i < N; i++) {
 				Render();
 				if (IsKey(kKeyEscape)) {
 					break;
 				}
 				Sleep(0.01);
-				vp_->Move(speed);
+				vp_->MoveNoClamp(speed);
 				speed += Vec2F(0.0f, 1.0f);
 			}
 
 			frameVisibility_ = true;
 			panelVisibility_ = true;
 		}
-
-		vp_->Locate(initialCoords);
 
 		MakeTools();
 	}
@@ -519,7 +515,7 @@ public:
 				dx += 4;
 				dy += 2;
 
-				vp_->Move(Vec2F(-16.0f, 8.0f));
+				vp_->MoveNoClamp(Vec2F(-16.0f, 8.0f));
 
 				Pos::dx = (int)dx;
 				Pos::dy = (int)dy;
@@ -531,7 +527,7 @@ public:
 			for (int i = 0; i < 50; i++) {
 				Render();
 				Sleep(0.01);
-				vp_->Move(speed);
+				vp_->MoveNoClamp(speed);
 				speed += Vec2F(0.0f, -1.0f);
 			}
 
