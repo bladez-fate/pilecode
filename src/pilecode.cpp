@@ -414,6 +414,7 @@ namespace pilecode {
 						}
 						if (!blocked_) {
 							executing_ = 1;
+							sfx::g_read.Play();
 						}
 						break;
 					}
@@ -422,6 +423,7 @@ namespace pilecode {
 							blocked_ = !world->WriteLetter(wu, reg_);
 							if (!blocked_) {
 								executing_ = 1;
+								sfx::g_write.Play();
 							}
 						}
 						else {

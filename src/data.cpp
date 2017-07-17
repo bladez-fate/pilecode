@@ -64,6 +64,8 @@ namespace pilecode {
 		Sound g_click2;
 		Sound g_positive;
 		Sound g_negative2;
+		Sound g_read;
+		Sound g_write;
 	}
 
 	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
@@ -147,6 +149,8 @@ namespace pilecode {
 		sfx::g_click2.Load("data/lokif/click_2.wav");
 		sfx::g_positive.Load("data/lokif/positive.wav");
 		sfx::g_negative2.Load("data/lokif/negative_2.wav");
+		sfx::g_read.Load("data/circlerun/read.wav");
+		sfx::g_write.Load("data/circlerun/write.wav");
 	}
 
 	void InitData()

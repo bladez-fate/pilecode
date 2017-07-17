@@ -77,6 +77,8 @@ namespace pilecode {
 		extern Sound g_click2;
 		extern Sound g_positive;
 		extern Sound g_negative2;
+		extern Sound g_read;
+		extern Sound g_write;
 	}
 
 	void InitData();
