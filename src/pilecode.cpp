@@ -34,8 +34,8 @@ namespace pilecode {
 	int Pos::dz = 25 * 4;
 
 	namespace screen {
-		int w = 1280;
-		int h = 720;
+		int w = 1680;
+		int h = 1050;
 		int cx = w/2;
 		int cy = h/2;
 		size_t size = w*h;
@@ -994,7 +994,38 @@ namespace pilecode {
 			for (Si32 y = 0; y < shadowMask.Height(); y++) {
 				for (Si32 x = 0; x < shadowMask.Width(); x++, shad++, surf++) {
 					if (surf->a > 0) {
-						shad->a = surf->a / 8;
+						Si32 tx = x - g_xtileorigin;
+						Si32 ty = y - g_ytileorigin;
+						Vec2F tr = Pos::ToTile(Vec2Si32(tx, ty));
+						
+						float light = 0.0f;
+						float contrast = 6.0f;
+						if (!shadow.ceiling(1, 0)) {
+							light = std::max(light, 1.0f - (1.0f - tr.x) * contrast);
+						}
+						if (!shadow.ceiling(0, 1)) {
+							light = std::max(light, 1.0f - (1.0f - tr.y) * contrast);
+						}
+						if (!shadow.ceiling(-1, 0)) {
+							light = std::max(light, 1.0f - (tr.x) * contrast);
+						}
+						if (!shadow.ceiling(0, -1)) {
+							light = std::max(light, 1.0f - (tr.y) * contrast);
+						}
+
+						if (!shadow.ceiling(1, 1)) {
+							light = std::max(light, 1.0f - (2.0f - tr.x - tr.y) * contrast);
+						}
+						if (!shadow.ceiling(1, -1)) {
+							light = std::max(light, 1.0f - (1.0f - tr.x + tr.y) * contrast);
+						}
+						if (!shadow.ceiling(-1, 1)) {
+							light = std::max(light, 1.0f - (1.0f - tr.y + tr.x) * contrast);
+						}
+						if (!shadow.ceiling(-1, -1)) {
+							light = std::max(light, 1.0f - (tr.x + tr.y) * contrast);
+						}
+						shad->a = (Ui8)std::max(0.0f, std::min(255.0f, float(surf->a) * (1.0f - light) / 8.0f));
 					}
 				}
 			}

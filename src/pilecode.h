@@ -379,10 +379,18 @@ namespace pilecode {
 		static Vec3Si32 ToWorld(Vec2Si32 s, int wz)
 		{
 			s.y -= dz * wz;
-			int wx = int(-(float(s.x) / dx + float(s.y) / dy) / 2);
-			int wy = int((float(s.x) / dx - float(s.y) / dy) / 2);
+			int wx = int(-(float(s.x) / dx + float(s.y) / dy) / 2.0f);
+			int wy = int( (float(s.x) / dx - float(s.y) / dy) / 2.0f);
 
 			return Vec3Si32(wx, wy, wz);
+		}
+
+		static Vec2F ToTile(Vec2Si32 s)
+		{
+			float wx = -(float(s.x) / dx + float(s.y) / dy) / 2.0f;
+			float wy =  (float(s.x) / dx - float(s.y) / dy) / 2.0f;
+
+			return Vec2F(wx, wy);
 		}
 	};
 
