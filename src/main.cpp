@@ -465,11 +465,13 @@ public:
 		// Add letter buttons
 		for (int k = kLtSpace + 1; k < kLtMax; k++) {
 			auto letter = Letter(k);
-			AddButton(btnPos++, image::g_button_letter[letter])->Click([=](Button* btn) {
-				SwitchPlaceMode(kPmLetter, letter);
-			})->OnUpdate([=](Button* btn) {
-				btn->set_frame(placeMode_ == kPmLetter && placeLetter_ == letter);
-			});
+			if (world_->IsLetterAllowed(letter)) {
+				AddButton(btnPos++, image::g_button_letter[letter])->Click([=](Button* btn) {
+					SwitchPlaceMode(kPmLetter, letter);
+				})->OnUpdate([=](Button* btn) {
+					btn->set_frame(placeMode_ == kPmLetter && placeLetter_ == letter);
+				});
+			}
 		}
 	}
 
