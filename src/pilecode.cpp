@@ -94,7 +94,9 @@ namespace pilecode {
 		}
 
 		// shadow
-		vp->DrawShadow(wx, wy, wz, 1);
+		if (type_ != kTlNone) {
+			vp->DrawShadow(wx, wy, wz, 1);
+		}
 	}
 
 	Letter Tile::ReadLetter()
