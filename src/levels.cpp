@@ -93,6 +93,13 @@ namespace pilecode {
 				world->AddPlatform(plat3);
 				world->AddPlatform(plat4);
 
+				world->AllowLetter(kLtUp);
+				world->AllowLetter(kLtRight);
+				world->AllowLetter(kLtDown);
+				world->AllowLetter(kLtLeft);
+				world->AllowLetter(kLtRead);
+				world->AllowLetter(kLtWrite);
+
 				AddSandbox(world);
 			}
 
