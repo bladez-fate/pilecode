@@ -644,11 +644,6 @@ void EasyMain()
 				break;
 			}
 
-			if (IsKeyOnce(kKeyF1)) {
-				level = -1;
-				break;
-			}
-
 			game.Update();
 			game.Render();
 			if (game.IsComplete()) {
@@ -657,6 +652,10 @@ void EasyMain()
 				break;
 			}
 #ifdef DEV_MODE
+			if (IsKeyOnce(kKeyF1)) {
+				level = -1;
+				break;
+			}
 			if (IsKeyOnce(kKeyF3)) {
 				level++;
 				break;
