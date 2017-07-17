@@ -36,6 +36,7 @@ namespace ar = arctic;
 
 namespace pilecode {
 	using ae::Sprite;
+	using ae::Sound;
 	using ae::Si8;
 	using ae::Ui8;
 	using ae::Si16;

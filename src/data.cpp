@@ -55,6 +55,10 @@ namespace pilecode {
 		Sprite g_background[g_backgroundCount];
 	}
 
+	namespace music {
+		Sound g_background[g_backgroundCount];
+	}
+
 	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
 	{
 		bgSprite.Create(screen::w, screen::h);
@@ -77,7 +81,7 @@ namespace pilecode {
 		}
 	}
 
-	void InitData()
+	void InitImage()
 	{
 		image::g_empty.Load("data/empty.tga");
 
@@ -123,5 +127,16 @@ namespace pilecode {
 		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
 		CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
 		CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
+	}
+
+	void InitMusic()
+	{
+		music::g_background[0].Load("data/music-observing-the-star.ogg");
+	}
+
+	void InitData()
+	{
+		InitImage();
+		InitMusic();
 	}
 }

@@ -67,5 +67,10 @@ namespace pilecode {
 		extern Sprite g_background[g_backgroundCount];
 	}
 
+	namespace music {
+		constexpr int g_backgroundCount = 1;
+		extern Sound g_background[g_backgroundCount];
+	}
+
 	void InitData();
 }

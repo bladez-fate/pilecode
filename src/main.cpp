@@ -593,7 +593,7 @@ private:
 
 	// debug
 #ifdef DEV_MODE
-	bool disableAnimation_ = false; // true;
+	bool disableAnimation_ = true;
 #else
 	bool disableAnimation_ = false;
 #endif
@@ -603,6 +603,17 @@ void Init()
 {
 	InitData();
 	ResizeScreen(screen::w, screen::h);
+}
+
+void UpdateMusic()
+{
+	static int musicIdx = 0;
+
+	// switch background music tracks
+	if (!music::g_background[musicIdx].IsPlaying()) {
+		musicIdx = (musicIdx + 1) % music::g_backgroundCount;
+		music::g_background[musicIdx].Play();
+	}
 }
 
 void EasyMain()
@@ -645,6 +656,8 @@ void EasyMain()
 				break;
 			}
 #endif
+
+			UpdateMusic();
 		}
 
 		game.Finish();
