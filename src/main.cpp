@@ -629,6 +629,7 @@ void EasyMain()
 {
 	Init();
 	srand((int)time(nullptr));
+	UpdateMusic();
 
 	bool exiting = false;
 	int level = 0;
