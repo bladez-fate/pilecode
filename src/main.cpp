@@ -178,24 +178,25 @@ public:
 			case kPmRobot:
 				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
 					if (world_->steps() > 0) {
-						// TODO: play forbidden sound and text reason
-						// TODO: disable robot placement button iff world_->steps() > 0
+						sfx::g_negative2.Play();
 					}
 					else {
 						Robot original; // to sync seed in initWorld_ and world_
 						world_->SwitchRobot(wmouse_, original);
 						initWorld_->SwitchRobot(wmouse_, original);
+						sfx::g_click.Play();
 					}
 				}
 				break;
 			case kPmLetter:
 				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
 					if (world_->IsTouched(wmouse_)) {
-						// TODO: play forbidden sound and text reason
+						sfx::g_negative2.Play();
 					}
 					else {
 						world_->SetLetter(wmouse_, placeLetter_);
 						initWorld_->SetLetter(wmouse_, placeLetter_);
+						sfx::g_click.Play();
 					}
 				}
 				break;
@@ -307,6 +308,7 @@ public:
 			if (enabled_ && onClick_) {
 				if ((hover_ && IsKeyOnce(kKeyMouseLeft))
 					|| (hotkey_ && IsKeyOnce(hotkey_))) {
+					sfx::g_click2.Play();
 					onClick_(this);
 				}
 			}
@@ -414,6 +416,9 @@ public:
 	void PlayOrPause()
 	{
 		simPaused_ = !simPaused_;
+		if (simPaused_ == false) {
+			DefaultPlaceMode();
+		}
 	}
 
 	void DefaultPlaceMode()
@@ -458,6 +463,7 @@ public:
 			SwitchPlaceMode(kPmRobot, kLtSpace);
 		})->OnUpdate([=](Button* btn) {
 			btn->set_frame(placeMode_ == kPmRobot);
+			btn->set_enabled(world_->steps() == 0);
 		});
 
 		Si32 btnPos = 4;
@@ -470,6 +476,7 @@ public:
 					SwitchPlaceMode(kPmLetter, letter);
 				})->OnUpdate([=](Button* btn) {
 					btn->set_frame(placeMode_ == kPmLetter && placeLetter_ == letter);
+					btn->set_enabled(world_->steps() == 0); // TODO: allow to change untouched tiles
 				});
 			}
 		}
@@ -645,6 +652,7 @@ void EasyMain()
 			game.Update();
 			game.Render();
 			if (game.IsComplete()) {
+				sfx::g_positive.Play();
 				level++;
 				break;
 			}

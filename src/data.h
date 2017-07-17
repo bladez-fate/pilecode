@@ -72,5 +72,12 @@ namespace pilecode {
 		extern Sound g_background[g_backgroundCount];
 	}
 
+	namespace sfx {
+		extern Sound g_click;
+		extern Sound g_click2;
+		extern Sound g_positive;
+		extern Sound g_negative2;
+	}
+
 	void InitData();
 }

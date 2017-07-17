@@ -59,6 +59,13 @@ namespace pilecode {
 		Sound g_background[g_backgroundCount];
 	}
 
+	namespace sfx {
+		Sound g_click;
+		Sound g_click2;
+		Sound g_positive;
+		Sound g_negative2;
+	}
+
 	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
 	{
 		bgSprite.Create(screen::w, screen::h);
@@ -134,9 +141,18 @@ namespace pilecode {
 		music::g_background[0].Load("data/music-observing-the-star.ogg");
 	}
 
+	void InitSfx()
+	{
+		sfx::g_click.Load("data/lokif/click.wav");
+		sfx::g_click2.Load("data/lokif/click_2.wav");
+		sfx::g_positive.Load("data/lokif/positive.wav");
+		sfx::g_negative2.Load("data/lokif/negative_2.wav");
+	}
+
 	void InitData()
 	{
 		InitImage();
 		InitMusic();
+		InitSfx();
 	}
 }

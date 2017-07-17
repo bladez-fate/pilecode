@@ -23,7 +23,7 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
-#define DEV_MODE
+//#define DEV_MODE
 
 #include "engine/easy.h"
 
