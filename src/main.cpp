@@ -322,8 +322,8 @@ public:
 		void Render()
 		{
 			auto blend = (enabled_ ?
-				(hover_ ? Rgba(0, 0, 0, 0) : Rgba(0, 0, 0, 0x20)) :
-				Rgba(0, 0, 0, 0x50));
+				(hover_ ? Rgba(0x55, 0xff, 0x66, 0x80) : Rgba(0, 0, 0, 0)) :
+				Rgba(0x63, 0xa8, 0xdd, 0xff));
 
 			if (frame_) {
 				AlphaDrawAndBlend(image::g_button_frame, x1_, y1_, blend);
