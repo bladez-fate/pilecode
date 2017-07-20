@@ -732,7 +732,8 @@ namespace pilecode {
 		}
 	};
 
-	World* GenerateLevel(int level) {
+	World* GenerateLevel(int level)
+	{
 		auto levels = Levels::Instance();
 		if (level >= 0) {
 			size_t idx = level % levels->worlds_.size();
@@ -742,5 +743,11 @@ namespace pilecode {
 			size_t idx = (-level - 1) % levels->sandboxes_.size();
 			return levels->sandboxes_[idx]->Clone();
 		}
+	}
+
+	size_t LevelsCount()
+	{
+		auto levels = Levels::Instance();
+		return levels->worlds_.size();
 	}
 }

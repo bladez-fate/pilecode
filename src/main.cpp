@@ -27,6 +27,7 @@
 
 #include <functional>
 #include <list>
+#include <fstream>
 
 using namespace arctic;  // NOLINT
 using namespace arctic::easy;  // NOLINT
@@ -43,6 +44,48 @@ bool IsKeyOnce(T t)
 		return false;
 	}
 }
+
+struct PlayerProfile {
+	void SaveTo(std::ostream& s) const
+	{
+		Save<size_t>(s, level_.size());
+		for (const auto& l : level_) {
+			l->SaveTo(s);
+		}
+	}
+
+	void LoadFrom(std::istream& s)
+	{
+		size_t levels;
+		Load<size_t>(s, levels);
+		level_.resize(levels);
+		for (auto& l : level_) {
+			l.reset(new World());
+			l->LoadFrom(s);
+		}
+	}
+
+	void SaveToDisk() const
+	{
+		std::ofstream ofs("profile.sav");
+		SaveTo(ofs);
+	}
+
+	void LoadFromDisk()
+	{
+		std::ifstream ifs("profile.sav");
+		if (ifs.good()) {
+			LoadFrom(ifs);
+		}
+	}
+
+	std::vector<std::shared_ptr<World>> level_;
+
+	bool IsLevelAvailable(int level) const
+	{
+		return (size_t)level < level_.size();
+	}
+};
 
 class Game {
 private:
@@ -631,6 +674,9 @@ void EasyMain()
 	srand((int)time(nullptr));
 	UpdateMusic();
 
+	PlayerProfile profile;
+	profile.LoadFromDisk();
+
 	bool exiting = false;
 	int level = 0;
 	int prevLevel = 0;
@@ -652,16 +698,33 @@ void EasyMain()
 				level++;
 				break;
 			}
+
+			int nextLevel = level;
+			if (IsKeyOnce(kKeyF2)) {
+				nextLevel = (level > 0 ? level - 1 : level);
+			}
+			if (IsKeyOnce(kKeyF3)) {
+				nextLevel = (level + 1) % LevelsCount();
+			}
+			if (nextLevel != level) {
+				if (profile.IsLevelAvailable(nextLevel)) {
+					level = nextLevel;
+				}
+				else {
+					sfx::g_negative2.Play();
+				}
+			}
+
 #ifdef DEV_MODE
-			if (IsKeyOnce(kKeyF1)) {
+			if (IsKeyOnce(kKeyF8)) {
 				level = -1;
 				break;
 			}
-			if (IsKeyOnce(kKeyF3)) {
+			if (IsKeyOnce(kKeyF9)) {
 				level++;
 				break;
 			}
-			if (IsKeyOnce(kKeyF2)) {
+			if (IsKeyOnce(kKeyF10)) {
 				level--;
 				break;
 			}
@@ -672,4 +735,6 @@ void EasyMain()
 
 		game.Finish();
 	}
+
+	profile.SaveToDisk();
 }

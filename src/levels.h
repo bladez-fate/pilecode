@@ -29,5 +29,6 @@
 namespace pilecode {
 
 	World* GenerateLevel(int level);
+	size_t LevelsCount();
 
 }

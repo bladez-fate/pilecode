@@ -273,6 +273,7 @@ namespace pilecode {
 
 	class World {
 	public:
+		World();
 		explicit World(const WorldParams& wparams);
 
 		// rendering
@@ -300,8 +301,8 @@ namespace pilecode {
 		bool IsOutputCorrect();
 		Tile* At(Vec3Si32 w);
 		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
-		std::string Serialize() const;
-		void Deserialize(std::string data);
+		void SaveTo(std::ostream& s) const;
+		void LoadFrom(std::istream& s);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }
@@ -528,4 +529,18 @@ namespace pilecode {
 		std::vector<RenderList> cmnds_;
 		Sprite transparent_;
 	};
+
+	template <class T>
+	void Save(std::ostream& os, const T& t)
+	{
+		// works fine for PODs if you dont bother about endians
+		os.write(reinterpret_cast<const char*>(&t), sizeof(T));
+	}
+
+	template <class T>
+	void Load(std::istream& is, T& t)
+	{
+		// works fine for PODs if you dont bother about endians
+		is.read(reinterpret_cast<char*>(&t), sizeof(T));
+	}
 }

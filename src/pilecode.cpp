@@ -43,20 +43,6 @@ namespace pilecode {
 		size_t size = w*h;
 	}
 
-	template <class T>
-	void Save(std::ostream& os, const T& t)
-	{
-		// works fine for PODs if you dont bother about endians
-		os.write(reinterpret_cast<const char*>(&t), sizeof(T));
-	}
-
-	template <class T>
-	void Load(std::istream& is, T& t)
-	{
-		// works fine for PODs if you dont bother about endians
-		is.read(reinterpret_cast<char*>(&t), sizeof(T));
-	}
-
 	Shadow::Shadow()
 	{
 		for (bool& v : ceiling_) {
@@ -660,6 +646,11 @@ namespace pilecode {
 		Load(s, executing_);
 	}
 
+	World::World()
+	{
+		// intended to be used with LoadFrom()
+	}
+
 	World::World(const WorldParams & wparams)
 		: wparams_(wparams)
 	{
@@ -872,50 +863,47 @@ namespace pilecode {
 		}
 	}
 
-	std::string World::Serialize() const
+	void World::SaveTo(std::ostream & s) const
 	{
-		std::stringstream ss;
-		wparams_.SaveTo(ss);
-		Save<size_t>(ss, platform_.size());
+		wparams_.SaveTo(s);
+		Save<size_t>(s, platform_.size());
 		for (const auto& p : platform_) {
-			p->SaveTo(ss);
+			p->SaveTo(s);
 		}
-		Save<size_t>(ss, robot_.size());
+		Save<size_t>(s, robot_.size());
 		for (const auto& r : robot_) {
-			r->SaveTo(ss);
+			r->SaveTo(s);
 		}
-		Save<size_t>(ss, kLtMax);
+		Save<size_t>(s, kLtMax);
 		for (size_t i = 0; i < kLtMax; i++) {
-			Save(ss, isLetterAllowed_[i]);
+			Save(s, isLetterAllowed_[i]);
 		}
-		Save(ss, steps_);
-		return ss.str();
+		Save(s, steps_);
 	}
 
-	void World::Deserialize(std::string data)
+	void World::LoadFrom(std::istream& s)
 	{
-		std::stringstream ss(data);
-		wparams_.LoadFrom(ss);
+		wparams_.LoadFrom(s);
 		size_t platforms;
-		Load(ss, platforms);
+		Load(s, platforms);
 		platform_.resize(platforms);
 		for (auto& p : platform_) {
 			p.reset(new Platform());
-			p->LoadFrom(ss);
+			p->LoadFrom(s);
 		}
 		size_t robots;
-		Load(ss, robots);
+		Load(s, robots);
 		robot_.resize(robots);
 		for (auto& r : robot_) {
 			r.reset(new Robot());
-			r->LoadFrom(ss);
+			r->LoadFrom(s);
 		}
 		size_t maxLetters;
-		Load(ss, maxLetters);
+		Load(s, maxLetters);
 		for (size_t i = 0; i < maxLetters; i++) {
-			Load(ss, isLetterAllowed_[i]);
+			Load(s, isLetterAllowed_[i]);
 		}
-		Load(ss, steps_);
+		Load(s, steps_);
 	}
 
 	ViewPort::ViewPort(World* world)
