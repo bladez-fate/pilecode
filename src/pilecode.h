@@ -92,8 +92,11 @@ namespace pilecode {
 		Letter ReadLetter();
 		void WriteLetter(Letter letter);
 
+		// utility
 		bool IsMovable() const;
 		bool IsModifiable() const;
+		void SaveTo(std::ostream& s) const;
+		void LoadFrom(std::istream& s);
 
 		// accessors
 		TileType type() const { return type_;  }
@@ -129,7 +132,9 @@ namespace pilecode {
 
 	class WorldParams {
 	public:
+		WorldParams();
 		WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors);
+		void Init();
 
 		size_t xsize() const { return xsize_; }
 		size_t ysize() const { return ysize_; }
@@ -138,10 +143,17 @@ namespace pilecode {
 
 		size_t size() const { return xyzsize_; }
 		size_t index(int x, int y, int z) const { return z * xysize_ + y * xsize_ + x; }
+
+		// utility
+		void SaveTo(std::ostream& s) const;
+		void LoadFrom(std::istream& s);
+
 	private:
 		size_t xsize_;
 		size_t ysize_;
 		size_t zsize_;
+		size_t colors_;
+
 		size_t xysize_;
 		size_t xyzsize_;
 		std::shared_ptr<WorldData> data_;
@@ -149,6 +161,7 @@ namespace pilecode {
 
 	class Platform {
 	public:
+		Platform();
 		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
 		void Draw(ViewPort* vp);
 		Platform* Clone() const;
@@ -175,6 +188,8 @@ namespace pilecode {
 
 		// utility
 		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
+		void SaveTo(std::ostream& s) const;
+		void LoadFrom(std::istream& s);
 
 		// accessors
 		int index() const { return index_; }
@@ -222,6 +237,8 @@ namespace pilecode {
 		Robot* Clone() const;
 		Vec2Si32 d_pos();
 		Vec2Si32 dir_delta();
+		void SaveTo(std::ostream& s) const;
+		void LoadFrom(std::istream& s);
 
 		// accessors
 		int priority() const { return priority_; }
@@ -231,7 +248,7 @@ namespace pilecode {
 		int y() const { return y_; }
 	private:
 		// robot configuration
-		const int seed_;
+		int seed_;
 		int priority_;
 
 		// robot is currently on this platform
@@ -243,15 +260,15 @@ namespace pilecode {
 		int px_; // previous state
 		int py_; // previous state 
 
-		// simulation intermediates
-		Vec3Si32 curr_;
-		Vec3Si32 next_;
-
 		// simulation state
 		Direction dir_ = kDirHalt; // direction of motion
 		Letter reg_ = kLtSpace; // robot has one register that can hold a letter
 		bool blocked_ = false; // robot blocks if it cannot execute current instruction
 		Si32 executing_ = 0;
+
+		// simulation intermediates (not serializable)
+		Vec3Si32 curr_;
+		Vec3Si32 next_;
 	};
 
 	class World {
@@ -283,6 +300,8 @@ namespace pilecode {
 		bool IsOutputCorrect();
 		Tile* At(Vec3Si32 w);
 		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
+		std::string Serialize() const;
+		void Deserialize(std::string data);
 
 		// accessors
 		Platform* platform(int i) const { return platform_[i].get(); }

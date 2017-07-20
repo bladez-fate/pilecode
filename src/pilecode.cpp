@@ -27,6 +27,8 @@
 
 #include "engine/arctic_math.h"
 
+#include <sstream>
+
 namespace pilecode {
 
 	int Pos::dx = 14 * 4;
@@ -39,6 +41,20 @@ namespace pilecode {
 		int cx = w/2;
 		int cy = h/2;
 		size_t size = w*h;
+	}
+
+	template <class T>
+	void Save(std::ostream& os, const T& t)
+	{
+		// works fine for PODs if you dont bother about endians
+		os.write(reinterpret_cast<const char*>(&t), sizeof(T));
+	}
+
+	template <class T>
+	void Load(std::istream& is, T& t)
+	{
+		// works fine for PODs if you dont bother about endians
+		is.read(reinterpret_cast<char*>(&t), sizeof(T));
 	}
 
 	Shadow::Shadow()
@@ -121,6 +137,22 @@ namespace pilecode {
 		return type_ == kTlBrick;
 	}
 
+	void Tile::SaveTo(std::ostream& s) const
+	{
+		Save(s, type_);
+		Save(s, letter_);
+		Save(s, touched_);
+		Save(s, output_);
+	}
+
+	void Tile::LoadFrom(std::istream& s)
+	{
+		Load(s, type_);
+		Load(s, letter_);
+		Load(s, touched_);
+		Load(s, output_);
+	}
+
 	WorldData::WorldData(size_t colors)
 	{
 		tileSprite_.resize(colors);
@@ -153,12 +185,46 @@ namespace pilecode {
 		return &tileSprite_[color][type];
 	}
 
+	WorldParams::WorldParams()
+	{
+		// intended to be used with LoadFrom()
+	}
+
 	WorldParams::WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors)
 		: xsize_(xsize), ysize_(ysize), zsize_(zsize)
-		, xysize_(xsize * ysize)
-		, xyzsize_(xsize * ysize * zsize)
-		, data_(new WorldData(colors))
-	{}
+		, colors_(colors)
+	{
+		Init();
+	}
+
+	void WorldParams::Init()
+	{
+		xysize_ = xsize_ * ysize_;
+		xyzsize_ = xsize_ * ysize_ * zsize_;
+		data_.reset(new WorldData(colors_));
+	}
+
+	void WorldParams::SaveTo(std::ostream& s) const
+	{
+		Save(s, xsize_);
+		Save(s, ysize_);
+		Save(s, zsize_);
+		Save(s, colors_);
+	}
+
+	void WorldParams::LoadFrom(std::istream& s)
+	{
+		Load(s, xsize_);
+		Load(s, ysize_);
+		Load(s, zsize_);
+		Load(s, colors_);
+		Init();
+	}
+
+	Platform::Platform()
+	{
+		// intended to be used with LoadFrom()
+	}
 
 	Platform::Platform(int x, int y, int z,
 		std::initializer_list<std::initializer_list<int>> data)
@@ -316,6 +382,36 @@ namespace pilecode {
 					func(w, tile);
 				}
 			}
+		}
+	}
+
+	void Platform::SaveTo(std::ostream& s) const
+	{
+		Save(s, index_);
+		Save(s, x_);
+		Save(s, y_);
+		Save(s, z_);
+		Save(s, w_);
+		Save(s, h_);
+		Save<size_t>(s, tiles_.size());
+		for (const auto& tile : tiles_) {
+			tile.SaveTo(s);
+		}
+	}
+
+	void Platform::LoadFrom(std::istream& s)
+	{
+		Load(s, index_);
+		Load(s, x_);
+		Load(s, y_);
+		Load(s, z_);
+		Load(s, w_);
+		Load(s, h_);
+		size_t tiles;
+		Load<size_t>(s, tiles);
+		tiles_.resize(tiles);
+		for (auto& tile : tiles_) {
+			tile.LoadFrom(s);
 		}
 	}
 
@@ -534,6 +630,36 @@ namespace pilecode {
 		return Vec2Si32(0, 0);
 	}
 
+	void Robot::SaveTo(std::ostream& s) const
+	{
+		Save(s, seed_);
+		Save(s, priority_);
+		Save(s, platform_);
+		Save(s, x_);
+		Save(s, y_);
+		Save(s, px_);
+		Save(s, py_);
+		Save(s, dir_);
+		Save(s, reg_);
+		Save(s, blocked_);
+		Save(s, executing_);
+	}
+
+	void Robot::LoadFrom(std::istream& s)
+	{
+		Load(s, seed_);
+		Load(s, priority_);
+		Load(s, platform_);
+		Load(s, x_);
+		Load(s, y_);
+		Load(s, px_);
+		Load(s, py_);
+		Load(s, dir_);
+		Load(s, reg_);
+		Load(s, blocked_);
+		Load(s, executing_);
+	}
+
 	World::World(const WorldParams & wparams)
 		: wparams_(wparams)
 	{
@@ -744,6 +870,52 @@ namespace pilecode {
 		for (const auto& p : platform_) {
 			p->ForEachTile(func);
 		}
+	}
+
+	std::string World::Serialize() const
+	{
+		std::stringstream ss;
+		wparams_.SaveTo(ss);
+		Save<size_t>(ss, platform_.size());
+		for (const auto& p : platform_) {
+			p->SaveTo(ss);
+		}
+		Save<size_t>(ss, robot_.size());
+		for (const auto& r : robot_) {
+			r->SaveTo(ss);
+		}
+		Save<size_t>(ss, kLtMax);
+		for (size_t i = 0; i < kLtMax; i++) {
+			Save(ss, isLetterAllowed_[i]);
+		}
+		Save(ss, steps_);
+		return ss.str();
+	}
+
+	void World::Deserialize(std::string data)
+	{
+		std::stringstream ss(data);
+		wparams_.LoadFrom(ss);
+		size_t platforms;
+		Load(ss, platforms);
+		platform_.resize(platforms);
+		for (auto& p : platform_) {
+			p.reset(new Platform());
+			p->LoadFrom(ss);
+		}
+		size_t robots;
+		Load(ss, robots);
+		robot_.resize(robots);
+		for (auto& r : robot_) {
+			r.reset(new Robot());
+			r->LoadFrom(ss);
+		}
+		size_t maxLetters;
+		Load(ss, maxLetters);
+		for (size_t i = 0; i < maxLetters; i++) {
+			Load(ss, isLetterAllowed_[i]);
+		}
+		Load(ss, steps_);
 	}
 
 	ViewPort::ViewPort(World* world)
