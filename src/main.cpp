@@ -179,6 +179,55 @@ public:
 		MakeTools();
 	}
 
+
+	void Finish(int level, int prevLevel)
+	{
+		if (!disableAnimation_) {
+			int dx0 = Pos::dx;
+			int dy0 = Pos::dy;
+			int dz0 = Pos::dz;
+
+			float dx = (float)Pos::dx;
+			float dy = (float)Pos::dy;
+			float dz = (float)Pos::dz;
+
+			frameVisibility_ = false;
+			panelVisibility_ = false;
+
+			//float speed = 1.01;
+			for (int i = 0; i < 10; i++) {
+				Render();
+				// TODO: interrupt on mouse click
+
+				Sleep(0.01);
+				dx += 4;
+				dy += 2;
+
+				vp_->MoveNoClamp(Vec2F(-16.0f, 8.0f));
+
+				Pos::dx = (int)dx;
+				Pos::dy = (int)dy;
+				Pos::dz = (int)dz;
+			}
+			Sleep(0.1);
+
+			auto speed = Vec2F(0.0f, -1.0f);
+			for (int i = 0; i < 50; i++) {
+				Render();
+				Sleep(0.01);
+				vp_->MoveNoClamp(speed);
+				speed += Vec2F(0.0f, -1.0f);
+			}
+
+			frameVisibility_ = true;
+			panelVisibility_ = true;
+
+			Pos::dx = dx0;
+			Pos::dy = dy0;
+			Pos::dz = dz0;
+		}
+	}
+
 	bool Control()
 	{
 		if (IsKey(kKeyEscape)) {
@@ -592,54 +641,6 @@ public:
 		return world_->IsOutputCorrect();
 	}
 
-	void Finish()
-	{
-		if (!disableAnimation_) {
-			int dx0 = Pos::dx;
-			int dy0 = Pos::dy;
-			int dz0 = Pos::dz;
-
-			float dx = (float)Pos::dx;
-			float dy = (float)Pos::dy;
-			float dz = (float)Pos::dz;
-
-			frameVisibility_ = false;
-			panelVisibility_ = false;
-
-			//float speed = 1.01;
-			for (int i = 0; i < 10; i++) {
-				Render();
-				// TODO: interrupt on mouse click
-
-				Sleep(0.01);
-				dx += 4;
-				dy += 2;
-
-				vp_->MoveNoClamp(Vec2F(-16.0f, 8.0f));
-
-				Pos::dx = (int)dx;
-				Pos::dy = (int)dy;
-				Pos::dz = (int)dz;
-			}
-			Sleep(0.1);
-
-			auto speed = Vec2F(0.0f, -1.0f);
-			for (int i = 0; i < 50; i++) {
-				Render();
-				Sleep(0.01);
-				vp_->MoveNoClamp(speed);
-				speed += Vec2F(0.0f, -1.0f);
-			}
-
-			frameVisibility_ = true;
-			panelVisibility_ = true;
-
-			Pos::dx = dx0;
-			Pos::dy = dy0;
-			Pos::dz = dz0;
-		}
-	}
-
 	World* GetInitWorld() const
 	{
 		return initWorld_->Clone();
@@ -780,6 +781,6 @@ void EasyMain()
 		}
 
 		profile.UpdateLevel(prevLevel, game.GetInitWorld());
-		game.Finish();
+		game.Finish(level, prevLevel);
 	}
 }
