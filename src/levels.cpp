@@ -438,6 +438,58 @@ namespace pilecode {
 			}
 
 			{
+				WorldParams wparams(200, 200, 3, 6);
+				World* world = new World(wparams);
+				Platform* plat1 = new Platform(
+					0, 0, 0,
+					{
+						{ 0, 1, 0, 1, 0, },
+						{ 0, 1, 0, 1, 0, },
+						{ 0, 1, 0, 1, 0, },
+						{ 0, 1, 0, 1, 0, },
+						{ 0, 1, 0, 1, 0, },
+					});
+
+				Platform* plat2 = new Platform(
+					0, 0, 1,
+					{
+						{ 0, 0, 0, 0, 0, },
+						{ 1, 1, 1, 1, 1, },
+						{ 0, 0, 0, 0, 0, },
+						{ 1, 2, 2, 2, 1, },
+						{ 0, 0, 0, 0, 0, },
+					});
+
+				Platform* plat3 = new Platform(
+					0, 0, 2,
+					{
+						{ 0, 2, 0, 2, 0, },
+						{ 0, 2, 0, 2, 0, },
+						{ 0, 2, 0, 2, 0, },
+						{ 0, 2, 0, 2, 0, },
+						{ 0, 2, 0, 2, 0, },
+					});
+
+				plat3->changable_tile(1, 1)->set_letter(kLtDot);
+				plat3->changable_tile(1, 3)->set_letter(kLtDot);
+				plat3->changable_tile(3, 1)->set_output(kLtDot);
+				plat3->changable_tile(3, 3)->set_output(kLtDot);
+
+				world->AddPlatform(plat1);
+				world->AddPlatform(plat2);
+				world->AddPlatform(plat3);
+
+				world->AllowLetter(kLtUp);
+				world->AllowLetter(kLtRight);
+				world->AllowLetter(kLtDown);
+				world->AllowLetter(kLtLeft);
+				world->AllowLetter(kLtRead);
+				world->AllowLetter(kLtWrite);
+
+				AddLevel(world);
+			}
+
+			{
 				WorldParams wparams(200, 200, 2, 3);
 				World* world = new World(wparams);
 				Platform* plat1 = new Platform(
