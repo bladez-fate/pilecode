@@ -685,7 +685,35 @@ public:
 		})->OnUpdate([=](Button* btn) {
 			btn->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
-		
+
+		AddButton(1, image::g_button_play)->Click([=](Button* btn) {
+			if (simSpeed_ == 1.0f) {
+				simSpeed_ = 2.0f;
+			}
+			else if (simSpeed_ == 2.0f) {
+				simSpeed_ = 4.0f;
+			}
+			else if (simSpeed_ == 4.0f) {
+				simSpeed_ = 8.0f;
+			}
+			else if (simSpeed_ == 8.0f) {
+				simSpeed_ = 1.0f;
+			}
+		})->OnUpdate([=](Button* btn) {
+			if (simSpeed_ == 1.0f) {
+				btn->set_sprite(image::g_button_x1);
+			}
+			else if (simSpeed_ == 2.0f) {
+				btn->set_sprite(image::g_button_x2);
+			}
+			else if (simSpeed_ == 4.0f) {
+				btn->set_sprite(image::g_button_x4);
+			}
+			else if (simSpeed_ == 8.0f) {
+				btn->set_sprite(image::g_button_x8);
+			}
+		});
+
 		AddButton(2, image::g_button_stop)->Click([=](Button* btn) {
 			Restart();
 		})->OnUpdate([=](Button* btn) {

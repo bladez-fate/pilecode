@@ -49,6 +49,10 @@ namespace pilecode {
 		Sprite g_button_play;
 		Sprite g_button_pause;
 		Sprite g_button_stop;
+		Sprite g_button_x1;
+		Sprite g_button_x2;
+		Sprite g_button_x4;
+		Sprite g_button_x8;
 		Sprite g_button_robot;
 		Sprite g_button_letter[kLtMax];
 
@@ -123,6 +127,10 @@ namespace pilecode {
 		image::g_button_play.Load("data/button-play.tga");
 		image::g_button_pause.Load("data/button-pause.tga");
 		image::g_button_stop.Load("data/button-stop.tga");
+		image::g_button_x1.Load("data/button-x1.tga");
+		image::g_button_x2.Load("data/button-x2.tga");
+		image::g_button_x4.Load("data/button-x4.tga");
+		image::g_button_x8.Load("data/button-x8.tga");
 		image::g_button_robot.Load("data/button-robot.tga");
 		image::g_button_letter[kLtSpace] = image::g_empty;
 		image::g_button_letter[kLtUp].Load("data/button-up.tga");

@@ -60,6 +60,10 @@ namespace pilecode {
 		extern Sprite g_button_play;
 		extern Sprite g_button_pause;
 		extern Sprite g_button_stop;
+		extern Sprite g_button_x1;
+		extern Sprite g_button_x2;
+		extern Sprite g_button_x4;
+		extern Sprite g_button_x8;
 		extern Sprite g_button_robot;
 		extern Sprite g_button_letter[kLtMax];
 
