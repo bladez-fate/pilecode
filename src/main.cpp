@@ -179,7 +179,8 @@ public:
 		panelVisibility_ = false;
 
 		//float speed = 1.01;
-		for (int i = 0; i < 10; i++) {
+		int M = 10;
+		for (int i = 0; i < M; i++) {
 			Render();
 			// TODO: interrupt on mouse click
 
@@ -196,11 +197,99 @@ public:
 		Sleep(0.1);
 
 		auto speed = Vec2F(0.0f, -1.0f);
-		for (int i = 0; i < 50; i++) {
+		int N = 50;
+		for (int i = 0; i < N; i++) {
 			Render();
 			Sleep(0.01);
 			vp_->MoveNoClamp(speed);
 			speed += Vec2F(0.0f, -1.0f);
+		}
+
+		frameVisibility_ = true;
+		panelVisibility_ = true;
+
+		Pos::dx = dx0;
+		Pos::dy = dy0;
+		Pos::dz = dz0;
+	}
+
+	void BackwardFinishTransition()
+	{
+		frameVisibility_ = false;
+		panelVisibility_ = false;
+
+		int N = 50;
+		auto speed = Vec2F(0.0f, 0.0f);
+		for (int i = 0; i < N; i++) {
+			Render();
+			if (IsKey(kKeyMouseLeft)) {
+				break;
+			}
+			Sleep(0.01);
+			vp_->MoveNoClamp(speed);
+			speed += Vec2F(0.0f, 1.0f);
+		}
+
+		frameVisibility_ = true;
+		panelVisibility_ = true;
+	}
+
+	void BackwardStartTransition()
+	{
+		int dx0 = Pos::dx;
+		int dy0 = Pos::dy;
+		int dz0 = Pos::dz;
+
+		int N = 50;
+		int M = 10;
+		int ddx = 4;
+		int ddy = 2;
+
+		float dx = (float)Pos::dx + ddx * M;
+		float dy = (float)Pos::dy + ddy * M;
+		float dz = (float)Pos::dz;
+
+		Pos::dx = (int)dx;
+		Pos::dy = (int)dy;
+		Pos::dz = (int)dz;
+
+		auto delta = Vec2F(16.0f, -8.0f);
+		vp_->MoveNoClamp(delta * float(-M));
+
+		frameVisibility_ = false;
+		panelVisibility_ = false;
+
+		bgTransition_ = 1.0f;
+		auto speed = Vec2F(0.0f, N * 1.0f);
+		vp_->MoveNoClamp(Vec2F(0, -1.0f * N*(N + 1) / 2));
+		for (int i = 0; i < N; i++) {
+			Render();
+			if (IsKey(kKeyMouseLeft)) {
+				break;
+			}
+			Sleep(0.01);
+			vp_->MoveNoClamp(speed);
+			speed -= Vec2F(0.0f, 1.0f);
+			bgTransition_ -= 1.0f / N;
+		}
+		bgTransition_ = 0.0f;
+
+		Sleep(0.1);
+
+		for (int i = 0; i < M; i++) {
+			Render();
+			// TODO: interrupt on mouse click
+
+			Sleep(0.01);
+			dx -= ddx;
+			dy -= ddy;
+
+			vp_->MoveNoClamp(delta);
+
+
+			Pos::dx = (int)dx;
+			Pos::dy = (int)dy;
+			Pos::dz = (int)dz;
 		}
 
 		frameVisibility_ = true;
@@ -223,7 +312,12 @@ public:
 		Control();
 
 		if (!disableAnimation_) {
-			ForwardStartTransition();
+			if (prevLevel <= level) {
+				ForwardStartTransition();
+			}
+			else {
+				BackwardStartTransition();
+			}
 		}
 
 		vp_->Center();
@@ -235,8 +329,12 @@ public:
 	void Finish(int level, int prevLevel)
 	{
 		if (!disableAnimation_) {
-			
-			ForwardFinishTransition();
+			if (prevLevel <= level) {
+				ForwardFinishTransition();
+			}
+			else {
+				BackwardFinishTransition();
+			}
 		}
 	}
 
