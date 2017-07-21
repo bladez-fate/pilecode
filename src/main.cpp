@@ -45,7 +45,34 @@ bool IsKeyOnce(T t)
 	}
 }
 
-struct PlayerProfile {
+class PlayerProfile {
+public:
+	World* GetSavedWorld(int level)
+	{
+		if (IsLevelAvailable(level)) {
+			return level_[level]->Clone();
+		}
+		else {
+			return nullptr;
+		}
+	}
+
+	void UpdateLevel(int level, World* world)
+	{
+		if (level < level_.size()) {
+			level_[level] = std::shared_ptr<World>(world);
+		}
+		SaveToDisk();
+	}
+
+	void AddLevel(int level, World* world)
+	{
+		if (level == level_.size()) {
+			level_.emplace_back(world);
+		}
+		SaveToDisk();
+	}
+
 	void SaveTo(std::ostream& s) const
 	{
 		Save<size_t>(s, level_.size());
@@ -79,12 +106,17 @@ struct PlayerProfile {
 		}
 	}
 
-	std::vector<std::shared_ptr<World>> level_;
-
 	bool IsLevelAvailable(int level) const
 	{
 		return (size_t)level < level_.size();
 	}
+
+	int LastAvailableLevel() const
+	{
+		return int(level_.empty() ? 0 : level_.size() - 1);
+	}
+private:
+	std::vector<std::shared_ptr<World>> level_;
 };
 
 class Game {
@@ -108,11 +140,11 @@ public:
 		simPaused_ = true;
 	}
 
-	void Start(int level, int prevLevel)
+	void Start(int level, int prevLevel, World* savedWorld)
 	{
 		level_ = level;
 		prevLevel_ = prevLevel;
-		initWorld_.reset(GenerateLevel(level_));
+		initWorld_.reset(savedWorld? savedWorld: GenerateLevel(level_));
 		vp_.reset(new ViewPort(initWorld_.get()));
 		Restart();
 		DefaultPlaceMode();
@@ -608,6 +640,11 @@ public:
 		}
 	}
 
+	World* GetInitWorld() const
+	{
+		return initWorld_->Clone();
+	}
+
 private:
 	// control configuration
 	float movePxlPerSec_ = float(screen::h) * 0.50f;
@@ -678,11 +715,19 @@ void EasyMain()
 	profile.LoadFromDisk();
 
 	bool exiting = false;
-	int level = 0;
+	int level = profile.LastAvailableLevel();
 	int prevLevel = 0;
 	while (!exiting) {
 		Game game;
-		game.Start(level, prevLevel);
+		if (level >= 0) {
+			game.Start(level, prevLevel, profile.GetSavedWorld(level));
+			if (!profile.IsLevelAvailable(level)) {
+				profile.AddLevel(level, game.GetInitWorld());
+			}
+		}
+		else {
+			game.Start(level, prevLevel, nullptr);
+		}
 		prevLevel = level;
 
 		while (true) {
@@ -709,6 +754,7 @@ void EasyMain()
 			if (nextLevel != level) {
 				if (profile.IsLevelAvailable(nextLevel)) {
 					level = nextLevel;
+					break;
 				}
 				else {
 					sfx::g_negative2.Play();
@@ -733,8 +779,7 @@ void EasyMain()
 			UpdateMusic();
 		}
 
+		profile.UpdateLevel(prevLevel, game.GetInitWorld());
 		game.Finish();
 	}
-
-	profile.SaveToDisk();
 }
