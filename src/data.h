@@ -57,6 +57,8 @@ namespace pilecode {
 		extern Sprite g_panel_topright;
 
 		extern Sprite g_button_frame;
+		extern Sprite g_button_nextlevel;
+		extern Sprite g_button_prevlevel;
 		extern Sprite g_button_play;
 		extern Sprite g_button_pause;
 		extern Sprite g_button_stop;

@@ -300,10 +300,13 @@ public:
 		Pos::dz = dz0;
 	}
 
-	void Start(int level, int prevLevel, World* savedWorld)
+	void Start(int level, int prevLevel, int maxLevel, World* savedWorld)
 	{
 		level_ = level;
+		nextLevel_ = level_;
 		prevLevel_ = prevLevel;
+		maxLevel_ = maxLevel;
+
 		initWorld_.reset(savedWorld? savedWorld: GenerateLevel(level_));
 		vp_.reset(new ViewPort(initWorld_.get()));
 		Restart();
@@ -676,17 +679,26 @@ public:
 	void MakeTools()
 	{
 		buttons_.clear();
-		panelWidth_ = 5;
+		panelWidth_ = 6;
 		panelHeight_ = 2;
 
+		// Add level switching buttons
+		AddButton(0, image::g_button_prevlevel)->Click([=](Button* btn) {
+			nextLevel_ = level_ - 1;
+		})->set_enabled(level_ > 0);
+
+		AddButton(1, image::g_button_nextlevel)->Click([=](Button* btn) {
+			nextLevel_ = level_ + 1;
+		})->set_enabled(level_ < maxLevel_);
+
 		// Add playback buttons
-		AddButton(0, image::g_button_play)->Click([=](Button* btn) {
+		AddButton(2, image::g_button_play)->Click([=](Button* btn) {
 			PlayOrPause();
 		})->OnUpdate([=](Button* btn) {
 			btn->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
 
-		AddButton(1, image::g_button_play)->Click([=](Button* btn) {
+		AddButton(3, image::g_button_play)->Click([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
 				simSpeed_ = 2.0f;
 			}
@@ -714,21 +726,21 @@ public:
 			}
 		});
 
-		AddButton(2, image::g_button_stop)->Click([=](Button* btn) {
+		AddButton(4, image::g_button_stop)->Click([=](Button* btn) {
 			Restart();
 		})->OnUpdate([=](Button* btn) {
 			btn->set_enabled(world_->steps() != 0);
 		});
 
 		// Add robot button
-		AddButton(3, image::g_button_robot)->Click([=](Button* btn) {
+		AddButton(5, image::g_button_robot)->Click([=](Button* btn) {
 			SwitchPlaceMode(kPmRobot, kLtSpace);
 		})->OnUpdate([=](Button* btn) {
 			btn->set_frame(placeMode_ == kPmRobot);
 			btn->set_enabled(world_->steps() == 0);
 		});
 
-		Si32 btnPos = 4;
+		Si32 btnPos = 6;
 
 		// Add letter buttons
 		for (int k = kLtSpace + 1; k < kLtMax; k++) {
@@ -784,15 +796,24 @@ public:
 		return initWorld_->Clone();
 	}
 
+	int GetNextLevel() const
+	{
+		return nextLevel_;
+	}
+
 private:
 	// control configuration
 	float movePxlPerSec_ = float(screen::h) * 0.50f;
 	Si32 mouseScrollMargin_ = 5;
 	
-	// world
+	// levels and transitions
 	int level_ = 0;
 	int prevLevel_ = 0;
+	int nextLevel_ = 0;
+	int maxLevel_ = 0;
 	float bgTransition_ = 0.0f;
+
+	// world
 	std::unique_ptr<WorldParams> wparams_;
 	std::unique_ptr<World> initWorld_;
 	std::unique_ptr<World> world_;
@@ -859,13 +880,13 @@ void EasyMain()
 	while (!exiting) {
 		Game game;
 		if (level >= 0) {
-			game.Start(level, prevLevel, profile.GetSavedWorld(level));
+			game.Start(level, prevLevel, profile.LastAvailableLevel(), profile.GetSavedWorld(level));
 			if (!profile.IsLevelAvailable(level)) {
 				profile.AddLevel(level, game.GetInitWorld());
 			}
 		}
 		else {
-			game.Start(level, prevLevel, nullptr);
+			game.Start(level, prevLevel, level, nullptr);
 		}
 		prevLevel = level;
 
@@ -884,10 +905,10 @@ void EasyMain()
 			}
 
 			int nextLevel = level;
-			if (IsKeyOnce(kKeyF2)) {
+			if (IsKeyOnce(kKeyF2) || game.GetNextLevel() < level) {
 				nextLevel = (level > 0 ? level - 1 : level);
 			}
-			if (IsKeyOnce(kKeyF3)) {
+			if (IsKeyOnce(kKeyF3) || game.GetNextLevel() > level) {
 				nextLevel = (level + 1) % LevelsCount();
 			}
 			if (nextLevel != level) {

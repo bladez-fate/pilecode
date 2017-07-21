@@ -46,6 +46,8 @@ namespace pilecode {
 		Sprite g_panel_topright;
 
 		Sprite g_button_frame;
+		Sprite g_button_nextlevel;
+		Sprite g_button_prevlevel;
 		Sprite g_button_play;
 		Sprite g_button_pause;
 		Sprite g_button_stop;
@@ -124,6 +126,8 @@ namespace pilecode {
 		image::g_panel_topright.Load("data/panel-topright.tga");
 
 		image::g_button_frame.Load("data/button-frame.tga");
+		image::g_button_nextlevel.Load("data/button-next-level.tga");
+		image::g_button_prevlevel.Load("data/button-prev-level.tga");
 		image::g_button_play.Load("data/button-play.tga");
 		image::g_button_pause.Load("data/button-pause.tga");
 		image::g_button_stop.Load("data/button-stop.tga");
