@@ -861,7 +861,7 @@ void UpdateMusic()
 	// switch background music tracks
 	if (!music::g_background[musicIdx].IsPlaying()) {
 		musicIdx = (musicIdx + 1) % music::g_backgroundCount;
-		music::g_background[musicIdx].Play(0.2);
+		music::g_background[musicIdx].Play(0.2f);
 	}
 }
 
@@ -899,7 +899,7 @@ void EasyMain()
 			game.Update();
 			game.Render();
 			if (game.IsComplete()) {
-				sfx::g_positive.Play(0.5);
+				sfx::g_positive.Play(0.3f);
 				level++;
 				break;
 			}
