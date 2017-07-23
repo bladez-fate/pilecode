@@ -491,11 +491,11 @@ namespace pilecode {
 					case kLtRead: {
 						Letter letter;
 						blocked_ = !world->ReadLetter(wu, letter);
-						if (letter != kLtSpace) {
-							reg_ = letter;
-						}
 						if (!blocked_) {
 							executing_ = 1;
+							if (letter != kLtSpace) {
+								reg_ = letter;
+							}
 							sfx::g_read.Play();
 						}
 						break;
