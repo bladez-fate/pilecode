@@ -92,6 +92,7 @@ namespace pilecode {
 					RgbaMult(c2, alpha),
 					RgbaMult(c1, 256 - alpha)
 				);
+				p->a = 255;
 			}
 		}
 	}
