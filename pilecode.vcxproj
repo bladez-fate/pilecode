@@ -201,9 +201,11 @@
     <ClInclude Include="..\arctic\engine\vec4si32.h" />
     <ClInclude Include="src\data.h" />
     <ClInclude Include="src\defs.h" />
+    <ClInclude Include="src\game.h" />
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\levels.h" />
     <ClInclude Include="src\pilecode.h" />
+    <ClInclude Include="src\ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\arctic\engine\arctic_input.cpp" />
@@ -217,6 +219,7 @@
     <ClCompile Include="..\arctic\engine\easy_sprite_instance.cpp" />
     <ClCompile Include="..\arctic\engine\engine.cpp" />
     <ClCompile Include="src\data.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\levels.cpp" />
     <ClCompile Include="src\main.cpp" />

@@ -108,6 +108,12 @@
     <ClInclude Include="src\levels.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\game.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\arctic\engine\arctic_input.cpp">
@@ -153,6 +159,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\levels.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

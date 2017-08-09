@@ -32,8 +32,6 @@ namespace ae {
 	using namespace arctic::easy;
 }
 
-namespace ar = arctic;
-
 namespace pilecode {
 	using ae::Sprite;
 	using ae::Sound;
@@ -49,4 +47,16 @@ namespace pilecode {
 	using ae::Vec2F;
 	using ae::Vec2Si32;
 	using ae::Vec3Si32;
+
+	template <class T>
+	bool IsKeyOnce(T t)
+	{
+		if (ae::IsKey(t)) {
+			SetKey(t, false);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
