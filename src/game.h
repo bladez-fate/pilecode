@@ -46,6 +46,7 @@ namespace pilecode {
 		void ForwardFinishTransition();
 		void BackwardFinishTransition();
 		void BackwardStartTransition();
+		void StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Start(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Finish(int level, int prevLevel);
 		bool Control();
@@ -70,6 +71,9 @@ namespace pilecode {
 		// control configuration
 		float movePxlPerSec_ = float(screen::h) * 0.50f;
 		Si32 mouseScrollMargin_ = 5;
+
+		// mode
+		bool editorMode = false;
 
 		// levels and transitions
 		int level_ = 0;
@@ -107,9 +111,9 @@ namespace pilecode {
 
 		// debug
 #ifdef DEV_MODE
-		bool disableAnimation_ = true;
+		bool disableTransition_ = true;
 #else
-		bool disableAnimation_ = false;
+		bool disableTransition_ = false;
 #endif
 	};
 

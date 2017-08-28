@@ -199,7 +199,14 @@ namespace pilecode {
 		Pos::dz = dz0;
 	}
 
-	void Game::Start(int level, int prevLevel, int maxLevel, World* savedWorld)
+	void Game::StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld)
+	{
+		editorMode = true;
+		disableTransition_ = true;
+		Start(level, prevLevel, maxLevel, savedWorld);
+	}
+
+    void Game::Start(int level, int prevLevel, int maxLevel, World* savedWorld)
 	{
 		level_ = level;
 		nextLevel_ = level_;
@@ -213,7 +220,7 @@ namespace pilecode {
 
 		Control();
 
-		if (!disableAnimation_) {
+		if (!disableTransition_) {
 			if (prevLevel <= level) {
 				ForwardStartTransition();
 			}
@@ -230,7 +237,7 @@ namespace pilecode {
 
 	void Game::Finish(int level, int prevLevel)
 	{
-		if (!disableAnimation_) {
+		if (!disableTransition_) {
 			if (prevLevel <= level) {
 				ForwardFinishTransition();
 			}

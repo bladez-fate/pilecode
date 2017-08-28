@@ -132,84 +132,150 @@ public:
 		, prevLevel_(_prevLevel)
 	{}
 	
-	IScene* Run()
-	{
-		Game game;
-		if (level_ >= 0) {
-			game.Start(level_, prevLevel_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
-			if (!g_profile.IsLevelAvailable(level_)) {
-				g_profile.AddLevel(level_, game.GetInitWorld());
-			}
-		}
-		else {
-			game.Start(level_, prevLevel_, level_, nullptr);
-		}
-		prevLevel_ = level_;
+	IScene* Run() override;
 
-		while (true) {
-			if (!game.Control()) {
-				exiting = true;
-				break;
-			}
-
-			game.Update();
-			game.Render();
-			if (game.IsComplete()) {
-				sfx::g_positive.Play(0.3f);
-				level_++;
-				break;
-			}
-
-			int nextLevel = level_;
-			if (IsKeyOnce(kKeyF2) || game.GetNextLevel() < level_) {
-				nextLevel = (level_ > 0 ? level_ - 1 : level_);
-			}
-			if (IsKeyOnce(kKeyF3) || game.GetNextLevel() > level_) {
-				nextLevel = (level_ + 1) % LevelsCount();
-			}
-			if (nextLevel != level_) {
-				if (g_profile.IsLevelAvailable(nextLevel)) {
-					level_ = nextLevel;
-					break;
-				}
-				else {
-					sfx::g_negative2.Play();
-				}
-			}
-
-#ifdef DEV_MODE
-			if (IsKeyOnce(kKeyF8)) {
-				level = -1;
-				break;
-			}
-			if (IsKeyOnce(kKeyF9)) {
-				level++;
-				break;
-			}
-			if (IsKeyOnce(kKeyF10)) {
-				level--;
-				break;
-			}
-#endif
-
-			UpdateMusic();
-		}
-
-		g_profile.UpdateLevel(prevLevel_, game.GetInitWorld());
-		game.Finish(level_, prevLevel_);
-
-		if (exiting) {
-			return nullptr;
-		}
-		else {
-			return new GameScene(level_, prevLevel_);
-		}
-	}
 private:
 	bool exiting = false;
 	int level_ = 0;
 	int prevLevel_ = 0;
 };
+
+class EditorScene : public IScene {
+public:
+	explicit EditorScene(int _level)
+		: level_(_level)
+	{}
+
+	IScene* Run() override;
+
+private:
+	bool exiting = false;
+	int level_ = 0;
+	int prevLevel_ = 0;
+};
+
+IScene* GameScene::Run()
+{
+	Game game;
+	if (level_ >= 0) {
+		game.Start(level_, prevLevel_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
+		if (!g_profile.IsLevelAvailable(level_)) {
+			g_profile.AddLevel(level_, game.GetInitWorld());
+		}
+	}
+	else {
+		game.Start(level_, prevLevel_, level_, nullptr);
+	}
+	prevLevel_ = level_;
+
+	while (true) {
+		if (!game.Control()) {
+			exiting = true;
+			break;
+		}
+
+		game.Update();
+		game.Render();
+		if (game.IsComplete()) {
+			sfx::g_positive.Play(0.3f);
+			level_++;
+			break;
+		}
+
+		int nextLevel = level_;
+		if (game.GetNextLevel() < level_) {
+			nextLevel = (level_ > 0 ? level_ - 1 : level_);
+		}
+		if (game.GetNextLevel() > level_) {
+			nextLevel = (level_ + 1) % LevelsCount();
+		}
+		if (nextLevel != level_) {
+			if (g_profile.IsLevelAvailable(nextLevel)) {
+				level_ = nextLevel;
+				break;
+			}
+			else {
+				sfx::g_negative2.Play();
+			}
+		}
+
+		if (IsKeyOnce(kKeyF4)) {
+			return new EditorScene(level_);
+		}
+
+#ifdef DEV_MODE
+		if (IsKeyOnce(kKeyF8)) {
+			level = -1;
+			break;
+		}
+		if (IsKeyOnce(kKeyF9)) {
+			level++;
+			break;
+		}
+		if (IsKeyOnce(kKeyF10)) {
+			level--;
+			break;
+		}
+#endif
+
+		UpdateMusic();
+	}
+
+	g_profile.UpdateLevel(prevLevel_, game.GetInitWorld());
+	game.Finish(level_, prevLevel_);
+
+	if (exiting) {
+		return nullptr;
+	}
+	else {
+		return new GameScene(level_, prevLevel_);
+	}
+}
+
+IScene* EditorScene::Run()
+{
+	Game game;
+	if (level_ >= 0) {
+		game.StartWithEditor(level_, level_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
+	}
+	else {
+		game.StartWithEditor(level_, level_, level_, nullptr);
+	}
+
+	while (true) {
+		if (!game.Control()) {
+			exiting = true;
+			break;
+		}
+
+		game.Update();
+		game.Render();
+
+		int nextLevel = level_;
+		if (game.GetNextLevel() < level_) {
+			nextLevel = (level_ > 0 ? level_ - 1 : level_);
+		}
+		if (game.GetNextLevel() > level_) {
+			nextLevel = (level_ + 1) % LevelsCount();
+		}
+		if (nextLevel != level_) {
+			level_ = nextLevel;
+			break;
+		}
+
+		UpdateMusic();
+	}
+
+	g_profile.UpdateLevel(prevLevel_, game.GetInitWorld());
+	game.Finish(level_, prevLevel_);
+
+	if (exiting) {
+		return new GameScene(level_, level_);
+	}
+	else {
+		return new EditorScene(level_);
+	}
+}
 
 void EasyMain()
 {
