@@ -106,11 +106,7 @@ private:
 	std::vector<std::shared_ptr<World>> level_;
 };
 
-void Init()
-{
-	InitData();
-	ResizeScreen(screen::w, screen::h);
-}
+PlayerProfile g_profile;
 
 void UpdateMusic()
 {
@@ -123,30 +119,32 @@ void UpdateMusic()
 	}
 }
 
-void EasyMain()
-{
-	Init();
-	srand((int)time(nullptr));
-	UpdateMusic();
+class IScene {
+public:
+	virtual ~IScene() {}
+	virtual IScene* Run() = 0;
+};
 
-	PlayerProfile profile;
-	profile.LoadFromDisk();
-
-	bool exiting = false;
-	int level = profile.LastAvailableLevel();
-	int prevLevel = 0;
-	while (!exiting) {
+class GameScene : public IScene {
+public:
+	GameScene(int _level, int _prevLevel)
+		: level_(_level)
+		, prevLevel_(_prevLevel)
+	{}
+	
+	IScene* Run()
+	{
 		Game game;
-		if (level >= 0) {
-			game.Start(level, prevLevel, profile.LastAvailableLevel(), profile.GetSavedWorld(level));
-			if (!profile.IsLevelAvailable(level)) {
-				profile.AddLevel(level, game.GetInitWorld());
+		if (level_ >= 0) {
+			game.Start(level_, prevLevel_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
+			if (!g_profile.IsLevelAvailable(level_)) {
+				g_profile.AddLevel(level_, game.GetInitWorld());
 			}
 		}
 		else {
-			game.Start(level, prevLevel, level, nullptr);
+			game.Start(level_, prevLevel_, level_, nullptr);
 		}
-		prevLevel = level;
+		prevLevel_ = level_;
 
 		while (true) {
 			if (!game.Control()) {
@@ -158,20 +156,20 @@ void EasyMain()
 			game.Render();
 			if (game.IsComplete()) {
 				sfx::g_positive.Play(0.3f);
-				level++;
+				level_++;
 				break;
 			}
 
-			int nextLevel = level;
-			if (IsKeyOnce(kKeyF2) || game.GetNextLevel() < level) {
-				nextLevel = (level > 0 ? level - 1 : level);
+			int nextLevel = level_;
+			if (IsKeyOnce(kKeyF2) || game.GetNextLevel() < level_) {
+				nextLevel = (level_ > 0 ? level_ - 1 : level_);
 			}
-			if (IsKeyOnce(kKeyF3) || game.GetNextLevel() > level) {
-				nextLevel = (level + 1) % LevelsCount();
+			if (IsKeyOnce(kKeyF3) || game.GetNextLevel() > level_) {
+				nextLevel = (level_ + 1) % LevelsCount();
 			}
-			if (nextLevel != level) {
-				if (profile.IsLevelAvailable(nextLevel)) {
-					level = nextLevel;
+			if (nextLevel != level_) {
+				if (g_profile.IsLevelAvailable(nextLevel)) {
+					level_ = nextLevel;
 					break;
 				}
 				else {
@@ -197,7 +195,36 @@ void EasyMain()
 			UpdateMusic();
 		}
 
-		profile.UpdateLevel(prevLevel, game.GetInitWorld());
-		game.Finish(level, prevLevel);
+		g_profile.UpdateLevel(prevLevel_, game.GetInitWorld());
+		game.Finish(level_, prevLevel_);
+
+		if (exiting) {
+			return nullptr;
+		}
+		else {
+			return new GameScene(level_, prevLevel_);
+		}
+	}
+private:
+	bool exiting = false;
+	int level_ = 0;
+	int prevLevel_ = 0;
+};
+
+void EasyMain()
+{
+	srand((int)time(nullptr));
+
+	InitData();
+	ResizeScreen(screen::w, screen::h);
+
+	g_profile.LoadFromDisk();
+	UpdateMusic();
+
+	IScene* scene = new GameScene(g_profile.LastAvailableLevel(), 0);
+	while (scene) {
+		IScene* nextScene = scene->Run();
+		delete scene;
+		scene = nextScene;
 	}
 }
