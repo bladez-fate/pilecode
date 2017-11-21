@@ -29,6 +29,8 @@ namespace pilecode {
 	const Vec2Si32 g_tileCenter(64, 54);
 
 	namespace image {
+		Sprite g_pilecode;
+
 		Sprite g_empty;
 
 		Sprite g_tile[kTlMax];
@@ -145,10 +147,6 @@ namespace pilecode {
 		image::g_button_letter[kLtRead].Load("data/button-read.tga");
 		image::g_button_letter[kLtWrite].Load("data/button-write.tga");
 		image::g_button_letter[kLtDot] = image::g_empty;
-
-		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
-		CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
-		CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
 	}
 
 	void InitMusic()
@@ -164,6 +162,15 @@ namespace pilecode {
 		sfx::g_negative2.Load("data/lokif/negative_2.wav");
 		sfx::g_read.Load("data/circlerun/read.wav");
 		sfx::g_write.Load("data/circlerun/write.wav");
+	}
+
+	void PreInitData()
+	{
+		image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
+
+		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+		CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
+		CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
 	}
 
 	void InitData()

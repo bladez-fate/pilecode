@@ -77,6 +77,36 @@ namespace pilecode {
 		}
 	}
 
+	template <class FilterFunc>
+	void FilterFillColor(const Rgba color, const Si32 to_x_pivot, const Si32 to_y_pivot,
+		const Si32 to_width, const Si32 to_height, Sprite to_sprite, FilterFunc filter)
+	{
+		const Si32 to_stride_pixels = to_sprite.Width();
+
+		const Si32 to_x = to_x_pivot;
+		const Si32 to_y = to_y_pivot;
+
+		Rgba *to = to_sprite.RgbaData()
+			+ to_y * to_stride_pixels
+			+ to_x;
+
+		const Si32 to_y_db = (to_y >= 0 ? 0 : -to_y);
+		const Si32 to_y_d_max = to_sprite.Height() - to_y;
+		const Si32 to_y_de = (to_height < to_y_d_max ? to_height : to_y_d_max);
+
+		const Si32 to_x_db = (to_x >= 0 ? 0 : -to_x);
+		const Si32 to_x_d_max = to_sprite.Width() - to_x;
+		const Si32 to_x_de = (to_width < to_x_d_max ? to_width : to_x_d_max);
+
+		for (Si32 to_y_disp = to_y_db; to_y_disp < to_y_de; ++to_y_disp) {
+			Rgba *to_line = to + to_y_disp * to_stride_pixels;
+			for (Si32 to_x_disp = to_x_db; to_x_disp < to_x_de; ++to_x_disp) {
+				Rgba *to_rgba = to_line + to_x_disp;
+				*to_rgba = filter(&color, to_rgba);
+			}
+		}
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y)
@@ -283,6 +313,17 @@ namespace pilecode {
 	{
 		AlphaDrawAndBlend2(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
 			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend1, blend2);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void FilterBrightness(Sprite sprite, Ui8 alpha)
+	{
+		float a = float(alpha) / 255.0f;
+		FilterFillColor(Rgba(), 0, 0, sprite.Width(), sprite.Height(),
+			sprite, [=](const Rgba*, const Rgba* bg) {
+			return RgbaMult(*bg, alpha);
+		});
 	}
 
 }

@@ -42,6 +42,8 @@ namespace pilecode {
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2);
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend1, Rgba blend2);
 
+	void FilterBrightness(Sprite sprite, Ui8 alpha);
+
 	inline Rgba RgbaMult(Rgba c, Ui32 m)
 	{
 		Ui32 rb = c.rgba & 0x00ff00ff;

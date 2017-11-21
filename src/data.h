@@ -40,6 +40,8 @@ namespace pilecode {
 	extern const Vec2Si32 g_tileCenter;
 
 	namespace image {
+		extern Sprite g_pilecode;
+
 		extern Sprite g_empty;
 
 		extern Sprite g_tile[kTlMax];
@@ -87,5 +89,6 @@ namespace pilecode {
 		extern Sound g_write;
 	}
 
+	void PreInitData();
 	void InitData();
 }

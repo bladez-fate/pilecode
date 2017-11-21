@@ -277,16 +277,57 @@ IScene* EditorScene::Run()
 	}
 }
 
+void DrawIntro()
+{
+	DrawWithFixedAlphaBlend(image::g_background[2], 0, 0, Ui8(255));
+	AlphaDraw(image::g_pilecode, 0, 0);
+}
+
+void Intro()
+{
+	double transitionSec = 1.2f;
+
+	// Show Intro
+	double startTime = ae::Time();
+	while (true) {
+		if (IsKey(kKeySpace) || IsKey(kKeyEscape) || IsKey(kKeyEnter) || IsKey(kKeyMouseLeft)) {
+			break;
+		}
+		DrawIntro();
+		Ui8 brightness = Ui8(ae::Clamp(float((ae::Time() - startTime) * 255 / transitionSec), 0.0f, 255.0f));
+		FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
+		ae::ShowFrame();
+		Sleep(0.010);
+	}
+
+	// Hide intro
+	double showedTime = ae::Time() - startTime;
+	double finishTime = ae::Time() + std::min(transitionSec, showedTime);
+	while (ae::Time() < finishTime) {
+		DrawIntro();
+		Ui8 brightness = Ui8(ae::Clamp(float((finishTime - ae::Time()) * 255 / transitionSec), 0.0f, 255.0f));
+		FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
+		ae::ShowFrame();
+		Sleep(0.010);
+	}
+	Sleep(0.100);
+}
+
 void EasyMain()
 {
+	// Init system stuff
 	srand((int)time(nullptr));
-
-	InitData();
 	ResizeScreen(screen::w, screen::h);
 
+	// Init game
+	PreInitData();
+	InitData();
 	g_profile.LoadFromDisk();
-	UpdateMusic();
 
+	Intro();
+
+	// Run game
+	UpdateMusic();
 	IScene* scene = new GameScene(g_profile.LastAvailableLevel(), 0);
 	while (scene) {
 		IScene* nextScene = scene->Run();
