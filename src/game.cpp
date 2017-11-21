@@ -201,7 +201,7 @@ namespace pilecode {
 
 	void Game::StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld)
 	{
-		editorMode = true;
+		editorMode_ = true;
 		disableTransition_ = true;
 		Start(level, prevLevel, maxLevel, savedWorld);
 	}
@@ -413,7 +413,13 @@ namespace pilecode {
 
 	Button* Game::AddButton(Si32 pos, Sprite sprite)
 	{
-		buttons_.emplace_back(pos / panelHeight_, pos % panelHeight_, sprite);
+		Si32 playerPanelHeight = 2;
+		Si32 posx = pos / playerPanelHeight;
+		Si32 posy = pos % playerPanelHeight;
+		if (editorMode_) {
+			posy++;
+		}
+		buttons_.emplace_back(posx, posy, sprite);
 		Button* btn = &buttons_.back();
 
 		char gridHotkeys[] = {
@@ -421,6 +427,21 @@ namespace pilecode {
 		};
 		if (pos < sizeof(gridHotkeys) / sizeof(*gridHotkeys)) {
 			btn->HotKey(gridHotkeys[pos]);
+		}
+
+		return btn;
+	}
+
+	Button* Game::AddEditorButton(Si32 pos, Sprite sprite)
+	{
+		buttons_.emplace_back(pos, 0, sprite);
+		Button* btn = &buttons_.back();
+
+		char gridHotkeys2[] = {
+			'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.'
+		};
+		if (pos < sizeof(gridHotkeys2) / sizeof(*gridHotkeys2)) {
+			btn->HotKey(gridHotkeys2[pos]);
 		}
 
 		return btn;
@@ -495,7 +516,7 @@ namespace pilecode {
 	{
 		buttons_.clear();
 		panelWidth_ = 6;
-		panelHeight_ = 2;
+		panelHeight_ = editorMode_? 3: 2;
 
 		// Add level switching buttons
 		AddButton(0, image::g_button_prevlevel)->Click([=](Button* btn) {
@@ -568,6 +589,23 @@ namespace pilecode {
 					btn->set_enabled(world_->steps() == 0); // TODO: allow to change untouched tiles
 				});
 			}
+		}
+
+		// Add editor buttons
+		// - set map size (x,y,z)
+		// - add platform
+		// - move platform (6 directions)
+		// - delete platform
+		// - add tile
+		// - remove tile
+		// - change tile type
+		if (editorMode_) {
+			//AddEditorButton(0, image::g_button_addplatform)->Click([=](Button* btn) {
+			//	SwitchPlaceMode(kPmRobot, kLtSpace);
+			//})->OnUpdate([=](Button* btn) {
+			//	btn->set_frame(placeMode_ == kPmRobot);
+			//	btn->set_enabled(world_->steps() == 0);
+			//});
 		}
 	}
 

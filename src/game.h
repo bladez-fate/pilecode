@@ -53,6 +53,7 @@ namespace pilecode {
 		void Update();
 		void DrawPanel(Si32 width, Si32 height);
 		Button* AddButton(Si32 pos, Sprite sprite);
+		Button* AddEditorButton(Si32 pos, Sprite sprite);
 		void ControlTools();
 		bool IsMouseInPanel();
 		void UpdateTools();
@@ -73,7 +74,7 @@ namespace pilecode {
 		Si32 mouseScrollMargin_ = 5;
 
 		// mode
-		bool editorMode = false;
+		bool editorMode_ = false;
 
 		// levels and transitions
 		int level_ = 0;
