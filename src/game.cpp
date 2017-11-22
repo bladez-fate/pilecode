@@ -475,19 +475,6 @@ namespace pilecode {
 
 	void Game::RenderTools()
 	{
-		if (placeMode_ == kPmRobot) {
-			// Show robot near mouse cursor
-			AlphaDraw(image::g_robot,
-				ae::MousePos().x - g_tileCenter.x,
-				ae::MousePos().y - g_tileCenter.y);
-		}
-		else if (placeMode_ == kPmLetter) {
-			// Dont show letter near mouse cursor
-			//AlphaDraw(image::g_letter[placeLetterDown_],
-			//	ae::MousePos().x - g_tileCenter.x,
-			//	ae::MousePos().y - g_tileCenter.y);
-		}
-
 		DrawPanel(panelWidth_, panelHeight_);
 		for (Button& button : buttons_) {
 			button.Render();
@@ -704,7 +691,9 @@ namespace pilecode {
 				}
 			}
 			// Show letter on tile to be placed
-			if (placeMode_ == kPmLetter) {
+			if (placeMode_ == kPmRobot) {
+				vp_->Draw(&image::g_robot, wmouse_, 3).Alpha().Blend(ui::ActiveColorBlink());
+			} else if (placeMode_ == kPmLetter) {
 				vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(ui::ActiveColorBlink());
 			}
 		}

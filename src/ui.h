@@ -40,7 +40,7 @@ namespace pilecode {
 		inline Rgba ActiveColorBlink()
 		{
 			double alpha = (0.5 + 0.5 * sin(ae::Time() * 20));
-			return Rgba(0x55, 0xff, 0x66, Ui8(0xdd * alpha));
+			return Rgba(0x55, 0xff, 0x66, Ui8(0xbb * alpha));
 		}
 	}
 
