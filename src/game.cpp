@@ -476,14 +476,16 @@ namespace pilecode {
 	void Game::RenderTools()
 	{
 		if (placeMode_ == kPmRobot) {
+			// Show robot near mouse cursor
 			AlphaDraw(image::g_robot,
 				ae::MousePos().x - g_tileCenter.x,
 				ae::MousePos().y - g_tileCenter.y);
 		}
 		else if (placeMode_ == kPmLetter) {
-			AlphaDraw(image::g_letter[placeLetterDown_],
-				ae::MousePos().x - g_tileCenter.x,
-				ae::MousePos().y - g_tileCenter.y);
+			// Dont show letter near mouse cursor
+			//AlphaDraw(image::g_letter[placeLetterDown_],
+			//	ae::MousePos().x - g_tileCenter.x,
+			//	ae::MousePos().y - g_tileCenter.y);
 		}
 
 		DrawPanel(panelWidth_, panelHeight_);
@@ -694,9 +696,16 @@ namespace pilecode {
 		vp_->BeginRender(ae::Time());
 		world_->Draw(vp_.get());
 
-		if (tileHover_ && frameVisibility_) {
-			for (int wz = 0; wz <= wmouse_.z; wz++) {
-				vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1);
+		if (tileHover_) {
+			// Draw frame on all z-layers
+			if (frameVisibility_) {
+				for (int wz = 0; wz <= wmouse_.z; wz++) {
+					vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1).Alpha();
+				}
+			}
+			// Show letter on tile to be placed
+			if (placeMode_ == kPmLetter) {
+				vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(ui::ActiveColorBlink());
 			}
 		}
 

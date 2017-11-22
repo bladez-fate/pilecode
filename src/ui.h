@@ -26,6 +26,24 @@
 
 namespace pilecode {
 
+	namespace ui {
+		inline Rgba HoverColor()
+		{
+			return Rgba(0x55, 0xff, 0x66, 0x80);
+		}
+
+		inline Rgba DisabledColor()
+		{
+			return Rgba(0x63, 0xa8, 0xdd, 0xff);
+		}
+
+		inline Rgba ActiveColorBlink()
+		{
+			double alpha = (0.5 + 0.5 * sin(ae::Time() * 20));
+			return Rgba(0x55, 0xff, 0x66, Ui8(0xdd * alpha));
+		}
+	}
+
 	class Button {
 	public:
 		Button(Si32 ix, Si32 iy, Sprite sprite)
@@ -81,10 +99,7 @@ namespace pilecode {
 
 		void Render()
 		{
-			auto blend = (enabled_ ?
-				(hover_ ? Rgba(0x55, 0xff, 0x66, 0x80) : Rgba(0, 0, 0, 0)) :
-				Rgba(0x63, 0xa8, 0xdd, 0xff));
-
+			auto blend = (enabled_ ? (hover_ ? ui::HoverColor() : Rgba(0, 0, 0, 0)) : ui::DisabledColor());
 			if (frame_) {
 				AlphaDrawAndBlend(image::g_button_frame, x1_, y1_, blend);
 			}
