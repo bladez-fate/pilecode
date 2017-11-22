@@ -1118,6 +1118,7 @@ namespace pilecode {
 		}
 	}
 
+	// Converts screen coords `p' into world coords at given z-level `wz'
 	Vec3Si32 ViewPort::ToWorldAtZ(int wz, Vec2Si32 p) const
 	{
 		p.x -= int(x_ + 0.5f);
@@ -1127,11 +1128,44 @@ namespace pilecode {
 		return Pos::ToWorld(p, wz);
 	}
 
+	// Converts screen coords `p' into world coords and tile coords `tp' at given z-level `wz'
+	Vec3Si32 ViewPort::ToWorldTileAtZ(int wz, Vec2Si32 p, Vec2F& tp) const
+	{
+		p.x -= int(x_ + 0.5f);
+		p.y -= int(y_ + 0.5f);
+		p.x -= g_xtileorigin;
+		p.y -= g_ytileorigin;
+		Vec3Si32 result = Pos::ToWorld(p, wz);
+		p -= Pos::ToScreen(result);
+		tp = Pos::ToTile(p);
+		return result;
+	}
+
+	// Search all z-levels for highest with real tile
+	// and converts screen coords `p' into world coords `w' of that tile
+	// Returns false iff real tile was not found (`w' is not changed)
 	bool ViewPort::ToWorld(Vec2Si32 p, Vec3Si32& w) const
 	{
 		for (int wz = int(visible_z_) - 1; wz >= 0; wz--) {
 			Vec3Si32 w0 = ToWorldAtZ(wz, p);
 			if (Tile* tile = world_->At(w0)) {
+				w = w0;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Search all z-levels for highest with real tile
+	// and converts screen coords `p' into world coords `w' and tile coords `tp' of that tile
+	// Returns false iff real tile was not found (`w' and `tp' are not changed)
+	bool ViewPort::ToWorldTile(Vec2Si32 p, Vec3Si32& w, Vec2F& tp) const
+	{
+		for (int wz = int(visible_z_) - 1; wz >= 0; wz--) {
+			Vec2F tp0;
+			Vec3Si32 w0 = ToWorldTileAtZ(wz, p, tp0);
+			if (Tile* tile = world_->At(w0)) {
+				tp = tp0;
 				w = w0;
 				return true;
 			}

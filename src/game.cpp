@@ -306,7 +306,13 @@ namespace pilecode {
 			simSpeed_ = 8.0;
 		}
 
-		tileHover_ = vp_->ToWorld(ae::MousePos(), wmouse_);
+		tileHover_ = vp_->ToWorldTile(ae::MousePos(), wmouse_, tilePos_);
+		if (tileHover_) {
+			placeLetter_ = PlaceLetter(tilePos_, placeLetterRight_, placeLetterDown_, placeLetterUp_, placeLetterLeft_);
+		}
+		else {
+			placeLetter_ = placeLetterRight_;
+		}
 
 		if (IsKeyOnce(kKeyMouseRight)) {
 			DefaultPlaceMode();
@@ -475,7 +481,7 @@ namespace pilecode {
 				ae::MousePos().y - g_tileCenter.y);
 		}
 		else if (placeMode_ == kPmLetter) {
-			AlphaDraw(image::g_letter[placeLetter_],
+			AlphaDraw(image::g_letter[placeLetterDown_],
 				ae::MousePos().x - g_tileCenter.x,
 				ae::MousePos().y - g_tileCenter.y);
 		}
@@ -497,18 +503,61 @@ namespace pilecode {
 	void Game::DefaultPlaceMode()
 	{
 		placeMode_ = kPmSelect;
-		placeLetter_ = kLtSpace;
+		placeLetterRight_ = kLtSpace;
+		placeLetterDown_ = kLtSpace;
+		placeLetterUp_ = kLtSpace;
+		placeLetterLeft_ = kLtSpace;
+	}
+
+	void Game::SwitchPlaceMode(PlaceMode mode, Letter right, Letter down, Letter up, Letter left)
+	{
+		if (placeMode_ != mode
+			|| placeLetterRight_ != right
+			|| placeLetterDown_ != down
+			|| placeLetterUp_ != up
+			|| placeLetterLeft_ != left) {
+			// Enter new mode
+			placeMode_ = mode;
+			placeLetterRight_ = right;
+			placeLetterDown_ = down;
+			placeLetterUp_ = up;
+			placeLetterLeft_ = left;
+		}
+		else { // trying to switch mode we are currently in -- exit to default mode
+			DefaultPlaceMode();
+		}
 	}
 
 	void Game::SwitchPlaceMode(PlaceMode mode, Letter letter)
 	{
-		if (placeMode_ != mode || placeLetter_ != letter) {
-			// Enter new mode
-			placeMode_ = mode;
-			placeLetter_ = letter;
+		SwitchPlaceMode(mode, letter, letter, letter, letter);
+	}
+
+	Letter Game::PlaceLetter(Vec2F tp, Letter right, Letter down, Letter up, Letter left)
+	{
+		//
+		//   TILE COORDINATE SYSTEM SCHEME AND PLACEMENT REGIONS
+		//
+		//  ^ y
+		//  |
+		// 1+------+
+		//  |\    /|
+		//  | \  / |
+		//  |  \/  |
+		//  |  /\  |
+		//  | /  \ |
+		//  |/    \|
+		// 0+------+> x
+		//  0      1
+		//  kLtRight,          // x+
+		//	kLtDown,           // y-
+		//	kLtUp,             // y+
+		//	kLtLeft,           // x-
+		if (tp.y > tp.x) {
+			return (tp.y > 1 - tp.x ? up : left);
 		}
-		else { // trying to switch mode we are currently in -- exit to default mode
-			DefaultPlaceMode();
+		else {
+			return (tp.y > 1 - tp.x ? right : down);
 		}
 	}
 
@@ -579,13 +628,34 @@ namespace pilecode {
 		Si32 btnPos = 6;
 
 		// Add letter buttons
-		for (int k = kLtSpace + 1; k < kLtMax; k++) {
-			auto letter = Letter(k);
+		if (world_->IsLetterAllowed(kLtRight)
+			&& world_->IsLetterAllowed(kLtDown)
+			&& world_->IsLetterAllowed(kLtUp)
+			&& world_->IsLetterAllowed(kLtLeft)) {
+			AddButton(btnPos++, image::g_button_letter[kLtRight])->Click([=](Button* btn) {
+				SwitchPlaceMode(kPmLetter, kLtRight, kLtDown, kLtUp, kLtLeft);
+			})->OnUpdate([=](Button* btn) {
+				btn->set_frame(placeMode_ == kPmLetter
+					&& placeLetterRight_ == kLtRight
+					&& placeLetterDown_ == kLtDown
+					&& placeLetterUp_ == kLtUp
+					&& placeLetterLeft_ == kLtLeft
+				);
+				btn->set_enabled(world_->steps() == 0); // TODO: allow to change untouched tiles
+			});
+		}
+
+		for (auto letter : {kLtRead, kLtWrite, kLtDot}) {
 			if (world_->IsLetterAllowed(letter)) {
 				AddButton(btnPos++, image::g_button_letter[letter])->Click([=](Button* btn) {
 					SwitchPlaceMode(kPmLetter, letter);
 				})->OnUpdate([=](Button* btn) {
-					btn->set_frame(placeMode_ == kPmLetter && placeLetter_ == letter);
+					btn->set_frame(placeMode_ == kPmLetter
+						&& placeLetterRight_ == letter
+						&& placeLetterDown_ == letter
+						&& placeLetterUp_ == letter
+						&& placeLetterLeft_ == letter
+					);
 					btn->set_enabled(world_->steps() == 0); // TODO: allow to change untouched tiles
 				});
 			}

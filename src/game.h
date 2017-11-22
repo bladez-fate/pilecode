@@ -60,7 +60,9 @@ namespace pilecode {
 		void RenderTools();
 		void PlayOrPause();
 		void DefaultPlaceMode();
+		void SwitchPlaceMode(PlaceMode mode, Letter right, Letter down, Letter up, Letter left);
 		void SwitchPlaceMode(PlaceMode mode, Letter letter);
+		Letter PlaceLetter(Vec2F tp, Letter right, Letter down, Letter up, Letter left);
 		void MakeTools();
 		Sprite& BgForLevel(int level);
 		void Render();
@@ -102,13 +104,18 @@ namespace pilecode {
 		// gameplay
 		bool tileHover_ = false;
 		Vec3Si32 wmouse_;
+		Vec2F tilePos_;
 		bool frameVisibility_ = true;
 		bool panelVisibility_ = true;
 		Si32 panelWidth_;
 		Si32 panelHeight_;
 		std::list<Button> buttons_;
 		PlaceMode placeMode_;
-		Letter placeLetter_;
+		Letter placeLetterRight_;
+		Letter placeLetterDown_;
+		Letter placeLetterUp_;
+		Letter placeLetterLeft_;
+		Letter placeLetter_; // with respect to current mouse position 
 
 		// debug
 #ifdef DEV_MODE

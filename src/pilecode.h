@@ -396,6 +396,11 @@ namespace pilecode {
 			return Pos(w).Screen();
 		}
 
+		static Vec2Si32 ToScreen(Vec3Si32 w)
+		{
+			return Pos(w).Screen();
+		}
+
 		static Vec3Si32 ToWorld(Vec2Si32 s, int wz)
 		{
 			s.y -= dz * wz;
@@ -480,7 +485,9 @@ namespace pilecode {
 
 		// transformations
 		Vec3Si32 ToWorldAtZ(int wz, Vec2Si32 p) const;
+		Vec3Si32 ToWorldTileAtZ(int wz, Vec2Si32 p, Vec2F& tp) const;
 		bool ToWorld(Vec2Si32 p, Vec3Si32& w) const;
+		bool ToWorldTile(Vec2Si32 p, Vec3Si32& w, Vec2F& tp) const;
 
 		// world-related
 		World* world() const { return world_; }
