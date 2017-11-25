@@ -265,14 +265,19 @@ namespace pilecode {
 		image::g_button_x2.Load("data/button-x2.tga");
 		image::g_button_x4.Load("data/button-x4.tga");
 		image::g_button_x8.Load("data/button-x8.tga");
-		image::g_button_robot.Load("data/button-robot.tga");
+
+		// Palette
+		Sprite palette;
+		palette.Load("data/ui/palette.tga");
+		Si32 pw = 80, ph = 80;
+		LoadImageFromSpritesheet(palette, pw, ph, 0, 0, image::g_button_robot);
 		image::g_button_letter[kLtSpace] = image::g_empty;
-		image::g_button_letter[kLtUp].Load("data/button-up.tga");
-		image::g_button_letter[kLtDown].Load("data/button-down.tga");
-		image::g_button_letter[kLtRight].Load("data/button-right.tga");
-		image::g_button_letter[kLtLeft].Load("data/button-left.tga");
-		image::g_button_letter[kLtRead].Load("data/button-read.tga");
-		image::g_button_letter[kLtWrite].Load("data/button-write.tga");
+		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtUp]);
+		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtDown]);
+		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtRight]);
+		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtLeft]);
+		LoadImageFromSpritesheet(palette, pw, ph, 2, 0, image::g_button_letter[kLtRead]);
+		LoadImageFromSpritesheet(palette, pw, ph, 3, 0, image::g_button_letter[kLtWrite]);
 		image::g_button_letter[kLtDot] = image::g_empty;
 	}
 

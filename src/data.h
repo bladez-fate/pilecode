@@ -32,7 +32,6 @@ namespace pilecode {
 	namespace ui {
 		constexpr Si32 g_xcell = 96;
 		constexpr Si32 g_ycell = 96;
-		constexpr Si32 g_spacing = 16;
 		constexpr Si32 g_marginBottom = 32;
 		constexpr Si32 g_marginLeft = 16;
 		constexpr Si32 g_marginTop = g_marginBottom;

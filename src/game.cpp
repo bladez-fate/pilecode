@@ -401,13 +401,6 @@ namespace pilecode {
 		UpdateTools();
 	}
 
-	Button* Game::AddButton(Sprite sprite, Region region)
-	{
-		buttons_.emplace_back(sprite, region);
-		Button* btn = &buttons_.back();
-		return btn;
-	}
-
 	bool Game::ControlTools()
 	{
 		for (Button& button : buttons_) {
@@ -552,18 +545,16 @@ namespace pilecode {
 		});
 
 		// Add level switching buttons
-		GridFrame frmPrevLevel(kRightBottom, 1, 1, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
-		GridFrame frmNextLevel(kRightTop, 1, 1, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
-		AddButton(image::g_button_prevlevel, frmPrevLevel.Place(0, 0))->Click([=](Button* btn) {
+		AddButton(image::g_button_prevlevel, Region::Screen(), kRightBottom)->Click([=](Button* btn) {
 			nextLevel_ = level_ - 1;
 		})->set_enabled(level_ > 0);
-		AddButton(image::g_button_nextlevel, frmNextLevel.Place(0, 0))->Click([=](Button* btn) {
+		AddButton(image::g_button_nextlevel, Region::Screen(), kRightTop)->Click([=](Button* btn) {
 			nextLevel_ = level_ + 1;
 		})->set_enabled(level_ < maxLevel_);
 
 		// Add palette buttons
 		Si32 btnPos = 0;
-		GridFrame frmPalette(kLeftCenter, 1, 4, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
+		GridFrame frmPalette(kLeftCenter, 1, 4, image::g_button_robot.Width(), image::g_button_robot.Height(), 10, 10);
 		// Add robot button
 		AddButton(image::g_button_robot, frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
 			SwitchPlaceMode(kPmRobot, kLtSpace);

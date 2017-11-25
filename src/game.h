@@ -52,7 +52,6 @@ namespace pilecode {
 		bool Control();
 		void Update();
 		void DrawPanel(Si32 width, Si32 height);
-		Button* AddButton(Sprite sprite, Region region);
 		bool ControlTools();
 		void UpdateTools();
 		void RenderTools();
@@ -67,6 +66,15 @@ namespace pilecode {
 		bool IsComplete();
 		World* GetInitWorld() const;
 		int GetNextLevel() const;
+
+	private:
+		template <class... Args>
+		Button* Game::AddButton(Args... args)
+		{
+			buttons_.emplace_back(args...);
+			Button* btn = &buttons_.back();
+			return btn;
+		}
 
 	private:
 		// control configuration
