@@ -29,8 +29,15 @@
 #include "engine/easy.h"
 
 namespace pilecode {
-	constexpr Si32 g_xcell = 64;
-	constexpr Si32 g_ycell = 64;
+	namespace ui {
+		constexpr Si32 g_xcell = 96;
+		constexpr Si32 g_ycell = 96;
+		constexpr Si32 g_spacing = 16;
+		constexpr Si32 g_marginBottom = 32;
+		constexpr Si32 g_marginLeft = 16;
+		constexpr Si32 g_marginTop = g_marginBottom;
+		constexpr Si32 g_marginRight = g_marginLeft;
+	}
 
 	constexpr Si32 g_xtileorigin = 64;
 	constexpr Si32 g_ytileorigin = 82;
@@ -63,7 +70,8 @@ namespace pilecode {
 		extern Sprite g_button_prevlevel;
 		extern Sprite g_button_play;
 		extern Sprite g_button_pause;
-		extern Sprite g_button_stop;
+		extern Sprite g_button_rewind;
+		extern Sprite g_button_replay;
 		extern Sprite g_button_x1;
 		extern Sprite g_button_x2;
 		extern Sprite g_button_x4;
@@ -88,6 +96,8 @@ namespace pilecode {
 		extern Sound g_read;
 		extern Sound g_write;
 	}
+
+	Sprite CreateShadow(Sprite sprite, Si32 blurRadius);
 
 	void PreInitData();
 	void InitData();

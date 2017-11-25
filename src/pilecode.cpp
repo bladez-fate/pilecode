@@ -80,7 +80,7 @@ namespace pilecode {
 		// tile brick
 		if (type_ != kTlNone) {
 			Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
-			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0));
+			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0)).Alpha();
 		}
 
 		// output
@@ -151,15 +151,18 @@ namespace pilecode {
 				Sprite& src = image::g_tile[t];
 				Sprite& dst = ts[i];
 				dst.Create(src.Width(), src.Height());
-				Rgba* srcIt = src.RgbaData();
-				Rgba* dstIt = dst.RgbaData();
-				size_t left = src.Width() * src.Height();
-				for (; left > 0; srcIt++, dstIt++, left--) {
-					*dstIt = *srcIt;
-					Si16 gdelta = Si16(dstIt->g * alpha);
-					Si16 bdelta = Si16(dstIt->b * alpha);
-					dstIt->g += bdelta - gdelta;
-					dstIt->b += gdelta - bdelta;
+				Rgba* srcIt0 = src.RgbaData();
+				Rgba* dstIt0 = dst.RgbaData();
+				for (Si32 y = 0; y < src.Height(); srcIt0 += src.StridePixels(), dstIt0 += dst.StridePixels(), y++) {
+					Rgba* srcIt = srcIt0;
+					Rgba* dstIt = dstIt0;
+					for (Si32 x = 0; x < src.Width(); srcIt++, dstIt++, x++) {
+						*dstIt = *srcIt;
+						Si16 gdelta = Si16(dstIt->g * alpha);
+						Si16 bdelta = Si16(dstIt->b * alpha);
+						dstIt->g += bdelta - gdelta;
+						dstIt->b += gdelta - bdelta;
+					}
 				}
 			}
 		}
@@ -442,7 +445,8 @@ namespace pilecode {
 		vp->Draw(&image::g_robot,
 			p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
 			2,
-			Vec2Si32(off.x, off.y + body_off_y));
+			Vec2Si32(off.x, off.y + body_off_y))
+			.Alpha();
 
 		if (reg_ != kLtSpace) {
 			vp->Draw(&image::g_letter[reg_],

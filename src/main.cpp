@@ -290,7 +290,7 @@ void Intro()
 	// Show Intro
 	double startTime = ae::Time();
 	while (true) {
-		if (IsKey(kKeySpace) || IsKey(kKeyEscape) || IsKey(kKeyEnter) || IsKey(kKeyMouseLeft)) {
+		if (ui::StopAnimationKey()) {
 			break;
 		}
 		DrawIntro();

@@ -52,10 +52,8 @@ namespace pilecode {
 		bool Control();
 		void Update();
 		void DrawPanel(Si32 width, Si32 height);
-		Button* AddButton(Si32 pos, Sprite sprite);
-		Button* AddEditorButton(Si32 pos, Sprite sprite);
-		void ControlTools();
-		bool IsMouseInPanel();
+		Button* AddButton(Sprite sprite, Region region);
+		bool ControlTools();
 		void UpdateTools();
 		void RenderTools();
 		void PlayOrPause();

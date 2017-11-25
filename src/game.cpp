@@ -50,7 +50,7 @@ namespace pilecode {
 		vp_->MoveNoClamp(Vec2F(0, 1.0f * N*(N + 1) / 2));
 		for (int i = 0; i < N; i++) {
 			Render();
-			if (IsKey(kKeyMouseLeft)) {
+			if (ui::StopAnimationKey()) {
 				break;
 			}
 			Sleep(0.01);
@@ -79,9 +79,13 @@ namespace pilecode {
 
 		//float speed = 1.01;
 		int M = 10;
+		bool stop = false;
 		for (int i = 0; i < M; i++) {
 			Render();
-			// TODO: interrupt on mouse click
+			if (ui::StopAnimationKey()) {
+				stop = true;
+				break;
+			}
 
 			Sleep(0.01);
 			dx += 4;
@@ -97,7 +101,10 @@ namespace pilecode {
 
 		auto speed = Vec2F(0.0f, -1.0f);
 		int N = 50;
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N && !stop; i++) {
+			if (ui::StopAnimationKey()) {
+				break;
+			}
 			Render();
 			Sleep(0.01);
 			vp_->MoveNoClamp(speed);
@@ -121,7 +128,7 @@ namespace pilecode {
 		auto speed = Vec2F(0.0f, 0.0f);
 		for (int i = 0; i < N; i++) {
 			Render();
-			if (IsKey(kKeyMouseLeft)) {
+			if (ui::StopAnimationKey()) {
 				break;
 			}
 			Sleep(0.01);
@@ -161,9 +168,11 @@ namespace pilecode {
 		bgTransition_ = 1.0f;
 		auto speed = Vec2F(0.0f, N * 1.0f);
 		vp_->MoveNoClamp(Vec2F(0, -1.0f * N*(N + 1) / 2));
+		bool stop = false;
 		for (int i = 0; i < N; i++) {
 			Render();
-			if (IsKey(kKeyMouseLeft)) {
+			if (ui::StopAnimationKey()) {
+				stop = true;
 				break;
 			}
 			Sleep(0.01);
@@ -175,16 +184,16 @@ namespace pilecode {
 
 		Sleep(0.1);
 
-		for (int i = 0; i < M; i++) {
+		for (int i = 0; i < M && !stop; i++) {
 			Render();
-			// TODO: interrupt on mouse click
-
+			if (ui::StopAnimationKey()) {
+				break;
+			}
 			Sleep(0.01);
 			dx -= ddx;
 			dy -= ddy;
 
 			vp_->MoveNoClamp(delta);
-
 
 			Pos::dx = (int)dx;
 			Pos::dy = (int)dy;
@@ -249,7 +258,7 @@ namespace pilecode {
 
 	bool Game::Control()
 	{
-		if (IsKey(kKeyEscape)) {
+		if (IsKeyOnce(kKeyEscape)) {
 			return false;
 		}
 
@@ -306,19 +315,20 @@ namespace pilecode {
 			simSpeed_ = 8.0;
 		}
 
-		tileHover_ = vp_->ToWorldTile(ae::MousePos(), wmouse_, tilePos_);
-		if (tileHover_) {
-			placeLetter_ = PlaceLetter(tilePos_, placeLetterRight_, placeLetterDown_, placeLetterUp_, placeLetterLeft_);
+		if (!ControlTools()) { // if any ui buttons is hovered -- stop here
+			frameVisibility_ = false;
+			return true;
 		}
-		else {
-			placeLetter_ = placeLetterRight_;
-		}
+		else { // if buttons are not hovered -- try proceed with placement actions
+			frameVisibility_ = true;
+			tileHover_ = vp_->ToWorldTile(ae::MousePos(), wmouse_, tilePos_);
+			if (tileHover_) {
+				placeLetter_ = PlaceLetter(tilePos_, placeLetterRight_, placeLetterDown_, placeLetterUp_, placeLetterLeft_);
+			}
+			else {
+				placeLetter_ = placeLetterRight_;
+			}
 
-		if (IsKeyOnce(kKeyMouseRight)) {
-			DefaultPlaceMode();
-		}
-
-		if (!IsMouseInPanel()) {
 			switch (placeMode_) {
 			case kPmSelect:
 				// TODO: rectangular selection with copy/cut/paste and delete support
@@ -350,11 +360,9 @@ namespace pilecode {
 				}
 				break;
 			}
+
+			return true;
 		}
-
-		ControlTools();
-
-		return true;
 	}
 
 	void Game::Update()
@@ -393,81 +401,25 @@ namespace pilecode {
 		UpdateTools();
 	}
 
-	void Game::DrawPanel(Si32 width, Si32 height)
+	Button* Game::AddButton(Sprite sprite, Region region)
 	{
-		Si32 dx = image::g_panel.Width();
-		Si32 dy = image::g_panel.Height();
-
-		for (int iy = 0; iy < height; iy++) {
-			for (int ix = 0; ix < width; ix++) {
-				AlphaDraw(image::g_panel, ix * dx, iy * dy);
-			}
-		}
-
-		for (int ix = 0; ix < width; ix++) {
-			AlphaDraw(image::g_panel_top, ix * dx, height * dy);
-		}
-
-		AlphaDraw(image::g_panel_bottomright, width * dx, 0);
-
-		for (int iy = 1; iy < height; iy++) {
-			AlphaDraw(image::g_panel_right, width * dx, iy * dy);
-		}
-
-		AlphaDraw(image::g_panel_topright, width * dx, height * dy);
-	}
-
-	Button* Game::AddButton(Si32 pos, Sprite sprite)
-	{
-		Si32 playerPanelHeight = 2;
-		Si32 posx = pos / playerPanelHeight;
-		Si32 posy = pos % playerPanelHeight;
-		if (editorMode_) {
-			posy++;
-		}
-		buttons_.emplace_back(posx, posy, sprite);
+		buttons_.emplace_back(sprite, region);
 		Button* btn = &buttons_.back();
-
-		char gridHotkeys[] = {
-			'A', 'Q', 'S', 'W', 'D', 'E', 'F', 'R', 'G', 'T', 'H', 'Y', 'J', 'U', 'K', 'I', 'L', 'O', ';', 'P'
-		};
-		if (pos < sizeof(gridHotkeys) / sizeof(*gridHotkeys)) {
-			btn->HotKey(gridHotkeys[pos]);
-		}
-
 		return btn;
 	}
 
-	Button* Game::AddEditorButton(Si32 pos, Sprite sprite)
-	{
-		buttons_.emplace_back(pos, 0, sprite);
-		Button* btn = &buttons_.back();
-
-		char gridHotkeys2[] = {
-			'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.'
-		};
-		if (pos < sizeof(gridHotkeys2) / sizeof(*gridHotkeys2)) {
-			btn->HotKey(gridHotkeys2[pos]);
-		}
-
-		return btn;
-	}
-
-	void Game::ControlTools()
+	bool Game::ControlTools()
 	{
 		for (Button& button : buttons_) {
-			button.Control();
+			if (!button.Control()) {
+				return false;
+			}
 		}
-	}
-
-	bool Game::IsMouseInPanel()
-	{
-		return ae::MousePos().x < g_xcell * panelWidth_ && ae::MousePos().y < g_ycell * panelHeight_;
+		return true;
 	}
 
 	void Game::UpdateTools()
 	{
-		frameVisibility_ = !IsMouseInPanel();
 		for (Button& button : buttons_) {
 			button.Update();
 		}
@@ -475,7 +427,7 @@ namespace pilecode {
 
 	void Game::RenderTools()
 	{
-		DrawPanel(panelWidth_, panelHeight_);
+		//DrawPanel(panelWidth_, panelHeight_);
 		for (Button& button : buttons_) {
 			button.Render();
 		}
@@ -553,26 +505,25 @@ namespace pilecode {
 	void Game::MakeTools()
 	{
 		buttons_.clear();
-		panelWidth_ = 6;
-		panelHeight_ = editorMode_? 3: 2;
-
-		// Add level switching buttons
-		AddButton(0, image::g_button_prevlevel)->Click([=](Button* btn) {
-			nextLevel_ = level_ - 1;
-		})->set_enabled(level_ > 0);
-
-		AddButton(1, image::g_button_nextlevel)->Click([=](Button* btn) {
-			nextLevel_ = level_ + 1;
-		})->set_enabled(level_ < maxLevel_);
 
 		// Add playback buttons
-		AddButton(2, image::g_button_play)->Click([=](Button* btn) {
+		HorizonalFluidFrame frmPlayback(kCenterBottom, 10);
+		frmPlayback
+			.Add(image::g_button_rewind)
+			.Add(image::g_button_play)
+			.Add(image::g_button_x8)
+			;
+		AddButton(image::g_button_rewind, frmPlayback.Place(0))->Click([=](Button* btn) {
+			Restart();
+		})->OnUpdate([=](Button* btn) {
+			btn->set_enabled(world_->steps() != 0);
+		});
+		AddButton(image::g_button_play, frmPlayback.Place(1))->Click([=](Button* btn) {
 			PlayOrPause();
 		})->OnUpdate([=](Button* btn) {
-			btn->set_sprite(simPaused_ ? image::g_button_play : image::g_button_pause);
+			btn->SetSprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
-
-		AddButton(3, image::g_button_play)->Click([=](Button* btn) {
+		AddButton(image::g_button_play, frmPlayback.Place(2))->Click([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
 				simSpeed_ = 2.0f;
 			}
@@ -587,41 +538,45 @@ namespace pilecode {
 			}
 		})->OnUpdate([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
-				btn->set_sprite(image::g_button_x1);
+				btn->SetSprite(image::g_button_x1);
 			}
 			else if (simSpeed_ == 2.0f) {
-				btn->set_sprite(image::g_button_x2);
+				btn->SetSprite(image::g_button_x2);
 			}
 			else if (simSpeed_ == 4.0f) {
-				btn->set_sprite(image::g_button_x4);
+				btn->SetSprite(image::g_button_x4);
 			}
 			else if (simSpeed_ == 8.0f) {
-				btn->set_sprite(image::g_button_x8);
+				btn->SetSprite(image::g_button_x8);
 			}
 		});
 
-		AddButton(4, image::g_button_stop)->Click([=](Button* btn) {
-			Restart();
-		})->OnUpdate([=](Button* btn) {
-			btn->set_enabled(world_->steps() != 0);
-		});
+		// Add level switching buttons
+		GridFrame frmPrevLevel(kRightBottom, 1, 1, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
+		GridFrame frmNextLevel(kRightTop, 1, 1, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
+		AddButton(image::g_button_prevlevel, frmPrevLevel.Place(0, 0))->Click([=](Button* btn) {
+			nextLevel_ = level_ - 1;
+		})->set_enabled(level_ > 0);
+		AddButton(image::g_button_nextlevel, frmNextLevel.Place(0, 0))->Click([=](Button* btn) {
+			nextLevel_ = level_ + 1;
+		})->set_enabled(level_ < maxLevel_);
 
+		// Add palette buttons
+		Si32 btnPos = 0;
+		GridFrame frmPalette(kLeftCenter, 1, 4, ui::g_xcell, ui::g_ycell, ui::g_spacing, ui::g_spacing);
 		// Add robot button
-		AddButton(5, image::g_button_robot)->Click([=](Button* btn) {
+		AddButton(image::g_button_robot, frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
 			SwitchPlaceMode(kPmRobot, kLtSpace);
 		})->OnUpdate([=](Button* btn) {
 			btn->set_frame(placeMode_ == kPmRobot);
 			btn->set_enabled(world_->steps() == 0);
 		});
 
-		Si32 btnPos = 6;
-
-		// Add letter buttons
 		if (world_->IsLetterAllowed(kLtRight)
 			&& world_->IsLetterAllowed(kLtDown)
 			&& world_->IsLetterAllowed(kLtUp)
 			&& world_->IsLetterAllowed(kLtLeft)) {
-			AddButton(btnPos++, image::g_button_letter[kLtRight])->Click([=](Button* btn) {
+			AddButton(image::g_button_letter[kLtRight], frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
 				SwitchPlaceMode(kPmLetter, kLtRight, kLtDown, kLtUp, kLtLeft);
 			})->OnUpdate([=](Button* btn) {
 				btn->set_frame(placeMode_ == kPmLetter
@@ -636,7 +591,7 @@ namespace pilecode {
 
 		for (auto letter : {kLtRead, kLtWrite, kLtDot}) {
 			if (world_->IsLetterAllowed(letter)) {
-				AddButton(btnPos++, image::g_button_letter[letter])->Click([=](Button* btn) {
+				AddButton(image::g_button_letter[letter], frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
 					SwitchPlaceMode(kPmLetter, letter);
 				})->OnUpdate([=](Button* btn) {
 					btn->set_frame(placeMode_ == kPmLetter
@@ -650,21 +605,15 @@ namespace pilecode {
 			}
 		}
 
-		// Add editor buttons
-		// - set map size (x,y,z)
-		// - add platform
-		// - move platform (6 directions)
-		// - delete platform
-		// - add tile
-		// - remove tile
-		// - change tile type
 		if (editorMode_) {
-			//AddEditorButton(0, image::g_button_addplatform)->Click([=](Button* btn) {
-			//	SwitchPlaceMode(kPmRobot, kLtSpace);
-			//})->OnUpdate([=](Button* btn) {
-			//	btn->set_frame(placeMode_ == kPmRobot);
-			//	btn->set_enabled(world_->steps() == 0);
-			//});
+			// Add editor buttons
+			// - set map size (x,y,z)
+			// - add platform
+			// - move platform (6 directions)
+			// - delete platform
+			// - add tile
+			// - remove tile
+			// - change tile type
 		}
 	}
 

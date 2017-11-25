@@ -42,17 +42,192 @@ namespace pilecode {
 			double alpha = (0.5 + 0.5 * sin(ae::Time() * 20));
 			return Rgba(0x55, 0xff, 0x66, Ui8(0xbb * alpha));
 		}
+
+		inline bool StopAnimationKey()
+		{
+			return IsKeyOnce(ae::kKeyMouseLeft)
+				|| IsKeyOnce(ae::kKeyEscape)
+				|| IsKeyOnce(ae::kKeyEnter)
+				|| IsKeyOnce(ae::kKeySpace)
+				;
+		}
 	}
+
+	enum Align : Si32 {
+		kLeftTop = 6, kCenterTop = 7, kRightTop = 8,
+		kLeftCenter = 3, kCenter = 4, kRightCenter = 5,
+		kLeftBottom = 0, kCenterBottom = 1, kRightBottom = 2
+	};
+
+	struct Region {
+		Vec2Si32 p1;
+		Vec2Si32 p2;
+
+		Region() {}
+
+		explicit Region(Si32 x1, Si32 y1, Si32 x2, Si32 y2)
+			: p1(x1, y1)
+			, p2(x2, y2)
+		{}
+
+		Si32 left() const { return p1.x; }
+		Si32 bottom() const { return p1.y; }
+		Si32 right() const { return p2.x; }
+		Si32 top() const { return p2.y; }
+
+		Si32 x1() const { return p1.x; }
+		Si32 y1() const { return p1.y; }
+		Si32 x2() const { return p2.x; }
+		Si32 y2() const { return p2.y; }
+
+		Si32 width() const { return x2() - x1(); }
+		Si32 height() const { return y2() - y1(); }
+
+		Vec2Si32 size() const { return Vec2Si32(width(), height()); }
+
+		void assign(const Region& o)
+		{
+			*this = o;
+		}
+
+		Region Place(Align align, Vec2Si32 size) const
+		{
+			// Alignment point position
+			Si32 xa = align % 3,
+				 ya = align / 3;
+			Si32 xc = x1() + xa * (width() / 2),
+				 yc = y1() + ya * (height() / 2);
+
+			// leftbottom corner
+			Si32 x1 = xc - xa * (size.x / 2),
+		 		 y1 = yc - ya * (size.y / 2);
+
+			return Region(x1, y1, x1 + size.x, y1 + size.y);
+		}
+
+		Region Place(Align align, Sprite sprite) const
+		{
+			return Place(align, sprite.Size());
+		}
+
+		static Region Screen()
+		{
+			return Region(
+				ui::g_marginLeft,
+				ui::g_marginBottom,
+				screen::w - ui::g_marginRight,
+				screen::h - ui::g_marginTop
+			);
+		}
+
+		static Region FullScreen()
+		{
+			return Region(0, 0,	screen::w, screen::h);
+		}
+	};
+
+	class GridFrame: public Region {
+	public:
+		GridFrame(Align align, Si32 xSize, Si32 ySize, Si32 btnWidth, Si32 btnHeight, Si32 xSpacing, Si32 ySpacing)
+			: btnWidth_(btnWidth), btnHeight_(btnHeight)
+			, xSpacing_(xSpacing), ySpacing_(ySpacing)
+		{
+			// Frame size
+			Si32 w = xSize * (btnWidth  + xSpacing) - xSpacing,
+			     h = ySize * (btnHeight + ySpacing) - ySpacing;
+
+			assign(Region::Screen().Place(align, Vec2Si32(w, h)));
+		}
+
+		Region Place(Si32 xPos, Si32 yPos)
+		{
+			Region r;
+			r.p1.x = x1() + xPos * (btnWidth_  + xSpacing_);
+			r.p1.y = y1() + yPos * (btnHeight_ + ySpacing_);
+			r.p2.x = r.p1.x + btnWidth_;
+			r.p2.y = r.p1.y + btnHeight_;
+			return r;
+		}
+
+	private:
+		Si32 btnWidth_;
+		Si32 btnHeight_;
+		Si32 xSpacing_;
+		Si32 ySpacing_;
+	};
+
+	class HorizonalFluidFrame: public Region {
+	public:
+		HorizonalFluidFrame(Align align, Si32 xSpacing)
+			: align_(align)
+			, xSpacing_(xSpacing)
+		{}
+
+		HorizonalFluidFrame& Add(Vec2Si32 size)
+		{
+			elements_.emplace_back(size);
+			Update();
+			return *this;
+		}
+
+		HorizonalFluidFrame& Add(Sprite sprite)
+		{
+			return Add(sprite.Size());
+		}
+
+		HorizonalFluidFrame& Add(Si32 spacing)
+		{
+			return Add(Vec2Si32(spacing, 0));
+		}
+
+		Region Place(Si32 pos)
+		{
+			Region r;
+			r.p1.x = x1();
+
+			Si32 width = 0;
+			for (Vec2Si32 e : elements_) {
+				if (pos-- == 0) {
+					width = e.x;
+					break;
+				}
+				else {
+					r.p1.x += e.x + xSpacing_;
+				}
+			}
+
+			r.p1.y = y1();
+			r.p2.x = r.p1.x + width;
+			r.p2.y = r.p1.y + height();
+
+			return r;
+		}
+
+	private:
+		void Update()
+		{
+			// Recompute size
+			Si32 w = -xSpacing_, h = 1;
+			for (Vec2Si32 e : elements_) {
+				w += e.x + xSpacing_;
+				h = std::max(h, e.y);
+			}
+
+			assign(Region::Screen().Place(align_, Vec2Si32(w, h)));
+		}
+
+	private:
+		Align align_;
+		Si32 xSpacing_;
+		std::vector<Vec2Si32> elements_;
+	};
 
 	class Button {
 	public:
-		Button(Si32 ix, Si32 iy, Sprite sprite)
-			: ix_(ix), iy_(iy), sprite_(sprite)
+		Button(Sprite sprite, Region region, Align align = kCenter)
+			: reg_(region.Place(align, sprite))
 		{
-			x1_ = g_xcell * ix_;
-			y1_ = g_ycell * iy_;
-			x2_ = g_xcell * (ix_ + 1) - 1;
-			y2_ = g_ycell * (iy_ + 1) - 1;
+			SetSprite(sprite);
 		}
 
 		Button* Click(std::function<void(Button*)> onClick)
@@ -73,13 +248,13 @@ namespace pilecode {
 			return this;
 		}
 
-		void Control()
+		bool Control()
 		{
 			hover_ =
-				ae::MousePos().x >= x1_ + margin_ &&
-				ae::MousePos().y >= y1_ + margin_ &&
-				ae::MousePos().x <= x2_ - margin_ &&
-				ae::MousePos().y <= y2_ - margin_;
+				ae::MousePos().x >= reg_.x1() + padding_ &&
+				ae::MousePos().y >= reg_.y1() + padding_ &&
+				ae::MousePos().x <  reg_.x2() - padding_ &&
+				ae::MousePos().y <  reg_.y2() - padding_;
 
 			if (enabled_ && onClick_) {
 				if ((hover_ && IsKeyOnce(ae::kKeyMouseLeft))
@@ -88,6 +263,9 @@ namespace pilecode {
 					onClick_(this);
 				}
 			}
+
+			// Continue checks if button is not hovered
+			return !enabled_ || !hover_;
 		}
 
 		void Update()
@@ -99,29 +277,33 @@ namespace pilecode {
 
 		void Render()
 		{
-			auto blend = (enabled_ ? (hover_ ? ui::HoverColor() : Rgba(0, 0, 0, 0)) : ui::DisabledColor());
-			if (frame_) {
-				AlphaDrawAndBlend(image::g_button_frame, x1_, y1_, blend);
+			if (enabled_) {
+				auto blend = (hover_ ? ui::HoverColor() : Rgba(0, 0, 0, 0));
+				AlphaDraw(shadow_, reg_.x1(), reg_.y1());
+				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend);
+				if (frame_) {
+					AlphaDrawAndBlend(image::g_button_frame, reg_.x1(), reg_.y1(), blend);
+				}
 			}
-			AlphaDrawAndBlend(sprite_, x1_, y1_, blend);
+		}
+
+		void SetSprite(Sprite sprite)
+		{
+			sprite_ = sprite;
+			shadow_ = CreateShadow(sprite, 8);
 		}
 
 		// accessors
 		bool frame() const { return frame_; }
 		void set_frame(bool frame) { frame_ = frame; }
 		Sprite sprite() const { return sprite_; }
-		void set_sprite(Sprite sprite) { sprite_ = sprite; }
 		bool enabled() const { return enabled_; }
 		void set_enabled(bool enabled) { enabled_ = enabled; }
 
 	private:
-		Si32 ix_;
-		Si32 iy_;
-		Si32 x1_;
-		Si32 y1_;
-		Si32 x2_;
-		Si32 y2_;
+		Region reg_;
 		Sprite sprite_;
+		Sprite shadow_;
 		std::function<void(Button*)> onClick_;
 		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
@@ -129,7 +311,7 @@ namespace pilecode {
 		bool enabled_ = true;
 		char hotkey_ = 0;
 
-		static constexpr Si32 margin_ = 8;
+		static constexpr Si32 padding_ = 8;
 	};
 
 }

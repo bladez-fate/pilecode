@@ -52,7 +52,8 @@ namespace pilecode {
 		Sprite g_button_prevlevel;
 		Sprite g_button_play;
 		Sprite g_button_pause;
-		Sprite g_button_stop;
+		Sprite g_button_rewind;
+		Sprite g_button_replay;
 		Sprite g_button_x1;
 		Sprite g_button_x2;
 		Sprite g_button_x4;
@@ -99,28 +100,112 @@ namespace pilecode {
 		}
 	}
 
+	Sprite CreateShadow(Sprite sprite, Si32 blurRadius)
+	{
+		Sprite shadow;
+		shadow.Create(sprite.Width() + 2 * blurRadius, sprite.Height() + 2 * blurRadius);
+		shadow.SetPivot(Vec2Si32(blurRadius, blurRadius));
+
+		Ui32 totalWeight = (2 * blurRadius + 1) * (2 * blurRadius + 1);
+
+		// Accumulate
+		for (Si32 x = 0; x < sprite.Width(); x++) {
+			for (Si32 y = 0; y < sprite.Height(); y++) {
+				Rgba src = *(sprite.RgbaData() + sprite.StridePixels() * y + x);
+				Rgba* dst0 = shadow.RgbaData() + shadow.StridePixels() * y + x;
+				Rgba* dst0End = dst0 + shadow.StridePixels() * (2 * blurRadius + 1);
+				for (; dst0 != dst0End; dst0 += shadow.StridePixels()) {
+					for (Rgba *dst = dst0, *dstEnd = dst0 + 2 * blurRadius + 1; dst != dstEnd; dst++) {
+						dst->rgba += src.a;
+					}
+				}
+			}
+		}
+
+		// Finalize
+		Rgba* dst0 = shadow.RgbaData();
+		Rgba* dst0End = dst0 + shadow.StridePixels() * shadow.Height();
+		for (; dst0 != dst0End; dst0 += shadow.StridePixels()) {
+			for (Rgba *dst = dst0, *dstEnd = dst0 + shadow.Width(); dst != dstEnd; dst++) {
+				dst->rgba /= totalWeight;
+				dst->rgba <<= 24;
+			}
+		}
+
+		return shadow;
+	}
+
+	void LoadImageFromSpritesheet(Sprite sheet, Si32 width, Si32 height, Si32 posx, Si32 posy, Sprite& sprite)
+	{
+		sprite.Create(width, height);
+		sheet.Draw(0, 0, width, height, width * posx, height * posy, width, height, sprite);
+		sprite.SetPivot(Vec2Si32(0, 0));
+		sprite.Reference(sheet, width * posx, height * posy, width, height);
+		sprite.SetPivot(Vec2Si32(0, 0));
+	}
+
+
+	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
+	{
+		sprite.Load(file_name);
+		size_t left = sprite.Height() * sprite.Width();
+		for (Rgba* p = sprite.RgbaData(); left; left--, p++) {
+			p->r = 255;
+			p->g = 255;
+			p->b = 255;
+		}
+	}
+
+	void LoadImage(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
+	{
+		if (false /* width || height */) {
+			Sprite src;
+			src.Load(file_name);
+
+			// Try 1
+			//sprite.Create(width ? width : src.Width(), height ? height : src.Height());
+			//src.Draw(0, 0, 0, std::min(float(sprite.Width()) / src.Width(), float(sprite.Height()) / src.Height()), sprite);
+
+			// Try 2
+			//sprite.Create(src.Width(), src.Height());
+			//src.Draw(0, 0, sprite.Width(), sprite.Height(), 0, 0, src.Width(), src.Height(), sprite);
+
+			// Try 3
+			sprite.SetPivot(Vec2Si32(0, 0));
+			sprite.Create(src.Width(), src.Height());
+			src.Draw(0, 0, 0, 1.0f, sprite);
+			
+		}
+		else {
+			sprite.Load(file_name);
+		}
+	}
+
 	void InitImage()
 	{
+		Sprite sheet;
+		sheet.Load("data/spritesheet.tga");
+		Si32 sw = 128, sh = 256;
 		image::g_empty.Load("data/empty.tga");
 
 		image::g_tile[kTlNone] = image::g_empty;
-		image::g_tile[kTlBrick].Load("data/tile-brick.tga");
-		image::g_tile[kTlInactive].Load("data/tile-inactive-brick.tga");
+		LoadImageFromSpritesheet(sheet, sw, sh, 0, 0, image::g_tile[kTlBrick]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 1, 1, image::g_tile[kTlInactive]);
 
 		image::g_letter[kLtSpace] = image::g_empty;
-		image::g_letter[kLtUp].Load("data/letter-up.tga");
-		image::g_letter[kLtDown].Load("data/letter-down.tga");
-		image::g_letter[kLtRight].Load("data/letter-right.tga");
-		image::g_letter[kLtLeft].Load("data/letter-left.tga");
-		image::g_letter[kLtRead].Load("data/letter-read.tga");
-		image::g_letter[kLtWrite].Load("data/letter-write.tga");
-		image::g_letter[kLtDot].Load("data/letter-dot.tga");
+		LoadImageFromSpritesheet(sheet, sw, sh, 2, 2, image::g_letter[kLtUp]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 3, 2, image::g_letter[kLtDown]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 1, 2, image::g_letter[kLtRight]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 0, 2, image::g_letter[kLtLeft]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 0, 3, image::g_letter[kLtRead]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 1, 3, image::g_letter[kLtWrite]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 0, 6, image::g_letter[kLtDot]);
 
 		image::g_frame.Load("data/letter-frame.tga");
 		image::g_tileMask.Load("data/tile-mask.tga");
 
-		image::g_robot.Load("data/robot.tga");
-		image::g_robotShadow.Load("data/robot-shadow.tga");
+		LoadImageFromSpritesheet(sheet, sw, sh, 1, 0, image::g_robot);
+		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
 	
 		image::g_panel.Load("data/panel.tga");
 		image::g_panel_bottomright.Load("data/panel-bottomright.tga");
@@ -129,11 +214,12 @@ namespace pilecode {
 		image::g_panel_topright.Load("data/panel-topright.tga");
 
 		image::g_button_frame.Load("data/button-frame.tga");
-		image::g_button_nextlevel.Load("data/button-next-level.tga");
-		image::g_button_prevlevel.Load("data/button-prev-level.tga");
-		image::g_button_play.Load("data/button-play.tga");
-		image::g_button_pause.Load("data/button-pause.tga");
-		image::g_button_stop.Load("data/button-stop.tga");
+		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_play, "data/ui/play.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_pause, "data/ui/pause.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_rewind, "data/ui/rewind.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_replay, "data/ui/replay.tga", ui::g_xcell, ui::g_ycell);
 		image::g_button_x1.Load("data/button-x1.tga");
 		image::g_button_x2.Load("data/button-x2.tga");
 		image::g_button_x4.Load("data/button-x4.tga");
