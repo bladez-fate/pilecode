@@ -24,6 +24,8 @@
 #include "data.h"
 #include "graphics.h"
 
+#include <unordered_map>
+
 namespace pilecode {
 
 	const Vec2Si32 g_tileCenter(64, 54);
@@ -100,23 +102,58 @@ namespace pilecode {
 		}
 	}
 
-	Sprite CreateShadow(Sprite sprite, Si32 blurRadius)
+	// Creates shadow using series of transformations:
+	// - use `sprite' alpha-channel as source (RGB channels are ignored)
+	// - expand it by `expandRadius' pixels (using square shape)
+	// - then apply gaussian blur with `blurRadius' radius in pixels
+	// - apply given `color' to result (note that `color.a' is maximum shadow opacity)
+	Sprite CreateShadow(Sprite sprite, Si32 blurRadius, Si32 expandRadius, Rgba color)
 	{
-		Sprite shadow;
-		shadow.Create(sprite.Width() + 2 * blurRadius, sprite.Height() + 2 * blurRadius);
-		shadow.SetPivot(Vec2Si32(blurRadius, blurRadius));
+		Si32 totalRadius = blurRadius + expandRadius;
 
-		Ui32 totalWeight = (2 * blurRadius + 1) * (2 * blurRadius + 1);
+		Sprite shadow;
+		shadow.Create(sprite.Width() + 2 * totalRadius, sprite.Height() + 2 * totalRadius);
+		shadow.SetPivot(Vec2Si32(totalRadius, totalRadius));
+
+		// Gaussian blur weight map (with cache)
+		static std::unordered_map<Si32, std::pair<Sprite, Ui32>> cache;
+		auto& cv = cache[blurRadius];
+		Sprite& weight = cv.first;
+		Ui32& totalWeight = cv.second;
+		if (totalWeight == 0) {
+			weight.Create(2 * blurRadius + 1, 2 * blurRadius + 1);
+			Rgba* w0 = weight.RgbaData();
+			Rgba* w0End = w0 + weight.StridePixels() * weight.Height();
+			Si32 dy = -blurRadius;
+			float br2 = float(blurRadius * blurRadius);
+			for (; w0 != w0End; w0 += weight.StridePixels(), dy++) {
+				Si32 dx = -blurRadius;
+				for (Rgba *w = w0, *wEnd = w0 + weight.Width(); w != wEnd; w++, dx++) {
+					float dx2 = float(dx*dx) / br2 * 6.0f;
+					float dy2 = float(dy*dy) / br2 * 6.0f;
+					w->rgba = Ui32(256.0 * exp(-(dx2 + dy2)));
+					totalWeight += w->rgba;
+				}
+			}
+		}
 
 		// Accumulate
-		for (Si32 x = 0; x < sprite.Width(); x++) {
-			for (Si32 y = 0; y < sprite.Height(); y++) {
-				Rgba src = *(sprite.RgbaData() + sprite.StridePixels() * y + x);
-				Rgba* dst0 = shadow.RgbaData() + shadow.StridePixels() * y + x;
+		for (Si32 x = -expandRadius; x < sprite.Width() + expandRadius; x++) {
+			for (Si32 y = -expandRadius; y < sprite.Height() + expandRadius; y++) {
+				Ui8 value = 0;
+				for (Si32 x1 = std::max(0, x - expandRadius), x2 = std::min(sprite.Width(), x + expandRadius + 1); x1 < x2; x1++) {
+					for (Si32 y1 = std::max(0, y - expandRadius), y2 = std::min(sprite.Height(), y + expandRadius + 1); y1 < y2; y1++) {
+						Rgba src = *(sprite.RgbaData() + sprite.StridePixels() * y1 + x1);
+						value = std::max(value, src.a);
+					}
+				}
+
+				Rgba* dst0 = shadow.RgbaData() + shadow.StridePixels() * (y + expandRadius) + (x + expandRadius);
 				Rgba* dst0End = dst0 + shadow.StridePixels() * (2 * blurRadius + 1);
-				for (; dst0 != dst0End; dst0 += shadow.StridePixels()) {
-					for (Rgba *dst = dst0, *dstEnd = dst0 + 2 * blurRadius + 1; dst != dstEnd; dst++) {
-						dst->rgba += src.a;
+				Rgba* w0 = weight.RgbaData();
+				for (; dst0 != dst0End; dst0 += shadow.StridePixels(), w0 += weight.StridePixels()) {
+					for (Rgba *dst = dst0, *dstEnd = dst0 + 2 * blurRadius + 1, *w = w0; dst != dstEnd; dst++, w++) {
+						dst->rgba += value * w->rgba;
 					}
 				}
 			}
@@ -129,6 +166,10 @@ namespace pilecode {
 			for (Rgba *dst = dst0, *dstEnd = dst0 + shadow.Width(); dst != dstEnd; dst++) {
 				dst->rgba /= totalWeight;
 				dst->rgba <<= 24;
+				*dst = RgbaMult(*dst, color.a);
+				dst->r = color.r;
+				dst->g = color.g;
+				dst->b = color.b;
 			}
 		}
 

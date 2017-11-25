@@ -290,7 +290,8 @@ namespace pilecode {
 		void SetSprite(Sprite sprite)
 		{
 			sprite_ = sprite;
-			shadow_ = CreateShadow(sprite, 8);
+			Si32 size = std::min(sprite.Width(), sprite.Height());
+			shadow_ = CreateShadow(sprite, size > 64 ? 17 : 9, 1, Rgba(0, 0, 0, 0x80));
 		}
 
 		// accessors
