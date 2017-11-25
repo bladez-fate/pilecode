@@ -58,12 +58,6 @@ namespace pilecode {
 		extern Sprite g_robot;
 		extern Sprite g_robotShadow;
 
-		extern Sprite g_panel;
-		extern Sprite g_panel_bottomright;
-		extern Sprite g_panel_right;
-		extern Sprite g_panel_top;
-		extern Sprite g_panel_topright;
-
 		extern Sprite g_button_frame;
 		extern Sprite g_button_nextlevel;
 		extern Sprite g_button_prevlevel;

@@ -43,12 +43,6 @@ namespace pilecode {
 		Sprite g_robot;
 		Sprite g_robotShadow;
 
-		Sprite g_panel;
-		Sprite g_panel_bottomright;
-		Sprite g_panel_right;
-		Sprite g_panel_top;
-		Sprite g_panel_topright;
-
 		Sprite g_button_frame;
 		Sprite g_button_nextlevel;
 		Sprite g_button_prevlevel;
@@ -248,12 +242,6 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 0, image::g_robot);
 		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
 	
-		image::g_panel.Load("data/panel.tga");
-		image::g_panel_bottomright.Load("data/panel-bottomright.tga");
-		image::g_panel_right.Load("data/panel-right.tga");
-		image::g_panel_top.Load("data/panel-top.tga");
-		image::g_panel_topright.Load("data/panel-topright.tga");
-
 		image::g_button_frame.Load("data/button-frame.tga");
 		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga", ui::g_xcell, ui::g_ycell);
 		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga", ui::g_xcell, ui::g_ycell);
