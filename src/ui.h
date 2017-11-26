@@ -171,26 +171,27 @@ namespace pilecode {
 		Si32 ySpacing_;
 	};
 
-	class HorizonalFluidFrame: public Region {
+	class HorizontalFluidFrame: public Region {
 	public:
-		HorizonalFluidFrame(Align align, Si32 xSpacing)
-			: align_(align)
+		HorizontalFluidFrame(Align align, Si32 xSpacing, Region parent = Region::Screen())
+			: parent_(parent)
+			, align_(align)
 			, xSpacing_(xSpacing)
 		{}
 
-		HorizonalFluidFrame& Add(Vec2Si32 size)
+		HorizontalFluidFrame& Add(Vec2Si32 size)
 		{
 			elements_.emplace_back(size);
 			Update();
 			return *this;
 		}
 
-		HorizonalFluidFrame& Add(Sprite sprite)
+		HorizontalFluidFrame& Add(Sprite sprite)
 		{
 			return Add(sprite.Size());
 		}
 
-		HorizonalFluidFrame& Add(Si32 spacing)
+		HorizontalFluidFrame& Add(Si32 spacing)
 		{
 			return Add(Vec2Si32(spacing, 0));
 		}
@@ -228,10 +229,11 @@ namespace pilecode {
 				h = std::max(h, e.y);
 			}
 
-			assign(Region::Screen().Place(align_, Vec2Si32(w, h)));
+			assign(parent_.Place(align_, Vec2Si32(w, h)));
 		}
 
 	private:
+		Region parent_;
 		Align align_;
 		Si32 xSpacing_;
 		std::vector<Vec2Si32> elements_;
@@ -332,6 +334,12 @@ namespace pilecode {
 			return this;
 		}
 
+		Button* Padding(Si32 padding)
+		{
+			padding_ = padding;
+			return this;
+		}
+
 		bool Control()
 		{
 			hoverNext_ =
@@ -399,7 +407,7 @@ namespace pilecode {
 		bool enabled_ = true;
 		char hotkey_ = 0;
 
-		static constexpr Si32 padding_ = 8;
+		Si32 padding_ = 8;
 	};
 
 }

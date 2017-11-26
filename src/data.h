@@ -32,7 +32,7 @@ namespace pilecode {
 	namespace ui {
 		constexpr Si32 g_xcell = 96;
 		constexpr Si32 g_ycell = 96;
-		constexpr Si32 g_marginBottom = 32;
+		constexpr Si32 g_marginBottom = 16;
 		constexpr Si32 g_marginLeft = 16;
 		constexpr Si32 g_marginTop = g_marginBottom;
 		constexpr Si32 g_marginRight = g_marginLeft;
@@ -59,11 +59,13 @@ namespace pilecode {
 		extern Sprite g_robotShadow;
 
 		extern Sprite g_button_frame;
+		extern Sprite g_button_musicalnote;
 		extern Sprite g_button_nextlevel;
 		extern Sprite g_button_prevlevel;
 		extern Sprite g_button_play;
 		extern Sprite g_button_pause;
 		extern Sprite g_button_rewind;
+		extern Sprite g_button_fastforward;
 		extern Sprite g_button_replay;
 		extern Sprite g_button_minus;
 		extern Sprite g_button_plus;

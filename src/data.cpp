@@ -44,11 +44,13 @@ namespace pilecode {
 		Sprite g_robotShadow;
 
 		Sprite g_button_frame;
+		Sprite g_button_musicalnote;
 		Sprite g_button_nextlevel;
 		Sprite g_button_prevlevel;
 		Sprite g_button_play;
 		Sprite g_button_pause;
 		Sprite g_button_rewind;
+		Sprite g_button_fastforward;
 		Sprite g_button_replay;
 		Sprite g_button_minus;
 		Sprite g_button_plus;
@@ -245,11 +247,13 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
 	
 		image::g_button_frame.Load("data/button-frame.tga");
+		LoadMask(image::g_button_musicalnote, "data/ui/musical-note.tga");
 		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga");
 		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga");
 		LoadMask(image::g_button_play, "data/ui/play.tga");
 		LoadMask(image::g_button_pause, "data/ui/pause.tga");
 		LoadMask(image::g_button_rewind, "data/ui/rewind.tga");
+		LoadMask(image::g_button_fastforward, "data/ui/fast-forward.tga");
 		LoadMask(image::g_button_replay, "data/ui/replay.tga");
 		LoadMask(image::g_button_minus, "data/ui/minus.tga");
 		LoadMask(image::g_button_plus, "data/ui/plus.tga");

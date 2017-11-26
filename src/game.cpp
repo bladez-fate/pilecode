@@ -501,13 +501,13 @@ namespace pilecode {
 		buttons_.clear();
 
 		// Add playback buttons
-		HorizonalFluidFrame frmPlayback(kCenterBottom, 32);
+		HorizontalFluidFrame frmPlayback(kCenterBottom, 32);
 		frmPlayback
 			.Add(image::g_button_rewind)
 			.Add(image::g_button_play)
-			.Add(image::g_button_rewind) // just to align play button at the center
+			.Add(image::g_button_fastforward)
 			;
-		VerticalFluidFrame frmPlaybackRate(kLeftCenter, 1, frmPlayback.Place(2));
+		HorizontalFluidFrame frmPlaybackRate(kRightBottom, 1);
 		frmPlaybackRate
 			.Add(image::g_button_minus)
 			.Add(image::g_button_x1)
@@ -515,6 +515,11 @@ namespace pilecode {
 			;
 		AddButton(image::g_button_rewind, frmPlayback.Place(0))->Click([=](Button* btn) {
 			Restart();
+		})->OnUpdate([=](Button* btn) {
+			btn->set_enabled(world_->steps() != 0);
+		});
+		AddButton(image::g_button_fastforward, frmPlayback.Place(2))->Click([=](Button* btn) {
+			//FastForward();
 		})->OnUpdate([=](Button* btn) {
 			btn->set_enabled(world_->steps() != 0);
 		});
@@ -535,7 +540,8 @@ namespace pilecode {
 				simSpeed_ = 4.0f;
 			}
 		})->OnUpdate([=](Button* btn) {
-		});
+			btn->set_enabled(world_->steps() != 0);
+		})->Padding(0);
 
 		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))->Click([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
@@ -548,9 +554,11 @@ namespace pilecode {
 				simSpeed_ = 8.0f;
 			}
 		})->OnUpdate([=](Button* btn) {
-		});
+			btn->set_enabled(world_->steps() != 0);
+		})->Padding(0);
 
 		AddButton(image::g_button_x1, frmPlaybackRate.Place(1))->OnUpdate([=](Button* btn) {
+			btn->set_enabled(world_->steps() != 0);
 			if (simSpeed_ == 1.0f) {
 				btn->SetSprite(image::g_button_x1);
 			}
@@ -568,10 +576,14 @@ namespace pilecode {
 		// Add level switching buttons
 		AddButton(image::g_button_prevlevel, Region::Screen(), kRightBottom)->Click([=](Button* btn) {
 			nextLevel_ = level_ - 1;
-		})->set_enabled(level_ > 0);
+		})->OnUpdate([=](Button* btn) {
+			btn->set_enabled(level_ > 0 && world_->steps() == 0);
+		});
 		AddButton(image::g_button_nextlevel, Region::Screen(), kRightTop)->Click([=](Button* btn) {
 			nextLevel_ = level_ + 1;
-		})->set_enabled(level_ < maxLevel_);
+		})->OnUpdate([=](Button* btn) {
+			btn->set_enabled(level_ < maxLevel_ && world_->steps() == 0);
+		});
 
 		// Add palette buttons
 		Si32 btnPos = 0;
