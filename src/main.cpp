@@ -21,6 +21,7 @@
 // IN THE SOFTWARE.
 
 #include "game.h"
+#include "music.h"
 #include "pilecode.h"
 #include "data.h"
 #include "levels.h"
@@ -107,17 +108,6 @@ private:
 };
 
 PlayerProfile g_profile;
-
-void UpdateMusic()
-{
-	static int musicIdx = 0;
-
-	// switch background music tracks
-	if (!music::g_background[musicIdx].IsPlaying()) {
-		musicIdx = (musicIdx + 1) % music::g_backgroundCount;
-		music::g_background[musicIdx].Play(0.2f);
-	}
-}
 
 class IScene {
 public:

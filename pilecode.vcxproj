@@ -204,6 +204,7 @@
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\levels.h" />
+    <ClInclude Include="src\music.h" />
     <ClInclude Include="src\pilecode.h" />
     <ClInclude Include="src\ui.h" />
   </ItemGroup>
@@ -223,6 +224,7 @@
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\levels.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\music.cpp" />
     <ClCompile Include="src\pilecode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

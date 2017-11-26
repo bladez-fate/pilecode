@@ -25,6 +25,7 @@
 #include "defs.h"
 #include "data.h"
 #include "graphics.h"
+#include "music.h"
 #include "pilecode.h"
 #include "ui.h"
 

@@ -573,6 +573,11 @@ namespace pilecode {
 			}
 		});
 
+		// Add music on/off button
+		AddButton(image::g_button_musicalnote, Region::Screen(), kLeftTop)->Click([=](Button* btn) {
+			ToggleMusic();
+		});
+
 		// Add level switching buttons
 		AddButton(image::g_button_prevlevel, Region::Screen(), kRightBottom)->Click([=](Button* btn) {
 			nextLevel_ = level_ - 1;
