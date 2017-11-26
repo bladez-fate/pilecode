@@ -110,6 +110,21 @@ namespace pilecode {
 			return Place(align, sprite.Size());
 		}
 
+		Region Offset(Si32 dx, Si32 dy) const
+		{
+			return Region(x1() + dx, y1() + dy, x2() + dx, y2() + dy);
+		}
+
+		Region Outset(Si32 outset) const
+		{
+			return Region(x1() - outset, y1() - outset, x2() + outset, y2() + outset);
+		}
+
+		Region Inset(Si32 inset) const
+		{
+			return Outset(-inset);
+		}
+
 		static Region Screen()
 		{
 			return Region(
@@ -184,11 +199,12 @@ namespace pilecode {
 		{
 			Region r;
 			r.p1.x = x1();
+			r.p1.y = y1();
 
-			Si32 width = 0;
+			Si32 dx = 0;
 			for (Vec2Si32 e : elements_) {
 				if (pos-- == 0) {
-					width = e.x;
+					dx = e.x;
 					break;
 				}
 				else {
@@ -196,8 +212,7 @@ namespace pilecode {
 				}
 			}
 
-			r.p1.y = y1();
-			r.p2.x = r.p1.x + width;
+			r.p2.x = r.p1.x + dx;
 			r.p2.y = r.p1.y + height();
 
 			return r;
@@ -219,6 +234,75 @@ namespace pilecode {
 	private:
 		Align align_;
 		Si32 xSpacing_;
+		std::vector<Vec2Si32> elements_;
+	};
+
+
+	class VerticalFluidFrame : public Region {
+	public:
+		VerticalFluidFrame(Align align, Si32 ySpacing, Region parent = Region::Screen())
+			: parent_(parent)
+			, align_(align)
+			, ySpacing_(ySpacing)
+		{}
+
+		VerticalFluidFrame& Add(Vec2Si32 size)
+		{
+			elements_.emplace_back(size);
+			Update();
+			return *this;
+		}
+
+		VerticalFluidFrame& Add(Sprite sprite)
+		{
+			return Add(sprite.Size());
+		}
+
+		VerticalFluidFrame& Add(Si32 spacing)
+		{
+			return Add(Vec2Si32(spacing, 0));
+		}
+
+		Region Place(Si32 pos)
+		{
+			Region r;
+			r.p1.x = x1();
+			r.p1.y = y1();
+
+			Si32 dy = 0;
+			for (Vec2Si32 e : elements_) {
+				if (pos-- == 0) {
+					dy = e.y;
+					break;
+				}
+				else {
+					r.p1.y += e.y + ySpacing_;
+				}
+			}
+
+			r.p2.x = r.p1.x + width();
+			r.p2.y = r.p1.y + dy;
+
+			return r;
+		}
+
+	private:
+		void Update()
+		{
+			// Recompute size
+			Si32 w = 1, h = -ySpacing_;
+			for (Vec2Si32 e : elements_) {
+				w = std::max(w, e.x);
+				h += e.y + ySpacing_;
+			}
+
+			assign(parent_.Place(align_, Vec2Si32(w, h)));
+		}
+
+	private:
+		Region parent_;
+		Align align_;
+		Si32 ySpacing_;
 		std::vector<Vec2Si32> elements_;
 	};
 
@@ -250,14 +334,14 @@ namespace pilecode {
 
 		bool Control()
 		{
-			hover_ =
+			hoverNext_ =
 				ae::MousePos().x >= reg_.x1() + padding_ &&
 				ae::MousePos().y >= reg_.y1() + padding_ &&
 				ae::MousePos().x <  reg_.x2() - padding_ &&
 				ae::MousePos().y <  reg_.y2() - padding_;
 
 			if (enabled_ && onClick_) {
-				if ((hover_ && IsKeyOnce(ae::kKeyMouseLeft))
+				if ((hoverNext_ && IsKeyOnce(ae::kKeyMouseLeft))
 					|| (hotkey_ && IsKeyOnce(hotkey_))) {
 					sfx::g_click2.Play();
 					onClick_(this);
@@ -265,11 +349,13 @@ namespace pilecode {
 			}
 
 			// Continue checks if button is not hovered
-			return !enabled_ || !hover_;
+			return !enabled_ || !hoverNext_;
 		}
 
 		void Update()
 		{
+			hover_ = hoverNext_;
+			hoverNext_ = false;
 			if (onUpdate_) {
 				onUpdate_(this);
 			}
@@ -308,6 +394,7 @@ namespace pilecode {
 		std::function<void(Button*)> onClick_;
 		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
+		bool hoverNext_ = false;
 		bool frame_ = false;
 		bool enabled_ = true;
 		char hotkey_ = 0;

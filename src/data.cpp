@@ -50,6 +50,8 @@ namespace pilecode {
 		Sprite g_button_pause;
 		Sprite g_button_rewind;
 		Sprite g_button_replay;
+		Sprite g_button_minus;
+		Sprite g_button_plus;
 		Sprite g_button_x1;
 		Sprite g_button_x2;
 		Sprite g_button_x4;
@@ -243,12 +245,14 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
 	
 		image::g_button_frame.Load("data/button-frame.tga");
-		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga", ui::g_xcell, ui::g_ycell);
-		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga", ui::g_xcell, ui::g_ycell);
-		LoadMask(image::g_button_play, "data/ui/play.tga", ui::g_xcell, ui::g_ycell);
-		LoadMask(image::g_button_pause, "data/ui/pause.tga", ui::g_xcell, ui::g_ycell);
-		LoadMask(image::g_button_rewind, "data/ui/rewind.tga", ui::g_xcell, ui::g_ycell);
-		LoadMask(image::g_button_replay, "data/ui/replay.tga", ui::g_xcell, ui::g_ycell);
+		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga");
+		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga");
+		LoadMask(image::g_button_play, "data/ui/play.tga");
+		LoadMask(image::g_button_pause, "data/ui/pause.tga");
+		LoadMask(image::g_button_rewind, "data/ui/rewind.tga");
+		LoadMask(image::g_button_replay, "data/ui/replay.tga");
+		LoadMask(image::g_button_minus, "data/ui/minus.tga");
+		LoadMask(image::g_button_plus, "data/ui/plus.tga");
 		image::g_button_x1.Load("data/ui/button-x1.tga");
 		image::g_button_x2.Load("data/ui/button-x2.tga");
 		image::g_button_x4.Load("data/ui/button-x4.tga");

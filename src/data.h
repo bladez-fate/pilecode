@@ -65,6 +65,8 @@ namespace pilecode {
 		extern Sprite g_button_pause;
 		extern Sprite g_button_rewind;
 		extern Sprite g_button_replay;
+		extern Sprite g_button_minus;
+		extern Sprite g_button_plus;
 		extern Sprite g_button_x1;
 		extern Sprite g_button_x2;
 		extern Sprite g_button_x4;

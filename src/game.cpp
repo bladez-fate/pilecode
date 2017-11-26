@@ -403,7 +403,8 @@ namespace pilecode {
 
 	bool Game::ControlTools()
 	{
-		for (Button& button : buttons_) {
+		for (auto i = buttons_.rbegin(), e = buttons_.rend(); i != e; ++i) {
+			Button& button = *i;
 			if (!button.Control()) {
 				return false;
 			}
@@ -500,11 +501,17 @@ namespace pilecode {
 		buttons_.clear();
 
 		// Add playback buttons
-		HorizonalFluidFrame frmPlayback(kCenterBottom, 10);
+		HorizonalFluidFrame frmPlayback(kCenterBottom, 32);
 		frmPlayback
 			.Add(image::g_button_rewind)
 			.Add(image::g_button_play)
-			.Add(image::g_button_x8)
+			.Add(image::g_button_rewind) // just to align play button at the center
+			;
+		VerticalFluidFrame frmPlaybackRate(kLeftCenter, 1, frmPlayback.Place(2));
+		frmPlaybackRate
+			.Add(image::g_button_minus)
+			.Add(image::g_button_x1)
+			.Add(image::g_button_plus)
 			;
 		AddButton(image::g_button_rewind, frmPlayback.Place(0))->Click([=](Button* btn) {
 			Restart();
@@ -516,7 +523,21 @@ namespace pilecode {
 		})->OnUpdate([=](Button* btn) {
 			btn->SetSprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
-		AddButton(image::g_button_play, frmPlayback.Place(2))->Click([=](Button* btn) {
+
+		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))->Click([=](Button* btn) {
+			if (simSpeed_ == 2.0f) {
+				simSpeed_ = 1.0f;
+			}
+			else if (simSpeed_ == 4.0f) {
+				simSpeed_ = 2.0f;
+			}
+			else if (simSpeed_ == 8.0f) {
+				simSpeed_ = 4.0f;
+			}
+		})->OnUpdate([=](Button* btn) {
+		});
+
+		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))->Click([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
 				simSpeed_ = 2.0f;
 			}
@@ -526,10 +547,10 @@ namespace pilecode {
 			else if (simSpeed_ == 4.0f) {
 				simSpeed_ = 8.0f;
 			}
-			else if (simSpeed_ == 8.0f) {
-				simSpeed_ = 1.0f;
-			}
 		})->OnUpdate([=](Button* btn) {
+		});
+
+		AddButton(image::g_button_x1, frmPlaybackRate.Place(1))->OnUpdate([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
 				btn->SetSprite(image::g_button_x1);
 			}
