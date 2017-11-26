@@ -249,10 +249,10 @@ namespace pilecode {
 		LoadMask(image::g_button_pause, "data/ui/pause.tga", ui::g_xcell, ui::g_ycell);
 		LoadMask(image::g_button_rewind, "data/ui/rewind.tga", ui::g_xcell, ui::g_ycell);
 		LoadMask(image::g_button_replay, "data/ui/replay.tga", ui::g_xcell, ui::g_ycell);
-		image::g_button_x1.Load("data/button-x1.tga");
-		image::g_button_x2.Load("data/button-x2.tga");
-		image::g_button_x4.Load("data/button-x4.tga");
-		image::g_button_x8.Load("data/button-x8.tga");
+		image::g_button_x1.Load("data/ui/button-x1.tga");
+		image::g_button_x2.Load("data/ui/button-x2.tga");
+		image::g_button_x4.Load("data/ui/button-x4.tga");
+		image::g_button_x8.Load("data/ui/button-x8.tga");
 
 		// Palette
 		Sprite palette;
