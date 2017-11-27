@@ -340,6 +340,18 @@ namespace pilecode {
 			return this;
 		}
 
+		Button* Color(Rgba color)
+		{
+			set_color(color);
+			return this;
+		}
+
+		Button* Hidden()
+		{
+			set_visible(false);
+			return this;
+		}
+
 		bool Control()
 		{
 			hoverNext_ =
@@ -349,7 +361,7 @@ namespace pilecode {
 				ae::MousePos().y <  reg_.y2() - padding_;
 
 			if (enabled_ && onClick_) {
-				if ((hoverNext_ && IsKeyOnce(ae::kKeyMouseLeft))
+				if ((visible_ && hoverNext_ && IsKeyOnce(ae::kKeyMouseLeft))
 					|| (hotkey_ && IsKeyOnce(hotkey_))) {
 					sfx::g_click2.Play();
 					onClick_(this);
@@ -371,9 +383,9 @@ namespace pilecode {
 
 		void Render()
 		{
-			if (enabled_) {
-				auto blend = (hover_ ? ui::HoverColor() : Rgba(0, 0, 0, 0));
-				AlphaDraw(shadow_, reg_.x1(), reg_.y1());
+			if (enabled_ && visible_) {
+				auto blend = (hover_ ? ui::HoverColor() : color_);
+				AlphaDrawAndBlend(shadow_, reg_.x1(), reg_.y1(), Rgba(0, 0, 0, 0xff));
 				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend);
 				if (frame_) {
 					AlphaDrawAndBlend(image::g_button_frame, reg_.x1(), reg_.y1(), blend);
@@ -390,10 +402,14 @@ namespace pilecode {
 
 		// accessors
 		bool frame() const { return frame_; }
-		void set_frame(bool frame) { frame_ = frame; }
+		void set_frame(bool value) { frame_ = value; }
 		Sprite sprite() const { return sprite_; }
 		bool enabled() const { return enabled_; }
-		void set_enabled(bool enabled) { enabled_ = enabled; }
+		void set_enabled(bool value) { enabled_ = value; }
+		bool visible() const { return visible_; }
+		void set_visible(bool value) { visible_ = value; }
+		Rgba color() const { return color_; }
+		void set_color(Rgba value) { color_ = value; }
 
 	private:
 		Region reg_;
@@ -405,9 +421,10 @@ namespace pilecode {
 		bool hoverNext_ = false;
 		bool frame_ = false;
 		bool enabled_ = true;
+		bool visible_ = true;
 		char hotkey_ = 0;
-
 		Si32 padding_ = 8;
+		Rgba color_ = Rgba(0, 0, 0, 0);
 	};
 
 }

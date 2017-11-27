@@ -529,7 +529,7 @@ namespace pilecode {
 			btn->SetSprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
 
-		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))->Click([=](Button* btn) {
+		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))->HotKey('-')->Click([=](Button* btn) {
 			if (simSpeed_ == 2.0f) {
 				simSpeed_ = 1.0f;
 			}
@@ -543,7 +543,7 @@ namespace pilecode {
 			btn->set_enabled(world_->steps() != 0);
 		})->Padding(0);
 
-		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))->Click([=](Button* btn) {
+		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))->HotKey('=')->Click([=](Button* btn) {
 			if (simSpeed_ == 1.0f) {
 				simSpeed_ = 2.0f;
 			}
@@ -574,9 +574,12 @@ namespace pilecode {
 		});
 
 		// Add music on/off button
-		AddButton(image::g_button_musicalnote, Region::Screen(), kLeftTop)->Click([=](Button* btn) {
+		AddButton(image::g_button_musicalnote, Region::Screen(), kLeftTop)
+		->HotKey('M')->Click([=](Button* btn) {
 			ToggleMusic();
-		});
+		})->OnUpdate([=](Button* btn) {
+			// TODO: btn->set_opacity(IsMusicEnabled() ? 0xff : 0x80);
+		})->Hidden();
 
 		// Add level switching buttons
 		AddButton(image::g_button_prevlevel, Region::Screen(), kRightBottom)->Click([=](Button* btn) {
@@ -594,18 +597,31 @@ namespace pilecode {
 		Si32 btnPos = 0;
 		GridFrame frmPalette(kLeftCenter, 1, 4, image::g_button_robot.Width(), image::g_button_robot.Height(), 10, 10);
 		// Add robot button
-		AddButton(image::g_button_robot, frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
+		AddButton(image::g_button_robot, frmPalette.Place(0, btnPos++))
+		->HotKey('R')->Click([=](Button* btn) {
 			SwitchPlaceMode(kPmRobot, kLtSpace);
 		})->OnUpdate([=](Button* btn) {
 			btn->set_frame(placeMode_ == kPmRobot);
 			btn->set_enabled(world_->steps() == 0);
 		});
 
+		char hotkey[kLtMax] = {
+			' ', // kLtSpace,     
+			'G', // kLtRight,        
+			'G', // kLtDown,         
+			'G', // kLtUp,            
+			'G', // kLtLeft,        
+			'I', // kLtRead,          
+			'O', // kLtWrite,        
+			'.', // kLtDot,
+		};
+
 		if (world_->IsLetterAllowed(kLtRight)
 			&& world_->IsLetterAllowed(kLtDown)
 			&& world_->IsLetterAllowed(kLtUp)
 			&& world_->IsLetterAllowed(kLtLeft)) {
-			AddButton(image::g_button_letter[kLtRight], frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
+			AddButton(image::g_button_letter[kLtRight], frmPalette.Place(0, btnPos++))
+			->HotKey(hotkey[kLtRight])->Click([=](Button* btn) {
 				SwitchPlaceMode(kPmLetter, kLtRight, kLtDown, kLtUp, kLtLeft);
 			})->OnUpdate([=](Button* btn) {
 				btn->set_frame(placeMode_ == kPmLetter
@@ -620,7 +636,8 @@ namespace pilecode {
 
 		for (auto letter : {kLtRead, kLtWrite, kLtDot}) {
 			if (world_->IsLetterAllowed(letter)) {
-				AddButton(image::g_button_letter[letter], frmPalette.Place(0, btnPos++))->Click([=](Button* btn) {
+				AddButton(image::g_button_letter[letter], frmPalette.Place(0, btnPos++))
+				->HotKey(hotkey[letter])->Click([=](Button* btn) {
 					SwitchPlaceMode(kPmLetter, letter);
 				})->OnUpdate([=](Button* btn) {
 					btn->set_frame(placeMode_ == kPmLetter

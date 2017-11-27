@@ -28,5 +28,6 @@ namespace pilecode {
 
 	void UpdateMusic();
 	void ToggleMusic();
+	bool IsMusicEnabled();
 
 }

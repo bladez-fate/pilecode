@@ -54,4 +54,9 @@ namespace pilecode {
 		g_musicDisabled = !g_musicDisabled;
 	}
 
+	bool IsMusicEnabled()
+	{
+		return !g_musicDisabled;
+	}
+
 }

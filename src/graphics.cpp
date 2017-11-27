@@ -248,33 +248,50 @@ namespace pilecode {
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Rgba blend)
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Rgba blend, Ui8 opacity)
 	{
-		FilterDraw(sprite, to_x, to_y, to_width, to_height,
-			from_x, from_y, from_width, from_height,
-			to_sprite, [=](const Rgba* fg, const Rgba* bg) {
-			Rgba fg2 = RgbaSum(
-				RgbaMult(*fg, 256 - blend.a),
-				RgbaMult(blend, blend.a)
-			);
-			fg2.a = fg->a;
-			return RgbaSum(
-				RgbaMult(fg2, fg2.a),
-				RgbaMult(*bg, 256 - fg2.a)
-			);
-		});
+		if (opacity == 255) {
+			FilterDraw(sprite, to_x, to_y, to_width, to_height,
+				from_x, from_y, from_width, from_height,
+				to_sprite, [=](const Rgba* fg, const Rgba* bg) {
+				Rgba fg2 = RgbaSum(
+					RgbaMult(*fg, 256 - blend.a),
+					RgbaMult(blend, blend.a)
+				);
+				fg2.a = fg->a;
+				return RgbaSum(
+					RgbaMult(fg2, fg2.a),
+					RgbaMult(*bg, 256 - fg2.a)
+				);
+			});
+		}
+		else {
+			FilterDraw(sprite, to_x, to_y, to_width, to_height,
+				from_x, from_y, from_width, from_height,
+				to_sprite, [=](const Rgba* fg, const Rgba* bg) {
+				Rgba fg2 = RgbaSum(
+					RgbaMult(*fg, 256 - blend.a),
+					RgbaMult(blend, blend.a)
+				);
+				fg2.a = Ui8(Ui32(fg->a) * Ui32(opacity) >> 8);
+				return RgbaSum(
+					RgbaMult(fg2, fg2.a),
+					RgbaMult(*bg, 256 - fg2.a)
+				);
+			});
+		}
 	}
 
-	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend)
+	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend, Ui8 opacity)
 	{
 		AlphaDrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend);
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), blend, opacity);
 	}
 
-	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend)
+	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend, Ui8 opacity)
 	{
 		AlphaDrawAndBlend(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend);
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, blend, opacity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
