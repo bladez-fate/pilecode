@@ -236,8 +236,8 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 3, 2, image::g_letter[kLtDown]);
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 2, image::g_letter[kLtRight]);
 		LoadImageFromSpritesheet(sheet, sw, sh, 0, 2, image::g_letter[kLtLeft]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 0, 3, image::g_letter[kLtRead]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 1, 3, image::g_letter[kLtWrite]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 0, 3, image::g_letter[kLtInput]);
+		LoadImageFromSpritesheet(sheet, sw, sh, 1, 3, image::g_letter[kLtOutput]);
 		LoadImageFromSpritesheet(sheet, sw, sh, 0, 6, image::g_letter[kLtDot]);
 
 		image::g_frame.Load("data/letter-frame.tga");
@@ -272,8 +272,8 @@ namespace pilecode {
 		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtDown]);
 		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtRight]);
 		LoadImageFromSpritesheet(palette, pw, ph, 1, 0, image::g_button_letter[kLtLeft]);
-		LoadImageFromSpritesheet(palette, pw, ph, 2, 0, image::g_button_letter[kLtRead]);
-		LoadImageFromSpritesheet(palette, pw, ph, 3, 0, image::g_button_letter[kLtWrite]);
+		LoadImageFromSpritesheet(palette, pw, ph, 2, 0, image::g_button_letter[kLtInput]);
+		LoadImageFromSpritesheet(palette, pw, ph, 3, 0, image::g_button_letter[kLtOutput]);
 		image::g_button_letter[kLtDot] = image::g_empty;
 	}
 

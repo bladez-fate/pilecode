@@ -482,7 +482,7 @@ namespace pilecode {
 						dir_ = kDirLeft;
 						blocked_ = false;
 						break;
-					case kLtRead: {
+					case kLtInput: {
 						Letter letter;
 						blocked_ = !world->ReadLetter(wu, letter);
 						if (!blocked_) {
@@ -494,7 +494,7 @@ namespace pilecode {
 						}
 						break;
 					}
-					case kLtWrite:
+					case kLtOutput:
 						if (reg_ != kLtSpace) {
 							blocked_ = !world->WriteLetter(wu, reg_);
 							if (!blocked_) {

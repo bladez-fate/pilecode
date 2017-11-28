@@ -632,8 +632,8 @@ namespace pilecode {
 			'G', // kLtDown,         
 			'G', // kLtUp,            
 			'G', // kLtLeft,        
-			'I', // kLtRead,          
-			'O', // kLtWrite,        
+			'I', // kLtInput,          
+			'O', // kLtOutput,        
 			'.', // kLtDot,
 		};
 
@@ -655,7 +655,7 @@ namespace pilecode {
 			});
 		}
 
-		for (auto letter : {kLtRead, kLtWrite, kLtDot}) {
+		for (auto letter : {kLtInput, kLtOutput, kLtDot}) {
 			if (world_->IsLetterAllowed(letter)) {
 				AddButton(image::g_button_letter[letter], frmPalette.Place(0, btnPos++))
 				->HotKey(hotkey[letter])->Click([=](Button* btn) {

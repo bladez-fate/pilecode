@@ -97,8 +97,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddSandbox(world);
 			}
@@ -133,8 +133,8 @@ namespace pilecode {
 					});
 
 				plat1->changable_tile(0, 0)->set_letter(kLtUp);
-				plat1->changable_tile(0, 1)->set_letter(kLtRead);
-				plat1->changable_tile(0, 7)->set_letter(kLtWrite);
+				plat1->changable_tile(0, 1)->set_letter(kLtInput);
+				plat1->changable_tile(0, 7)->set_letter(kLtOutput);
 
 				plat2->changable_tile(0, 0)->set_letter(kLtDot);
 				plat3->changable_tile(0, 0)->set_output(kLtDot);
@@ -150,8 +150,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -196,8 +196,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -242,8 +242,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -289,8 +289,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -339,8 +339,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -383,8 +383,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -431,8 +431,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -483,8 +483,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -538,8 +538,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -589,8 +589,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -642,8 +642,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -704,8 +704,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -760,8 +760,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
@@ -800,8 +800,8 @@ namespace pilecode {
 				plat3->changable_tile(0, 1)->set_letter(kLtDot);
 				plat3->changable_tile(2, 1)->set_output(kLtDot);
 
-				plat2->changable_tile(0, 1)->set_letter(kLtWrite);
-				plat2->changable_tile(2, 1)->set_letter(kLtRead);
+				plat2->changable_tile(0, 1)->set_letter(kLtOutput);
+				plat2->changable_tile(2, 1)->set_letter(kLtInput);
 
 				plat2->changable_tile(0, 0)->set_letter(kLtRight);
 				plat2->changable_tile(2, 0)->set_letter(kLtUp);
@@ -817,8 +817,8 @@ namespace pilecode {
 				world->AllowLetter(kLtRight);
 				world->AllowLetter(kLtDown);
 				world->AllowLetter(kLtLeft);
-				world->AllowLetter(kLtRead);
-				world->AllowLetter(kLtWrite);
+				world->AllowLetter(kLtInput);
+				world->AllowLetter(kLtOutput);
 
 				AddLevel(world);
 			}
