@@ -257,6 +257,14 @@ namespace pilecode {
 		}
 	}
 
+	void Game::Response(ResultBase status)
+	{
+		SfxResponse(status);
+		if (status.IsOk()) {
+			responseDeadline_ = ae::Time() + 0.5;
+		}
+	}
+
 	bool Game::Control()
 	{
 		if (IsKeyOnce(kKeyEscape)) {
@@ -322,7 +330,12 @@ namespace pilecode {
 		}
 		else { // if buttons are not hovered -- try proceed with placement actions
 			frameVisibility_ = true;
-			tileHover_ = vp_->ToWorldTile(ae::MousePos(), wmouse_, tilePos_);
+			Vec3Si32 wmouse;
+			tileHover_ = vp_->ToWorldTile(ae::MousePos(), wmouse, tilePos_);
+			if (wmouse_ != wmouse) {
+				responseDeadline_ = 0.0; // stop any response animation if mouse was moved to another tile
+				wmouse_ = wmouse;
+			}
 			if (tileHover_) {
 				placeLetter_ = PlaceLetter(tilePos_, placeLetterRight_, placeLetterDown_, placeLetterUp_, placeLetterLeft_);
 			}
@@ -338,31 +351,31 @@ namespace pilecode {
 			case kPmRobot:
 				if (tileHover_) {
 					if (world_->steps() > 0) {
-						SfxResponse(kRsForbidden);
+						Response(kRsForbidden);
 					}
 					else if (IsKeyOnce(kKeyMouseLeft) || IsKeyOnce(kKeyMouseRight)) {
 						Robot original; // to sync seed in initWorld_ and world_
 						world_->SwitchRobot(wmouse_, original);
 						initWorld_->SwitchRobot(wmouse_, original);
-						SfxResponse(kRsOk);
+						Response(kRsOk);
 					}
 				} 
 				break;
 			case kPmLetter:
 				if (tileHover_) {
 					if (world_->IsTouched(wmouse_)) {
-						SfxResponse(kRsForbidden);
+						Response(kRsForbidden);
 					}
 					else {
 						if (IsKeyOnce(kKeyMouseLeft)) {
 							world_->SetLetter(wmouse_, placeLetter_);
 							auto res = initWorld_->SetLetter(wmouse_, placeLetter_);
-							SfxResponse(res);
+							Response(res);
 						}
 						else if (IsKeyOnce(kKeyMouseRight)) {
 							world_->SetLetter(wmouse_, kLtSpace);
 							auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
-							SfxResponse(res);
+							Response(res);
 						}
 					}
 				}
@@ -694,10 +707,27 @@ namespace pilecode {
 				}
 			}
 			// Show letter on tile to be placed
-			if (placeMode_ == kPmRobot) {
-				vp_->Draw(&image::g_robot, wmouse_, 3).Alpha().Blend(ui::ActiveColorBlink());
-			} else if (placeMode_ == kPmLetter) {
-				vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(ui::ActiveColorBlink());
+			if (ae::Time() > responseDeadline_) {
+				if (placeMode_ == kPmRobot) {
+					vp_->Draw(&image::g_robot, wmouse_, 3).Alpha().Blend(ui::PlaceColorBlink());
+				}
+				else if (placeMode_ == kPmLetter) {
+					bool erase = false;
+					Tile* tile;
+					if (tile = world_->At(wmouse_)) {
+						if (tile->letter() == placeLetter_) {
+							erase = true;
+						}
+					}
+					if (!erase && tile) {
+						if (auto* cmnd = vp_->GetRenderCmnd(&image::g_letter[tile->letter()], wmouse_)) {
+							// Lower opacity of letter to be replaced to highlight new letter
+							cmnd->Opacity(0x80);
+						}
+					}
+					Rgba color = erase ? ui::EraseColorBlink() : ui::PlaceColorBlink();
+					vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(color);
+				}
 			}
 		}
 

@@ -946,6 +946,24 @@ namespace pilecode {
 		Center();
 	}
 
+	ViewPort::RenderCmnd* ViewPort::GetRenderCmnd(Sprite* sprite, int wx, int wy, int wz)
+	{
+		for (int zl = 0; zl < zlSize; zl++) {
+			RenderList& rlist = renderList(wx, wy, wz, zl);
+			for (RenderCmnd& cmnd : rlist) {
+				if (cmnd.sprite_ == sprite) {
+					return &cmnd;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+	ViewPort::RenderCmnd* ViewPort::GetRenderCmnd(Sprite* sprite, Vec3Si32 w)
+	{
+		return GetRenderCmnd(sprite, w.x, w.y, w.z);
+	}
+
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
 		RenderList& rlist = renderList(wx, wy, wz, zl);
@@ -1248,6 +1266,12 @@ namespace pilecode {
 		return *this;
 	}
 
+	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Opacity(Ui8 value)
+	{
+		opacity_ = value;
+		return *this;
+	}
+
 	void ViewPort::RenderCmnd::Apply(ViewPort* vp, int x, int y, ViewPort::RenderCmnd::Filter filter)
 	{
 		Sprite to_sprite = filter == kFilterTransparent? vp->transparent(): ae::GetEngine()->GetBackbuffer();
@@ -1264,14 +1288,14 @@ namespace pilecode {
 			break;
 		case kSpriteRgba:
 			if (blend_.a == 0) {
-				AlphaDraw(*sprite_, x, y, to_sprite);
+				AlphaDraw(*sprite_, x, y, to_sprite, opacity_);
 			}
 			else {
-				AlphaDrawAndBlend(*sprite_, x, y, to_sprite, blend_);
+				AlphaDrawAndBlend(*sprite_, x, y, to_sprite, blend_, opacity_);
 			}
 			break;
 		case kShadow:
-			AlphaDrawAndBlend(vp->ShadowMask(image::g_tileMask, shadow_), x, y, to_sprite, Rgba(0, 0, 0, 255));
+			AlphaDrawAndBlend(vp->ShadowMask(image::g_tileMask, shadow_), x, y, to_sprite, Rgba(0, 0, 0, 255), opacity_);
 			break;
 		}
 	}

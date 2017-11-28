@@ -441,6 +441,7 @@ namespace pilecode {
 			Sprite* sprite_ = nullptr;
 			Vec2Si32 off_ = Vec2Si32(0, 0);
 			Rgba blend_ = Rgba(Ui32(0));
+			Ui8 opacity_ = 0xff;
 
 			// for kShadow
 			Shadow shadow_;
@@ -450,6 +451,7 @@ namespace pilecode {
 
 			RenderCmnd& Blend(Rgba rgba);
 			RenderCmnd& Alpha();
+			RenderCmnd& Opacity(Ui8 value);
 		private:
 			void Apply(ViewPort* vp, int x, int y, Filter filter);
 			friend class ViewPort;
@@ -461,6 +463,8 @@ namespace pilecode {
 		explicit ViewPort(World* world);
 
 		// drawing
+		RenderCmnd* GetRenderCmnd(Sprite* sprite, int wx, int wy, int wz);
+		RenderCmnd* GetRenderCmnd(Sprite* sprite, Vec3Si32 w);
 		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off);
 		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl);
 		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off);

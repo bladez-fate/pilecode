@@ -37,10 +37,16 @@ namespace pilecode {
 			return Rgba(0x63, 0xa8, 0xdd, 0xff);
 		}
 
-		inline Rgba ActiveColorBlink()
+		inline Rgba PlaceColorBlink()
 		{
-			double alpha = (0.5 + 0.5 * sin(ae::Time() * 20));
+			double alpha = (0.5 + 0.5 * sin(ae::Time() * 10));
 			return Rgba(0x55, 0xff, 0x66, Ui8(0xbb * alpha));
+		}
+
+		inline Rgba EraseColorBlink()
+		{
+			double alpha = (0.5 + 0.5 * sin(ae::Time() * 10));
+			return Rgba(0xff, 0x33, 0x44, Ui8(0xbb * alpha));
 		}
 
 		inline bool StopAnimationKey()
@@ -387,9 +393,9 @@ namespace pilecode {
 				auto blend = (hover_ ? ui::HoverColor() : color_);
 				AlphaDrawAndBlend(shadow_, reg_.x1(), reg_.y1(), Rgba(0, 0, 0, 0xff));
 				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend);
-				if (frame_) {
-					AlphaDrawAndBlend(image::g_button_frame, reg_.x1(), reg_.y1(), blend);
-				}
+				//if (frame_) {
+				//	AlphaDrawAndBlend(image::g_button_frame, reg_.x1(), reg_.y1(), blend);
+				//}
 			}
 		}
 

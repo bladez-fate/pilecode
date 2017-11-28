@@ -219,28 +219,41 @@ namespace pilecode {
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
 		const Si32 from_x, const Si32 from_y,
-		const Si32 from_width, const Si32 from_height, Sprite to_sprite)
+		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Ui8 opacity)
 	{
-		FilterDraw(sprite, to_x, to_y, to_width, to_height,
-			from_x, from_y, from_width, from_height,
-			to_sprite, [=](const Rgba* fg, const Rgba* bg) {
-			return RgbaSum(
-				RgbaMult(*fg, fg->a),
-				RgbaMult(*bg, 256 - fg->a)
-			);
-		});
+		if (opacity == 0xff) {
+			FilterDraw(sprite, to_x, to_y, to_width, to_height,
+				from_x, from_y, from_width, from_height,
+				to_sprite, [=](const Rgba* fg, const Rgba* bg) {
+				return RgbaSum(
+					RgbaMult(*fg, fg->a),
+					RgbaMult(*bg, 256 - fg->a)
+				);
+			});
+		}
+		else {
+			FilterDraw(sprite, to_x, to_y, to_width, to_height,
+				from_x, from_y, from_width, from_height,
+				to_sprite, [=](const Rgba* fg, const Rgba* bg) {
+				Ui8 a = Ui8(Ui32(fg->a) * Ui32(opacity) >> 8);
+				return RgbaSum(
+					RgbaMult(*fg, a),
+					RgbaMult(*bg, 256 - a)
+				);
+			});
+		}
 	}
 
-	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y)
+	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 opacity)
 	{
 		AlphaDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer());
+			0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer(), opacity);
 	}
 
-	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite)
+	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 opacity)
 	{
 		AlphaDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
-			0, 0, sprite.Width(), sprite.Height(), to_sprite);
+			0, 0, sprite.Width(), sprite.Height(), to_sprite, opacity);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////

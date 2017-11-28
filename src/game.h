@@ -50,9 +50,9 @@ namespace pilecode {
 		void StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Start(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Finish(int level, int prevLevel);
+		void Response(ResultBase status);
 		bool Control();
 		void Update();
-		void DrawPanel(Si32 width, Si32 height);
 		bool ControlTools();
 		void UpdateTools();
 		void RenderTools();
@@ -110,6 +110,7 @@ namespace pilecode {
 
 		// gameplay
 		bool tileHover_ = false;
+		double responseDeadline_ = 0.0;
 		Vec3Si32 wmouse_;
 		Vec2F tilePos_;
 		bool frameVisibility_ = true;

@@ -35,8 +35,8 @@ namespace pilecode {
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 alpha);
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 alpha);
 
-	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y);
-	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite);
+	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 opacity = 0xff);
+	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 opacity = 0xff);
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend, Ui8 opacity = 0xff);
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend, Ui8 opacity = 0xff);
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2);
