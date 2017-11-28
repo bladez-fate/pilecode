@@ -237,12 +237,6 @@ namespace pilecode {
 			Tile* t = tile;
 			for (int x : xdata) {
 				t->set_type(TileType(x));
-				//if (t->type() != kTlNone && rand()%4 == 0) {
-				//	t->set_letter(Letter(1+rand()%4));
-				//}
-				//else {
-				//	t->set_letter(kLtSpace);
-				//}
 				t++;
 			}
 			tile += w_;
@@ -265,29 +259,25 @@ namespace pilecode {
 		return new Platform(*this);
 	}
 
-	void Platform::SetLetter(World* world, int rx, int ry, Letter letter)
+	// Returns previous letter on changed tile iff successful
+	Result<Letter> Platform::SetLetter(World* world, int rx, int ry, Letter letter)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsModifiable()) {
-				if (tile->letter() != letter) {
+				Letter prevLetter = tile->letter();
+				if (prevLetter != letter) {
 					tile->set_letter(letter);
+					return MakeResult(kRsOk, prevLetter);
 				}
-				else {
-					tile->set_letter(kLtSpace);
+				else if (letter == kLtSpace) {
+					return MakeResult(kRsAlready, prevLetter);
 				}
+				tile->set_letter(kLtSpace);
+				return MakeResult(kRsUndone, prevLetter);
 			}
+			return MakeResult(kRsForbidden);
 		}
-	}
-
-	void Platform::SwitchLetter(World* world, int rx, int ry)
-	{
-		if (Tile* tile = changable_tile(rx, ry)) {
-			if (tile->IsModifiable()) {
-				do {
-					tile->set_letter(Letter((tile->letter() + 1) % kLtMax));
-				} while (!world->IsLetterAllowed(tile->letter()));
-			}
-		}
+		return MakeResult(kRsNotFound);
 	}
 
 	Tile* Platform::changable_tile(int rx, int ry)
@@ -685,22 +675,18 @@ namespace pilecode {
 		robot_.emplace_back(robot);
 	}
 
-	void World::SetLetter(Vec3Si32 w, Letter letter)
+	// returns previous letter on changed tile iff successful
+	Result<Letter> World::SetLetter(Vec3Si32 w, Letter letter)
 	{
 		for (const auto& p : platform_) {
 			if (p->WorldZ(0) == w.z) {
-				p->SetLetter(this, p->PlatformX(w.x), p->PlatformY(w.y), letter);
+				auto res = p->SetLetter(this, p->PlatformX(w.x), p->PlatformY(w.y), letter);
+				if (res.status != kRsNotFound) {
+					return res;
+				}
 			}
 		}
-	}
-
-	void World::SwitchLetter(Vec3Si32 w)
-	{
-		for (const auto& p : platform_) {
-			if (p->WorldZ(0) == w.z) {
-				p->SwitchLetter(this, p->PlatformX(w.x), p->PlatformY(w.y));
-			}
-		}
+		return MakeResult(kRsNotFound);
 	}
 
 	void World::SwitchRobot(Vec3Si32 w, const Robot& original)

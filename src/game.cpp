@@ -22,6 +22,7 @@
 
 #include "game.h"
 #include "levels.h"
+#include "sfx.h"
 
 namespace pilecode {
 
@@ -335,27 +336,34 @@ namespace pilecode {
 				// TODO: show help popups in this mode if single letter/robot is selected
 				break;
 			case kPmRobot:
-				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
+				if (tileHover_) {
 					if (world_->steps() > 0) {
-						sfx::g_negative2.Play();
+						SfxResponse(kRsForbidden);
 					}
-					else {
+					else if (IsKeyOnce(kKeyMouseLeft) || IsKeyOnce(kKeyMouseRight)) {
 						Robot original; // to sync seed in initWorld_ and world_
 						world_->SwitchRobot(wmouse_, original);
 						initWorld_->SwitchRobot(wmouse_, original);
-						sfx::g_click.Play();
+						SfxResponse(kRsOk);
 					}
-				}
+				} 
 				break;
 			case kPmLetter:
-				if (tileHover_ && IsKeyOnce(kKeyMouseLeft)) {
+				if (tileHover_) {
 					if (world_->IsTouched(wmouse_)) {
-						sfx::g_negative2.Play();
+						SfxResponse(kRsForbidden);
 					}
 					else {
-						world_->SetLetter(wmouse_, placeLetter_);
-						initWorld_->SetLetter(wmouse_, placeLetter_);
-						sfx::g_click.Play();
+						if (IsKeyOnce(kKeyMouseLeft)) {
+							world_->SetLetter(wmouse_, placeLetter_);
+							auto res = initWorld_->SetLetter(wmouse_, placeLetter_);
+							SfxResponse(res);
+						}
+						else if (IsKeyOnce(kKeyMouseRight)) {
+							world_->SetLetter(wmouse_, kLtSpace);
+							auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
+							SfxResponse(res);
+						}
 					}
 				}
 				break;
