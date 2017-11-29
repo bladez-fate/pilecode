@@ -403,7 +403,7 @@ namespace pilecode {
 		{
 			sprite_ = sprite;
 			Si32 size = std::min(sprite.Width(), sprite.Height());
-			shadow_ = CreateShadow(sprite, size > 64 ? 17 : 9, 1, Rgba(0, 0, 0, 0x80));
+			shadow_ = CreateShadow(sprite, 1, size > 64 ? 17 : 9, Rgba(0, 0, 0, 0x80));
 		}
 
 		// accessors

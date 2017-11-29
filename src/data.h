@@ -94,7 +94,7 @@ namespace pilecode {
 		extern Sound g_write;
 	}
 
-	Sprite CreateShadow(Sprite sprite, Si32 blurRadius, Si32 expandRadius, Rgba color);
+	Sprite CreateShadow(Sprite sprite, Si32 expandRadius, Si32 blurRadius, Rgba color);
 
 	void PreInitData();
 	void InitData();
