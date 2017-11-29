@@ -80,7 +80,6 @@ namespace pilecode {
 	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
 	{
 		bgSprite.Create(screen::w, screen::h);
-		bgSprite.SetPivot(Vec2Si32(0, 0));
 
 		Rgba* p = bgSprite.RgbaData();
 		Si64 rsqMax = 0;
@@ -177,10 +176,7 @@ namespace pilecode {
 	void LoadImageFromSpritesheet(Sprite sheet, Si32 width, Si32 height, Si32 posx, Si32 posy, Sprite& sprite)
 	{
 		sprite.Create(width, height);
-		sheet.Draw(0, 0, width, height, width * posx, height * posy, width, height, sprite);
-		sprite.SetPivot(Vec2Si32(0, 0));
 		sprite.Reference(sheet, width * posx, height * posy, width, height);
-		sprite.SetPivot(Vec2Si32(0, 0));
 	}
 
 
@@ -210,7 +206,6 @@ namespace pilecode {
 			//src.Draw(0, 0, sprite.Width(), sprite.Height(), 0, 0, src.Width(), src.Height(), sprite);
 
 			// Try 3
-			sprite.SetPivot(Vec2Si32(0, 0));
 			sprite.Create(src.Width(), src.Height());
 			src.Draw(0, 0, 0, 1.0f, sprite);
 			

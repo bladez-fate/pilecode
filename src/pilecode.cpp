@@ -902,7 +902,6 @@ namespace pilecode {
 		, visible_z_(wparams_.zsize())
 	{
 		transparent_.Create(screen::w, screen::h);
-		transparent_.SetPivot(Vec2Si32(0, 0));
 		xmin_ = std::numeric_limits<float>::max();
 		ymin_ = std::numeric_limits<float>::max();
 		xmax_ = std::numeric_limits<float>::min();
@@ -1194,7 +1193,6 @@ namespace pilecode {
 		if (shadow.ceiling(0, 0)) {
 			Sprite shadowMask;
 			shadowMask.Create(surfaceMask.Width(), surfaceMask.Height());
-			shadowMask.SetPivot(Vec2Si32(0, 0));
 			Rgba* shad = shadowMask.RgbaData();
 			Rgba* surf = surfaceMask.RgbaData();
 			for (Si32 y = 0; y < shadowMask.Height(); y++) {
