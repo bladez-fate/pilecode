@@ -195,15 +195,15 @@ IScene* GameScene::Run()
 
 #ifdef DEV_MODE
 		if (IsKeyOnce(kKeyF8)) {
-			level = -1;
+			level_ = -1;
 			break;
 		}
 		if (IsKeyOnce(kKeyF9)) {
-			level++;
+			level_++;
 			break;
 		}
 		if (IsKeyOnce(kKeyF10)) {
-			level--;
+			level_--;
 			break;
 		}
 #endif
