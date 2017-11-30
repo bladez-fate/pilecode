@@ -38,6 +38,7 @@ namespace pilecode {
 		Sprite g_tile[kTlMax];
 		Sprite g_letter[kLtMax];
 		Sprite g_letter_output[kLtMax];
+		Sprite g_letter_output_filled[kLtMax];
 		Sprite g_frame;
 		Sprite g_tileMask;
 
@@ -280,6 +281,8 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, 128, 256, posx, posy, image::g_letter[letter]);
 		image::g_letter_output[letter] = CreateBoundary(
 			image::g_letter[letter], 0, 0, 8, 4, 0x40, 0xc0, 2, 5, Rgba(0xff, 0xff, 0xff, 0xff));
+		image::g_letter_output_filled[letter] = CreateBoundary(
+			image::g_letter[letter], 0, 0, 14, 7, 0x30, 0xc0, 2, 5, Rgba(0x66, 0xff, 0x66, 0xff));
 	}
 
 	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
@@ -330,6 +333,7 @@ namespace pilecode {
 
 		image::g_letter[kLtSpace] = image::g_empty;
 		image::g_letter_output[kLtSpace] = image::g_empty;
+		image::g_letter_output_filled[kLtSpace] = image::g_empty;
 		LoadLetter(sheet, 2, 2, kLtUp);
 		LoadLetter(sheet, 3, 2, kLtDown);
 		LoadLetter(sheet, 1, 2, kLtRight);

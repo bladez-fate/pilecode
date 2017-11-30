@@ -32,6 +32,11 @@ namespace pilecode {
 			return Rgba(0x55, 0xff, 0x66, 0x80);
 		}
 
+		inline Rgba ContourColor()
+		{
+			return Rgba(0xff, 0x55, 0xff, 0xff);
+		}
+
 		inline Rgba DisabledColor()
 		{
 			return Rgba(0x63, 0xa8, 0xdd, 0xff);
@@ -392,10 +397,10 @@ namespace pilecode {
 			if (enabled_ && visible_) {
 				auto blend = (hover_ ? ui::HoverColor() : color_);
 				AlphaDrawAndBlend(shadow_, reg_.x1(), reg_.y1(), Rgba(0, 0, 0, 0xff));
+				if (contour_) {
+					AlphaDrawAndBlend(contourSprite_, reg_.x1(), reg_.y1(), ui::ContourColor());
+				}
 				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend);
-				//if (frame_) {
-				//	AlphaDrawAndBlend(image::g_button_frame, reg_.x1(), reg_.y1(), blend);
-				//}
 			}
 		}
 
@@ -403,12 +408,18 @@ namespace pilecode {
 		{
 			sprite_ = sprite;
 			Si32 size = std::min(sprite.Width(), sprite.Height());
-			shadow_ = CreateShadow(sprite, 1, size > 64 ? 17 : 9, Rgba(0, 0, 0, 0x80));
+			Si32 shadowBlur = size > 64 ? 17 : 9;
+			Si32 contourBlur = size > 64 ? 12 : 6;
+			shadow_ = CreateShadow(sprite, 1, shadowBlur, Rgba(0, 0, 0, 0x80));
+			contourSprite_ = CreateBoundary(sprite,
+				0, 0, contourBlur, contourBlur,
+				0x40, 0xff, 2, 8,
+				Rgba(0xff, 0xff, 0xff, 0xff));
 		}
 
 		// accessors
-		bool frame() const { return frame_; }
-		void set_frame(bool value) { frame_ = value; }
+		bool contour() const { return contour_; }
+		void set_contour(bool value) { contour_ = value; }
 		Sprite sprite() const { return sprite_; }
 		bool enabled() const { return enabled_; }
 		void set_enabled(bool value) { enabled_ = value; }
@@ -421,11 +432,12 @@ namespace pilecode {
 		Region reg_;
 		Sprite sprite_;
 		Sprite shadow_;
+		Sprite contourSprite_;
 		std::function<void(Button*)> onClick_;
 		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
 		bool hoverNext_ = false;
-		bool frame_ = false;
+		bool contour_ = false;
 		bool enabled_ = true;
 		bool visible_ = true;
 		char hotkey_ = 0;

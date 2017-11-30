@@ -53,6 +53,7 @@ namespace pilecode {
 		extern Sprite g_tile[kTlMax];
 		extern Sprite g_letter[kLtMax];
 		extern Sprite g_letter_output[kLtMax];
+		extern Sprite g_letter_output_filled[kLtMax];
 		extern Sprite g_frame;
 		extern Sprite g_tileMask;
 
@@ -95,7 +96,16 @@ namespace pilecode {
 		extern Sound g_write;
 	}
 
-	Sprite CreateShadow(Sprite sprite, Si32 expandRadius, Si32 blurRadius, Rgba color);
+	Sprite CreateBoundary(Sprite sprite,
+		Si32 xExpandRadius, Si32 yExpandRadius,
+		Si32 xBlurRadius, Si32 yBlurRadius,
+		Ui8 lo, Ui8 hi, Si32 loSlope, Si32 hiSlope,
+		Rgba color);
+
+	Sprite CreateShadow(Sprite sprite,
+		Si32 expandRadius,
+		Si32 blurRadius,
+		Rgba color);
 
 	void PreInitData();
 	void InitData();

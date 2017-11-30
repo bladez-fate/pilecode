@@ -24,6 +24,7 @@
 
 #include "data.h"
 #include "graphics.h"
+#include "ui.h"
 
 #include "engine/arctic_math.h"
 
@@ -85,7 +86,10 @@ namespace pilecode {
 
 		// output
 		if (output_ != kLtSpace) {
-			vp->Draw(&image::g_letter_output[output_], wx, wy, wz, 1).Alpha();
+			Sprite* sprite = output_ == letter_ ?
+				&image::g_letter_output_filled[output_] :
+				&image::g_letter_output[output_];
+			vp->Draw(sprite, wx, wy, wz, 1).Alpha();
 		}
 
 		// letter

@@ -622,7 +622,7 @@ namespace pilecode {
 		->HotKey('R')->Click([=](Button* btn) {
 			SwitchPlaceMode(kPmRobot, kLtSpace);
 		})->OnUpdate([=](Button* btn) {
-			btn->set_frame(placeMode_ == kPmRobot);
+			btn->set_contour(placeMode_ == kPmRobot);
 			btn->set_enabled(world_->steps() == 0);
 		});
 
@@ -645,7 +645,7 @@ namespace pilecode {
 			->HotKey(hotkey[kLtRight])->Click([=](Button* btn) {
 				SwitchPlaceMode(kPmLetter, kLtRight, kLtDown, kLtUp, kLtLeft);
 			})->OnUpdate([=](Button* btn) {
-				btn->set_frame(placeMode_ == kPmLetter
+				btn->set_contour(placeMode_ == kPmLetter
 					&& placeLetterRight_ == kLtRight
 					&& placeLetterDown_ == kLtDown
 					&& placeLetterUp_ == kLtUp
@@ -661,7 +661,7 @@ namespace pilecode {
 				->HotKey(hotkey[letter])->Click([=](Button* btn) {
 					SwitchPlaceMode(kPmLetter, letter);
 				})->OnUpdate([=](Button* btn) {
-					btn->set_frame(placeMode_ == kPmLetter
+					btn->set_contour(placeMode_ == kPmLetter
 						&& placeLetterRight_ == letter
 						&& placeLetterDown_ == letter
 						&& placeLetterUp_ == letter
