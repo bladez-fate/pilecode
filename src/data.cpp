@@ -37,6 +37,7 @@ namespace pilecode {
 
 		Sprite g_tile[kTlMax];
 		Sprite g_letter[kLtMax];
+		Sprite g_letter_output[kLtMax];
 		Sprite g_frame;
 		Sprite g_tileMask;
 
@@ -131,9 +132,9 @@ namespace pilecode {
 	// - use `sprite' alpha-channel as source (RGB channels are ignored)
 	// - expand it by `expandRadius' pixels (using square shape)
 	// - then apply gaussian blur with `blurRadius' radius in pixels
-	// - then transform using double boundary step functions at `lo' and `hi' values of brightness with `smooth'  
+	// - then transform using double boundary step functions at `lo' and `hi' values of brightness
 	// - apply given `color' to result (note that `color.a' is maximum result opacity)
-	Sprite CreateBoundary(Sprite sprite, Si32 expandRadius, Si32 blurRadius, Ui8 lo, Ui8 hi, float smooth, Rgba color)
+	Sprite CreateBoundary(Sprite sprite, Si32 expandRadius, Si32 blurRadius, Ui8 lo, Ui8 hi, Si32 slope, Rgba color)
 	{
 		Si32 totalRadius = blurRadius + expandRadius;
 
@@ -170,19 +171,16 @@ namespace pilecode {
 		// Finalize
 		Rgba* dst0 = result.RgbaData();
 		Rgba* dst0End = dst0 + result.StridePixels() * result.Height();
-		float hi1 = float(hi) / 255.0f;
-		float lo1 = float(lo) / 255.0f;
 		for (; dst0 != dst0End; dst0 += result.StridePixels()) {
 			for (Rgba *dst = dst0, *dstEnd = dst0 + result.Width(); dst != dstEnd; dst++) {
 				dst->rgba /= totalWeight; // normalize
 				dst->rgba <<= 24; // save value in alpha channel
 				
 				// apply double boundary step transformation
-				float a1 = float(dst->a) / 255.0f;
-				float dlo = (a1 - lo1) / smooth;
-				float dhi = (hi1 - a1) / smooth;
-				float r1 = std::min(expf(dlo) / (1 + expf(dlo)), expf(dhi) / (1 + expf(dhi)));
-				dst->a = Ui8(r1 * 255.0f + 0.5f);
+				dst->a = (Ui8)ae::Clamp(std::min(
+					slope * (Si32(dst->a) - lo) + 0x80,
+					slope * (hi - Si32(dst->a)) + 0x80
+				), 0, 0xff);
 
 				// apply color and opacity (color.a)
 				*dst = RgbaMult(*dst, color.a);
@@ -257,6 +255,12 @@ namespace pilecode {
 		sprite.Reference(sheet, width * posx, height * posy, width, height);
 	}
 
+	void LoadLetter(Sprite sheet, Si32 posx, Si32 posy, Letter letter)
+	{
+		LoadImageFromSpritesheet(sheet, 128, 256, posx, posy, image::g_letter[letter]);
+		image::g_letter_output[letter] = CreateBoundary(
+			image::g_letter[letter], 2, 4, 0x50, 0xb0, 3, Rgba(0xff, 0xff, 0xff, 0xff));
+	}
 
 	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
 	{
@@ -305,13 +309,14 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 1, image::g_tile[kTlInactive]);
 
 		image::g_letter[kLtSpace] = image::g_empty;
-		LoadImageFromSpritesheet(sheet, sw, sh, 2, 2, image::g_letter[kLtUp]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 3, 2, image::g_letter[kLtDown]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 1, 2, image::g_letter[kLtRight]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 0, 2, image::g_letter[kLtLeft]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 0, 3, image::g_letter[kLtInput]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 1, 3, image::g_letter[kLtOutput]);
-		LoadImageFromSpritesheet(sheet, sw, sh, 0, 6, image::g_letter[kLtDot]);
+		image::g_letter_output[kLtSpace] = image::g_empty;
+		LoadLetter(sheet, 2, 2, kLtUp);
+		LoadLetter(sheet, 3, 2, kLtDown);
+		LoadLetter(sheet, 1, 2, kLtRight);
+		LoadLetter(sheet, 0, 2, kLtLeft);
+		LoadLetter(sheet, 0, 3, kLtInput);
+		LoadLetter(sheet, 1, 3, kLtOutput);
+		LoadLetter(sheet, 0, 6, kLtDot);
 
 		image::g_frame.Load("data/letter-frame.tga");
 		image::g_tileMask.Load("data/tile-mask.tga");

@@ -85,9 +85,7 @@ namespace pilecode {
 
 		// output
 		if (output_ != kLtSpace) {
-			vp->Draw(&image::g_letter[output_], wx, wy, wz, 1,
-				Vec2Si32(0, letter_ != kLtSpace ? -3 : 0))
-				.Blend(Rgba(0, 0, 0, 255)).Alpha();
+			vp->Draw(&image::g_letter_output[output_], wx, wy, wz, 1).Alpha();
 		}
 
 		// letter
