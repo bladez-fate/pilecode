@@ -24,7 +24,7 @@
 #include "data.h"
 #include "graphics.h"
 
-#include <unordered_map>
+#include <map>
 
 namespace pilecode {
 
@@ -100,24 +100,30 @@ namespace pilecode {
 		}
 	}
 
-	Sprite GaussianBlurKernel(Si32 blurRadius, Ui32& normalizeCoef)
+	Sprite GaussianBlurKernel(Si32 xBlurRadius, Si32 yBlurRadius, Ui32& normalizeCoef)
 	{
-		// Gaussian blur weight map (with cache)
-		static std::unordered_map<Si32, std::pair<Sprite, Ui32>> cache;
-		auto& cv = cache[blurRadius];
+		// Get cached gaussian blur weight map
+		static std::map<
+			std::pair<Si32, Si32>,
+			std::pair<Sprite, Ui32>
+		> cache;
+		auto& cv = cache[std::make_pair(xBlurRadius, yBlurRadius)];
 		Sprite& kernel = cv.first;
 		Ui32& totalWeight = cv.second;
+
 		if (totalWeight == 0) {
-			kernel.Create(2 * blurRadius + 1, 2 * blurRadius + 1);
+			// Create weight map
+			kernel.Create(2 * xBlurRadius + 1, 2 * yBlurRadius + 1);
 			Rgba* w0 = kernel.RgbaData();
 			Rgba* w0End = w0 + kernel.StridePixels() * kernel.Height();
-			Si32 dy = -blurRadius;
-			float br2 = float(blurRadius * blurRadius);
+			Si32 dy = -yBlurRadius;
+			float xbr2 = float(xBlurRadius * xBlurRadius);
+			float ybr2 = float(yBlurRadius * yBlurRadius);
 			for (; w0 != w0End; w0 += kernel.StridePixels(), dy++) {
-				Si32 dx = -blurRadius;
+				Si32 dx = -xBlurRadius;
 				for (Rgba *w = w0, *wEnd = w0 + kernel.Width(); w != wEnd; w++, dx++) {
-					float dx2 = float(dx*dx) / br2 * 6.0f;
-					float dy2 = float(dy*dy) / br2 * 6.0f;
+					float dx2 = float(dx*dx) / xbr2 * 6.0f;
+					float dy2 = float(dy*dy) / ybr2 * 6.0f;
 					w->rgba = Ui32(256.0 * exp(-(dx2 + dy2)));
 					totalWeight += w->rgba;
 				}
@@ -128,25 +134,30 @@ namespace pilecode {
 		return kernel;
 	}
 
+	Sprite GaussianBlurKernel(Si32 blurRadius, Ui32& normalizeCoef)
+	{
+		return GaussianBlurKernel(blurRadius, blurRadius, normalizeCoef);
+	}
+
 	// Creates boundary using series of transformations:
 	// - use `sprite' alpha-channel as source (RGB channels are ignored)
 	// - expand it by `expandRadius' pixels (using square shape)
 	// - then apply gaussian blur with `blurRadius' radius in pixels
 	// - then transform using double boundary step functions at `lo' and `hi' values of brightness
 	// - apply given `color' to result (note that `color.a' is maximum result opacity)
-	Sprite CreateBoundary(Sprite sprite, Si32 expandRadius, Si32 blurRadius, Ui8 lo, Ui8 hi, Si32 slope, Rgba color)
+	Sprite CreateBoundary(Sprite sprite, Si32 expandRadius, Si32 xBlurRadius, Si32 yBlurRadius, Ui8 lo, Ui8 hi, Si32 slope, Rgba color)
 	{
-		Si32 totalRadius = blurRadius + expandRadius;
+		Si32 xTotalRadius = xBlurRadius + expandRadius;
+		Si32 yTotalRadius = yBlurRadius + expandRadius;
 
 		Sprite result;
-		result.Create(sprite.Width() + 2 * totalRadius, sprite.Height() + 2 * totalRadius);
-		result.SetPivot(Vec2Si32(totalRadius, totalRadius));
+		result.Create(sprite.Width() + 2 * xTotalRadius, sprite.Height() + 2 * yTotalRadius);
+		result.SetPivot(Vec2Si32(xTotalRadius, yTotalRadius));
 
 		Ui32 totalWeight;
-		Sprite weight = GaussianBlurKernel(blurRadius, totalWeight);
+		Sprite weight = GaussianBlurKernel(xBlurRadius, yBlurRadius, totalWeight);
 
 		// Accumulate
-		// TODO: get rid of the folowwing copy-pase
 		for (Si32 x = -expandRadius; x < sprite.Width() + expandRadius; x++) {
 			for (Si32 y = -expandRadius; y < sprite.Height() + expandRadius; y++) {
 				Ui8 value = 0;
@@ -158,10 +169,10 @@ namespace pilecode {
 				}
 
 				Rgba* dst0 = result.RgbaData() + result.StridePixels() * (y + expandRadius) + (x + expandRadius);
-				Rgba* dst0End = dst0 + result.StridePixels() * (2 * blurRadius + 1);
+				Rgba* dst0End = dst0 + result.StridePixels() * (2 * yBlurRadius + 1);
 				Rgba* w0 = weight.RgbaData();
 				for (; dst0 != dst0End; dst0 += result.StridePixels(), w0 += weight.StridePixels()) {
-					for (Rgba *dst = dst0, *dstEnd = dst0 + 2 * blurRadius + 1, *w = w0; dst != dstEnd; dst++, w++) {
+					for (Rgba *dst = dst0, *dstEnd = dst0 + 2 * xBlurRadius + 1, *w = w0; dst != dstEnd; dst++, w++) {
 						dst->rgba += value * w->rgba;
 					}
 				}
@@ -259,7 +270,7 @@ namespace pilecode {
 	{
 		LoadImageFromSpritesheet(sheet, 128, 256, posx, posy, image::g_letter[letter]);
 		image::g_letter_output[letter] = CreateBoundary(
-			image::g_letter[letter], 2, 4, 0x50, 0xb0, 3, Rgba(0xff, 0xff, 0xff, 0xff));
+			image::g_letter[letter], 2, 8, 4, 0x50, 0xb0, 3, Rgba(0xff, 0xff, 0xff, 0xff));
 	}
 
 	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
