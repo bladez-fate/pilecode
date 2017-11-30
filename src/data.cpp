@@ -141,14 +141,18 @@ namespace pilecode {
 
 	// Creates boundary using series of transformations:
 	// - use `sprite' alpha-channel as source (RGB channels are ignored)
-	// - expand it by `expandRadius' pixels (using square shape)
-	// - then apply gaussian blur with `blurRadius' radius in pixels
+	// - expand it by `*ExpandRadius' pixels (using square shape)
+	// - then apply gaussian blur with `*BlurRadius' radius in pixels
 	// - then transform using double boundary step functions at `lo' and `hi' values of brightness
 	// - apply given `color' to result (note that `color.a' is maximum result opacity)
-	Sprite CreateBoundary(Sprite sprite, Si32 expandRadius, Si32 xBlurRadius, Si32 yBlurRadius, Ui8 lo, Ui8 hi, Si32 slope, Rgba color)
+	Sprite CreateBoundary(Sprite sprite,
+		Si32 xExpandRadius, Si32 yExpandRadius,
+		Si32 xBlurRadius, Si32 yBlurRadius,
+		Ui8 lo, Ui8 hi, Si32 loSlope, Si32 hiSlope,
+		Rgba color)
 	{
-		Si32 xTotalRadius = xBlurRadius + expandRadius;
-		Si32 yTotalRadius = yBlurRadius + expandRadius;
+		Si32 xTotalRadius = xBlurRadius + xExpandRadius;
+		Si32 yTotalRadius = yBlurRadius + yExpandRadius;
 
 		Sprite result;
 		result.Create(sprite.Width() + 2 * xTotalRadius, sprite.Height() + 2 * yTotalRadius);
@@ -158,17 +162,17 @@ namespace pilecode {
 		Sprite weight = GaussianBlurKernel(xBlurRadius, yBlurRadius, totalWeight);
 
 		// Accumulate
-		for (Si32 x = -expandRadius; x < sprite.Width() + expandRadius; x++) {
-			for (Si32 y = -expandRadius; y < sprite.Height() + expandRadius; y++) {
+		for (Si32 x = -xExpandRadius; x < sprite.Width() + xExpandRadius; x++) {
+			for (Si32 y = -yExpandRadius; y < sprite.Height() + yExpandRadius; y++) {
 				Ui8 value = 0;
-				for (Si32 x1 = std::max(0, x - expandRadius), x2 = std::min(sprite.Width(), x + expandRadius + 1); x1 < x2; x1++) {
-					for (Si32 y1 = std::max(0, y - expandRadius), y2 = std::min(sprite.Height(), y + expandRadius + 1); y1 < y2; y1++) {
+				for (Si32 x1 = std::max(0, x - xExpandRadius), x2 = std::min(sprite.Width(), x + xExpandRadius + 1); x1 < x2; x1++) {
+					for (Si32 y1 = std::max(0, y - yExpandRadius), y2 = std::min(sprite.Height(), y + yExpandRadius + 1); y1 < y2; y1++) {
 						Rgba src = *(sprite.RgbaData() + sprite.StridePixels() * y1 + x1);
 						value = std::max(value, src.a);
 					}
 				}
 
-				Rgba* dst0 = result.RgbaData() + result.StridePixels() * (y + expandRadius) + (x + expandRadius);
+				Rgba* dst0 = result.RgbaData() + result.StridePixels() * (y + yExpandRadius) + (x + xExpandRadius);
 				Rgba* dst0End = dst0 + result.StridePixels() * (2 * yBlurRadius + 1);
 				Rgba* w0 = weight.RgbaData();
 				for (; dst0 != dst0End; dst0 += result.StridePixels(), w0 += weight.StridePixels()) {
@@ -188,10 +192,15 @@ namespace pilecode {
 				dst->rgba <<= 24; // save value in alpha channel
 				
 				// apply double boundary step transformation
-				dst->a = (Ui8)ae::Clamp(std::min(
-					slope * (Si32(dst->a) - lo) + 0x80,
-					slope * (hi - Si32(dst->a)) + 0x80
-				), 0, 0xff);
+				if (dst->a == 0x00 || dst->a == 0xff) {
+					dst->a = 0x00;
+				}
+				else {
+					dst->a = (Ui8)ae::Clamp(std::min(
+						loSlope * (Si32(dst->a) - lo) + 0x80,
+						hiSlope * (hi - Si32(dst->a)) + 0x80
+					), 0, 0xff);
+				}
 
 				// apply color and opacity (color.a)
 				*dst = RgbaMult(*dst, color.a);
@@ -270,7 +279,7 @@ namespace pilecode {
 	{
 		LoadImageFromSpritesheet(sheet, 128, 256, posx, posy, image::g_letter[letter]);
 		image::g_letter_output[letter] = CreateBoundary(
-			image::g_letter[letter], 2, 8, 4, 0x50, 0xb0, 3, Rgba(0xff, 0xff, 0xff, 0xff));
+			image::g_letter[letter], 0, 0, 8, 4, 0x40, 0xc0, 2, 5, Rgba(0xff, 0xff, 0xff, 0xff));
 	}
 
 	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
