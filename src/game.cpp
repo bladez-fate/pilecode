@@ -344,9 +344,17 @@ namespace pilecode {
 			}
 
 			switch (placeMode_) {
-			case kPmSelect:
-				// TODO: rectangular selection with copy/cut/paste and delete support
-				// TODO: show help popups in this mode if single letter/robot is selected
+			case kPmNone:
+				if (tileHover_) {
+					if (world_->IsTouched(wmouse_)) {
+						Response(kRsForbidden);
+					}
+					else if (IsKeyOnce(kKeyMouseRight)) {
+						world_->SetLetter(wmouse_, kLtSpace);
+						auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
+						Response(res);
+					}
+				}
 				break;
 			case kPmRobot:
 				if (tileHover_) {
@@ -458,7 +466,7 @@ namespace pilecode {
 
 	void Game::DefaultPlaceMode()
 	{
-		placeMode_ = kPmSelect;
+		placeMode_ = kPmNone;
 		placeLetterRight_ = kLtSpace;
 		placeLetterDown_ = kLtSpace;
 		placeLetterUp_ = kLtSpace;

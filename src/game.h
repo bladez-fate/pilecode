@@ -36,7 +36,7 @@ namespace pilecode {
 	class Game {
 	private:
 		enum PlaceMode {
-			kPmSelect = 0,
+			kPmNone = 0,
 			kPmRobot,
 			kPmLetter,
 		};
