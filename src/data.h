@@ -55,6 +55,7 @@ namespace pilecode {
 		extern Sprite g_letter_output[kLtMax];
 		extern Sprite g_letter_output_filled[kLtMax];
 		extern Sprite g_frame;
+		extern Sprite g_boldFrame;
 		extern Sprite g_tileMask;
 
 		extern Sprite g_robot;

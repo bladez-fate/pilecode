@@ -712,21 +712,29 @@ namespace pilecode {
 					vp_->Draw(&image::g_robot, wmouse_, 3).Alpha().Blend(ui::PlaceColorBlink());
 				}
 				else if (placeMode_ == kPmLetter) {
-					bool erase = false;
-					Tile* tile;
-					if (tile = world_->At(wmouse_)) {
-						if (tile->letter() == placeLetter_) {
-							erase = true;
+					if (Tile* tile = world_->At(wmouse_)) {
+						bool erase = tile->letter() == placeLetter_; // Erase if letter was already placed
+						if (tile->IsModifiable()) { // Actions is allowed
+							if (!erase && tile) {
+								if (auto* cmnd = vp_->GetRenderCmnd(&image::g_letter[tile->letter()], wmouse_)) {
+									// Lower opacity of letter to be replaced to highlight new letter
+									cmnd->Opacity(0x80);
+								}
+							}
+							Rgba color = erase ? ui::EraseColorBlink() : ui::PlaceColorBlink();
+							vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(color);
+						}
+						else { // Any actions are forbidden
+							Rgba color = ui::ForbidColorBlink();
+							Ui8 opacity = ui::ForbidOpacityBlink();
+							vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha()
+								.Blend(color)
+								.Opacity(opacity);
+							vp_->Draw(&image::g_boldFrame, wmouse_, 1).Alpha()
+								.Blend(color)
+								.Opacity(opacity);
 						}
 					}
-					if (!erase && tile) {
-						if (auto* cmnd = vp_->GetRenderCmnd(&image::g_letter[tile->letter()], wmouse_)) {
-							// Lower opacity of letter to be replaced to highlight new letter
-							cmnd->Opacity(0x80);
-						}
-					}
-					Rgba color = erase ? ui::EraseColorBlink() : ui::PlaceColorBlink();
-					vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(color);
 				}
 			}
 		}

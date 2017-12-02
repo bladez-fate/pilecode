@@ -40,6 +40,7 @@ namespace pilecode {
 		Sprite g_letter_output[kLtMax];
 		Sprite g_letter_output_filled[kLtMax];
 		Sprite g_frame;
+		Sprite g_boldFrame;
 		Sprite g_tileMask;
 
 		Sprite g_robot;
@@ -343,6 +344,7 @@ namespace pilecode {
 		LoadLetter(sheet, 0, 6, kLtDot);
 
 		image::g_frame.Load("data/letter-frame.tga");
+		image::g_boldFrame = CreateShadow(image::g_frame, 1, 2, Rgba(0xff, 0xff, 0xff, 0xff));
 		image::g_tileMask.Load("data/tile-mask.tga");
 
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 0, image::g_robot);

@@ -54,6 +54,17 @@ namespace pilecode {
 			return Rgba(0xff, 0x33, 0x44, Ui8(0xbb * alpha));
 		}
 
+		inline Rgba ForbidColorBlink()
+		{
+			return Rgba(0xff, 0x33, 0x44, 0xff);
+		}
+
+		inline Ui8 ForbidOpacityBlink()
+		{
+			double alpha = std::max(0.0, 1.0 * sin(ae::Time() * 10));
+			return Ui8(0xaa * alpha);
+		}
+
 		inline bool StopAnimationKey()
 		{
 			return IsKeyOnce(ae::kKeyMouseLeft)
