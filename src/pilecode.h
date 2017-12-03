@@ -459,7 +459,16 @@ namespace pilecode {
 			friend class ViewPort;
 		};
 
-		using RenderList = std::vector<RenderCmnd>;
+		struct RenderList {
+			std::vector<RenderCmnd> next;
+			std::vector<RenderCmnd> prev;
+
+			void EndRender()
+			{
+				prev.clear();
+				std::swap(next, prev);
+			}
+		};
 
 	public:
 		explicit ViewPort(World* world);

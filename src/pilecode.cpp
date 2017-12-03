@@ -952,7 +952,7 @@ namespace pilecode {
 	{
 		for (int zl = 0; zl < zlSize; zl++) {
 			RenderList& rlist = renderList(wx, wy, wz, zl);
-			for (RenderCmnd& cmnd : rlist) {
+			for (RenderCmnd& cmnd : rlist.next) {
 				if (cmnd.sprite_ == sprite) {
 					return &cmnd;
 				}
@@ -969,8 +969,8 @@ namespace pilecode {
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
 	{
 		RenderList& rlist = renderList(wx, wy, wz, zl);
-		rlist.emplace_back(RenderCmnd(RenderCmnd::kSprite, sprite, off));
-		return rlist.back();
+		rlist.next.emplace_back(RenderCmnd(RenderCmnd::kSprite, sprite, off));
+		return rlist.next.back();
 	}
 
 	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl)
@@ -991,8 +991,8 @@ namespace pilecode {
 	ViewPort::RenderCmnd& ViewPort::DrawShadow(int wx, int wy, int wz, int zl)
 	{
 		RenderList& rlist = renderList(wx, wy, wz, zl);
-		rlist.emplace_back(RenderCmnd(Shadow(world_, Vec3Si32(wx, wy, wz))));
-		return rlist.back();
+		rlist.next.emplace_back(RenderCmnd(Shadow(world_, Vec3Si32(wx, wy, wz))));
+		return rlist.next.back();
 	}
 
 	void ViewPort::BeginRender(double time)
@@ -1019,11 +1019,10 @@ namespace pilecode {
 				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
 					Pos p0 = p1;
 					for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
-						for (RenderCmnd& cmnd : *rlist) {
+						for (RenderCmnd& cmnd : rlist->next) {
 							cmnd.Apply(this, p0.x, p0.y, filter);
 						}
-						// note that render lists are cleared after rendering
-						rlist->clear();
+						rlist->EndRender();
 						rlist++;
 					}
 				}
