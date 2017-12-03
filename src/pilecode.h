@@ -37,10 +37,10 @@
 namespace pilecode {
 
 	namespace screen {
-		extern int w;
-		extern int h;
-		extern int cx;
-		extern int cy;
+		extern Si32 w;
+		extern Si32 h;
+		extern Si32 cx;
+		extern Si32 cy;
 		extern size_t size;
 	}
 
@@ -87,7 +87,7 @@ namespace pilecode {
 	class Tile {
 	public:
 		// rendering
-		void Draw(ViewPort* vp, int wx, int wy, int wz, int color);
+		void Draw(ViewPort* vp, Si32 wx, Si32 wy, Si32 wz, Si32 color);
 
 		// simulation
 		Letter ReadLetter();
@@ -126,7 +126,7 @@ namespace pilecode {
 	class WorldData {
 	public:
 		explicit WorldData(size_t colors);
-		Sprite* TileSprite(int color, TileType type);
+		Sprite* TileSprite(Si32 color, TileType type);
 	private:
 		std::vector<std::vector<Sprite>> tileSprite_; // tile_[color][tileType]
 	};
@@ -134,58 +134,57 @@ namespace pilecode {
 	class WorldParams {
 	public:
 		WorldParams();
-		WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors);
+		WorldParams(Si32 xsize, Si32 ysize, Si32 zsize, Si32 colors);
 		void Init();
 
-		size_t xsize() const { return xsize_; }
-		size_t ysize() const { return ysize_; }
-		size_t zsize() const { return zsize_; }
+		Si32 xsize() const { return xsize_; }
+		Si32 ysize() const { return ysize_; }
+		Si32 zsize() const { return zsize_; }
 		WorldData& data() { return *data_; }
 
-		size_t size() const { return xyzsize_; }
-		size_t index(int x, int y, int z) const { return z * xysize_ + y * xsize_ + x; }
+		Si32 size() const { return xyzsize_; }
+		Si32 index(Si32 x, Si32 y, Si32 z) const { return z * xysize_ + y * xsize_ + x; }
 
 		// utility
 		void SaveTo(std::ostream& s) const;
 		void LoadFrom(std::istream& s);
 
 	private:
-		size_t xsize_;
-		size_t ysize_;
-		size_t zsize_;
-		size_t colors_;
+		Si32 xsize_;
+		Si32 ysize_;
+		Si32 zsize_;
+		Si32 colors_;
 
-		size_t xysize_;
-		size_t xyzsize_;
+		Si32 xysize_;
+		Si32 xyzsize_;
 		std::shared_ptr<WorldData> data_;
 	};
 
 	class Platform {
 	public:
 		Platform();
-		Platform(int x, int y, int z, std::initializer_list<std::initializer_list<int>> data);
+		Platform(Si32 x, Si32 y, Si32 z, std::initializer_list<std::initializer_list<Si32>> data);
 		void Draw(ViewPort* vp);
 		Platform* Clone() const;
-		Result<Letter> SetLetter(World* world, int rx, int ry, Letter letter);
-		void SwitchLetter(World* world, int rx, int ry);
-
-		Tile* changable_tile(int rx, int ry);
-		const Tile* get_tile(int rx, int ry) const;
-		bool ReadLetter(int rx, int ry, Letter& letter);
-		bool WriteLetter(int rx, int ry, Letter letter);
+		Result<Letter> SetLetter(World* world, Si32 rx, Si32 ry, Letter letter);
+		
+		Tile* changable_tile(Si32 rx, Si32 ry);
+		const Tile* get_tile(Si32 rx, Si32 ry) const;
+		bool ReadLetter(Si32 rx, Si32 ry, Letter& letter);
+		bool WriteLetter(Si32 rx, Si32 ry, Letter letter);
 		bool IsOutputCorrect();
 
 		// transforms coordinates relative to platform to world's frame
-		int WorldX(int rx) const { return rx + x_; }
-		int WorldY(int ry) const { return ry + y_; }
-		int WorldZ(int rz) const { return rz + z_; }
-		Vec3Si32 ToWorld(int rx, int ry, int rz) const { return Vec3Si32(rx + x_, ry + y_, rz + z_); }
+		Si32 WorldX(Si32 rx) const { return rx + x_; }
+		Si32 WorldY(Si32 ry) const { return ry + y_; }
+		Si32 WorldZ(Si32 rz) const { return rz + z_; }
+		Vec3Si32 ToWorld(Si32 rx, Si32 ry, Si32 rz) const { return Vec3Si32(rx + x_, ry + y_, rz + z_); }
 		Tile* At(Vec3Si32 w);
 
 		// inverse transform
-		int PlatformX(int wx) const { return wx - x_; }
-		int PlatformY(int wy) const { return wy - y_; }
-		int PlatformZ(int wz) const { return wz - z_; }
+		Si32 PlatformX(Si32 wx) const { return wx - x_; }
+		Si32 PlatformY(Si32 wy) const { return wy - y_; }
+		Si32 PlatformZ(Si32 wz) const { return wz - z_; }
 
 		// utility
 		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
@@ -193,18 +192,18 @@ namespace pilecode {
 		void LoadFrom(std::istream& s);
 
 		// accessors
-		int index() const { return index_; }
-		void set_index(int index) { index_ = index; }
+		Si32 index() const { return index_; }
+		void set_index(Si32 index) { index_ = index; }
 
 	private:
-		int index_;
+		Si32 index_;
 
-		int x_;
-		int y_;
-		int z_;
+		Si32 x_;
+		Si32 y_;
+		Si32 z_;
 
-		int w_;
-		int h_;
+		Si32 w_;
+		Si32 h_;
 
 		std::vector<Tile> tiles_;
 	};
@@ -242,26 +241,26 @@ namespace pilecode {
 		void LoadFrom(std::istream& s);
 		
 		// accessors
-		int priority() const { return priority_; }
-		int set_priority() const { return priority_; }
-		int platform() const { return platform_; }
-		int x() const { return x_; }
-		int y() const { return y_; }
+		Si32 priority() const { return priority_; }
+		Si32 set_priority() const { return priority_; }
+		Si32 platform() const { return platform_; }
+		Si32 x() const { return x_; }
+		Si32 y() const { return y_; }
 	private:
 		void CalculatePosition(ViewPort* vp, Vec3Si32& w, Vec2Si32& off, Si32& body_off_y) const;
 	private:
 		// robot configuration
-		int seed_;
-		int priority_;
+		Si32 seed_;
+		Si32 priority_;
 
 		// robot is currently on this platform
-		int platform_;
+		Si32 platform_;
 
 		// coordinates are relative to platform
-		int x_;
-		int y_;
-		int px_; // previous state
-		int py_; // previous state 
+		Si32 x_;
+		Si32 y_;
+		Si32 px_; // previous state
+		Si32 py_; // previous state 
 
 		// simulation state
 		Direction dir_ = kDirHalt; // direction of motion
@@ -307,8 +306,8 @@ namespace pilecode {
 		void LoadFrom(std::istream& s);
 
 		// accessors
-		Platform* platform(int i) const { return platform_[i].get(); }
-		Robot* robot(int i) const { return robot_[i].get(); }
+		Platform* platform(Si32 i) const { return platform_[i].get(); }
+		Robot* robot(Si32 i) const { return robot_[i].get(); }
 		WorldParams& params() { return wparams_; }
 		size_t steps() const { return steps_; }
 	private:
@@ -321,20 +320,20 @@ namespace pilecode {
 
 	struct Pos {
 		// world to screen representation parameters
-		static int dx;
-		static int dy;
-		static int dz;
+		static Si32 dx;
+		static Si32 dy;
+		static Si32 dz;
 
 		// screen coordinates
-		int x;
-		int y;
+		Si32 x;
+		Si32 y;
 
 		// world coordinates
-		int wx;
-		int wy;
-		int wz;
+		Si32 wx;
+		Si32 wy;
+		Si32 wz;
 
-		Pos(int _wx, int _wy, int _wz)
+		Pos(Si32 _wx, Si32 _wy, Si32 _wz)
 			: x(dx * (_wy - _wx))
 			, y(-dy * (_wx + _wy) + dz *_wz)
 			, wx(_wx), wy(_wy), wz(_wz)
@@ -388,6 +387,11 @@ namespace pilecode {
 			y -= dz;
 		}
 
+		Vec3Si32 World() const
+		{
+			return Vec3Si32(wx, wy, wz);
+		}
+
 		Vec2Si32 Screen() const
 		{
 			return Vec2Si32(x, y);
@@ -403,11 +407,11 @@ namespace pilecode {
 			return Pos(w).Screen();
 		}
 
-		static Vec3Si32 ToWorld(Vec2Si32 s, int wz)
+		static Vec3Si32 ToWorld(Vec2Si32 s, Si32 wz)
 		{
 			s.y -= dz * wz;
-			int wx = int(-(float(s.x) / dx + float(s.y) / dy) / 2.0f);
-			int wy = int( (float(s.x) / dx - float(s.y) / dy) / 2.0f);
+			Si32 wx = Si32(-(float(s.x) / dx + float(s.y) / dy) / 2.0f);
+			Si32 wy = Si32( (float(s.x) / dx - float(s.y) / dy) / 2.0f);
 
 			return Vec3Si32(wx, wy, wz);
 		}
@@ -425,6 +429,16 @@ namespace pilecode {
 	public:
 		struct RenderCmnd;
 		friend struct RenderCmnd;
+		struct RenderList;
+		class EventHandling;
+
+	public:
+		enum EventPassing {
+			kBlock = 0, // blocks further event passing (e.g. tile brick)
+			kPass = 1, // pass event further (e.g. shadow)
+			kInteract = 2, // calls event handler (e.g. robot)
+		};
+
 		struct RenderCmnd {
 			enum Type {
 				kSprite = 0,
@@ -447,6 +461,11 @@ namespace pilecode {
 
 			// for kShadow
 			Shadow shadow_;
+
+			// for event handling
+			EventPassing passing_ = kBlock;
+			Ui64 tag_ = 0;
+			void* data_ = nullptr;
 		public:
 			RenderCmnd(Type type, Sprite* sprite, Vec2Si32 off_);
 			explicit RenderCmnd(const Shadow& shadow);
@@ -454,8 +473,11 @@ namespace pilecode {
 			RenderCmnd& Blend(Rgba rgba);
 			RenderCmnd& Alpha();
 			RenderCmnd& Opacity(Ui8 value);
+			RenderCmnd& Interactive(Ui64 tag = 0, void* data = nullptr);
+			RenderCmnd& PassEventThrough();
 		private:
-			void Apply(ViewPort* vp, int x, int y, Filter filter);
+			void Apply(ViewPort* vp, Si32 x, Si32 y, Filter filter);
+			bool IsHit(Vec2Si32 s, const EventHandling& eh, Ui8 alphaThreshold = 0x80);
 			friend class ViewPort;
 		};
 
@@ -470,21 +492,43 @@ namespace pilecode {
 			}
 		};
 
+		class EventHandling {
+		public:
+			explicit EventHandling(ViewPort* vp)
+				: vp_(vp)
+				, p_(0, 0, 0)
+			{}
+			void StopPropagate() { propagate_ = false; }
+			ViewPort* vp() const { return vp_; }
+			Pos p() const { return p_; }
+			Si32 zl() const { return zl_; }
+		private:
+			ViewPort* vp_;
+			Pos p_;
+			Si32 zl_;
+			bool propagate_ = true;
+			friend class ViewPort;
+		};
+
 	public:
 		explicit ViewPort(World* world);
 
 		// drawing
-		RenderCmnd* GetRenderCmnd(Sprite* sprite, int wx, int wy, int wz);
+		RenderCmnd::Filter FilterMode(Si32 wz);
+		RenderCmnd* GetRenderCmnd(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz);
 		RenderCmnd* GetRenderCmnd(Sprite* sprite, Vec3Si32 w);
-		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off);
-		RenderCmnd& Draw(Sprite* sprite, int wx, int wy, int wz, int zl);
-		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off);
-		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, int zl);
-		RenderCmnd& DrawShadow(int wx, int wy, int wz, int zl);
+		RenderCmnd& Draw(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz, Si32 zl, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz, Si32 zl);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, Si32 zl, Vec2Si32 off);
+		RenderCmnd& Draw(Sprite* sprite, Vec3Si32 w, Si32 zl);
+		RenderCmnd& DrawShadow(Si32 wx, Si32 wy, Si32 wz, Si32 zl);
 
 		// rendering
 		void BeginRender(double time);
 		void EndRender(bool drawCeiling, Vec3Si32 w);
+
+		// backtrack
+		void Event(Vec2Si32 s, std::function<void(EventHandling& eh, Ui64 tag, void* data)> handler);
 
 		// navigation
 		void Move(Vec2F delta);
@@ -499,8 +543,8 @@ namespace pilecode {
 		void set_progress(double progress) { progress_ = progress; }
 
 		// transformations
-		Vec3Si32 ToWorldAtZ(int wz, Vec2Si32 p) const;
-		Vec3Si32 ToWorldTileAtZ(int wz, Vec2Si32 p, Vec2F& tp) const;
+		Vec3Si32 ToWorldAtZ(Si32 wz, Vec2Si32 p) const;
+		Vec3Si32 ToWorldTileAtZ(Si32 wz, Vec2Si32 p, Vec2F& tp) const;
 		bool ToWorld(Vec2Si32 p, Vec3Si32& w) const;
 		bool ToWorldTile(Vec2Si32 p, Vec3Si32& w, Vec2F& tp) const;
 
@@ -512,11 +556,11 @@ namespace pilecode {
 		void ApplyCommands();
 		void DrawCeiling(Vec3Si32 w);
 
-		Pos GetPos(int wx, int wy, int wz = 0);
+		Pos GetPos(Si32 wx, Si32 wy, Si32 wz = 0);
 		Sprite ShadowMask(Sprite& surfaceMask, const Shadow& shadow);
 
 		Sprite transparent() { return transparent_; }
-		RenderList& renderList(int wx, int wy, int wz, int zl)
+		RenderList& renderList(Si32 wx, Si32 wy, Si32 wz, Si32 zl)
 		{
 			if (!(zl >= 0 && zl < zlSize)) {
 				abort();
@@ -538,7 +582,8 @@ namespace pilecode {
 		float ymax_ = 0;
 
 		// world rendering parameters
-		size_t visible_z_ = 0;
+		Si32 visible_z_ = 0;
+		Si32 drawn_z_ = 0; // z-layers drawn in current frame
 
 		// time-related
 		double lastFrameTime_ = 0.0;

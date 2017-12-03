@@ -32,15 +32,15 @@
 
 namespace pilecode {
 
-	int Pos::dx = 14 * 4;
-	int Pos::dy = 7 * 4;
-	int Pos::dz = 25 * 4;
+	Si32 Pos::dx = 14 * 4;
+	Si32 Pos::dy = 7 * 4;
+	Si32 Pos::dz = 25 * 4;
 
 	namespace screen {
-		int w = 1440;// 1680;
-		int h = 900; // 1050;
-		int cx = w/2;
-		int cy = h/2;
+		Si32 w = 1440;// 1680;
+		Si32 h = 900; // 1050;
+		Si32 cx = w/2;
+		Si32 cy = h/2;
 		size_t size = w*h;
 	}
 
@@ -76,7 +76,7 @@ namespace pilecode {
 		return ceiling_[dy * 3 + dx];
 	}
 
-	void Tile::Draw(ViewPort* vp, int wx, int wy, int wz, int color)
+	void Tile::Draw(ViewPort* vp, Si32 wx, Si32 wy, Si32 wz, Si32 color)
 	{
 		// tile brick
 		if (type_ != kTlNone) {
@@ -144,11 +144,11 @@ namespace pilecode {
 	WorldData::WorldData(size_t colors)
 	{
 		tileSprite_.resize(colors);
-		for (int wz = 0; wz < colors; wz++) {
+		for (Si32 wz = 0; wz < colors; wz++) {
 			auto& ts = tileSprite_[wz];
 			ts.resize(kTlMax);
 			float alpha = float(wz) / (colors - 1);
-			for (int i = 0; i < kTlMax; i++) {
+			for (Si32 i = 0; i < kTlMax; i++) {
 				TileType t = TileType(i);
 				Sprite& src = image::g_tile[t];
 				Sprite& dst = ts[i];
@@ -170,7 +170,7 @@ namespace pilecode {
 		}
 	}
 
-	Sprite* WorldData::TileSprite(int color, TileType type)
+	Sprite* WorldData::TileSprite(Si32 color, TileType type)
 	{
 		color = color % tileSprite_.size();
 		return &tileSprite_[color][type];
@@ -181,7 +181,7 @@ namespace pilecode {
 		// intended to be used with LoadFrom()
 	}
 
-	WorldParams::WorldParams(size_t xsize, size_t ysize, size_t zsize, size_t colors)
+	WorldParams::WorldParams(Si32 xsize, Si32 ysize, Si32 zsize, Si32 colors)
 		: xsize_(xsize), ysize_(ysize), zsize_(zsize)
 		, colors_(colors)
 	{
@@ -217,15 +217,15 @@ namespace pilecode {
 		// intended to be used with LoadFrom()
 	}
 
-	Platform::Platform(int x, int y, int z,
-		std::initializer_list<std::initializer_list<int>> data)
+	Platform::Platform(Si32 x, Si32 y, Si32 z,
+		std::initializer_list<std::initializer_list<Si32>> data)
 		: x_(x), y_(y), z_(z)
 	{
 		w_ = 0;
 		h_ = 0;
 		for (auto& xdata : data) {
 			if (w_ == 0) {
-				for (int x : xdata) {
+				for (Si32 x : xdata) {
 					w_++;
 				}
 			}
@@ -237,7 +237,7 @@ namespace pilecode {
 		Tile* tile = &tiles_[0];
 		for (auto& xdata : data) {
 			Tile* t = tile;
-			for (int x : xdata) {
+			for (Si32 x : xdata) {
 				t->set_type(TileType(x));
 				t++;
 			}
@@ -248,8 +248,8 @@ namespace pilecode {
 	void Platform::Draw(ViewPort * vp)
 	{
 		Tile* tile = &tiles_[0];
-		for (int iy = 0; iy < h_; iy++) {
-			for (int ix = 0; ix < w_; ix++) {
+		for (Si32 iy = 0; iy < h_; iy++) {
+			for (Si32 ix = 0; ix < w_; ix++) {
 				tile->Draw(vp, WorldX(ix), WorldY(iy), z_, index());
 				tile++;
 			}
@@ -262,7 +262,7 @@ namespace pilecode {
 	}
 
 	// Returns previous letter on changed tile iff successful
-	Result<Letter> Platform::SetLetter(World* world, int rx, int ry, Letter letter)
+	Result<Letter> Platform::SetLetter(World* world, Si32 rx, Si32 ry, Letter letter)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsModifiable()) {
@@ -282,7 +282,7 @@ namespace pilecode {
 		return MakeResult(kRsNotFound);
 	}
 
-	Tile* Platform::changable_tile(int rx, int ry)
+	Tile* Platform::changable_tile(Si32 rx, Si32 ry)
 	{
 		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
 			return &tiles_[ry * w_ + rx];
@@ -291,7 +291,7 @@ namespace pilecode {
 		}
 	}
 
-	const Tile* Platform::get_tile(int rx, int ry) const
+	const Tile* Platform::get_tile(Si32 rx, Si32 ry) const
 	{
 		if (rx >= 0 && rx < w_ && ry >= 0 && ry < h_) {
 			return &tiles_[ry * w_ + rx];
@@ -301,7 +301,7 @@ namespace pilecode {
 		}
 	}
 
-	bool Platform::ReadLetter(int rx, int ry, Letter& letter)
+	bool Platform::ReadLetter(Si32 rx, Si32 ry, Letter& letter)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			letter = tile->ReadLetter();
@@ -312,7 +312,7 @@ namespace pilecode {
 		}
 	}
 
-	bool Platform::WriteLetter(int rx, int ry, Letter letter)
+	bool Platform::WriteLetter(Si32 rx, Si32 ry, Letter letter)
 	{
 		if (Tile* tile = changable_tile(rx, ry)) {
 			if (tile->IsMovable()) {
@@ -356,9 +356,9 @@ namespace pilecode {
 	{
 		Tile* tile = &tiles_[0];
 		Vec3Si32 w(x_, y_, z_);
-		for (int ry = 0; ry < h_; ry++, w.y++) {
+		for (Si32 ry = 0; ry < h_; ry++, w.y++) {
 			w.x = x_;
-			for (int rx = 0; rx < w_; rx++, w.x++, tile++) {
+			for (Si32 rx = 0; rx < w_; rx++, w.x++, tile++) {
 				if (tile->type() != kTlNone) {
 					func(w, tile);
 				}
@@ -651,7 +651,7 @@ namespace pilecode {
 	World::World(const WorldParams & wparams)
 		: wparams_(wparams)
 	{
-		for (int i = 0; i < kLtMax; i++) {
+		for (Si32 i = 0; i < kLtMax; i++) {
 			isLetterAllowed_[i] = false;
 		}
 		AllowLetter(kLtSpace);
@@ -669,7 +669,7 @@ namespace pilecode {
 
 	void World::AddPlatform(Platform* platform)
 	{
-		platform->set_index((int)platform_.size());
+		platform->set_index((Si32)platform_.size());
 		platform_.emplace_back(platform);
 	}
 
@@ -695,8 +695,8 @@ namespace pilecode {
 	void World::SwitchRobot(Vec3Si32 w, const Robot& original)
 	{
 		if (Platform* p = FindPlatform(w)) {
-			int rx = p->PlatformX(w.x);
-			int ry = p->PlatformY(w.y);
+			Si32 rx = p->PlatformX(w.x);
+			Si32 ry = p->PlatformY(w.y);
 
 			// try find robot to remove
 			for (auto i = robot_.begin(), e = robot_.end(); i != e; ++i) {
@@ -809,7 +809,7 @@ namespace pilecode {
 		for (const auto& r : robot_) {
 			clone->AddRobot(r->Clone());
 		}
-		for (int i = 0; i < kLtMax; i++) {
+		for (Si32 i = 0; i < kLtMax; i++) {
 			clone->isLetterAllowed_[i] = isLetterAllowed_[i];
 		}
 		return clone;
@@ -948,9 +948,9 @@ namespace pilecode {
 		Center();
 	}
 
-	ViewPort::RenderCmnd* ViewPort::GetRenderCmnd(Sprite* sprite, int wx, int wy, int wz)
+	ViewPort::RenderCmnd* ViewPort::GetRenderCmnd(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz)
 	{
-		for (int zl = 0; zl < zlSize; zl++) {
+		for (Si32 zl = 0; zl < zlSize; zl++) {
 			RenderList& rlist = renderList(wx, wy, wz, zl);
 			for (RenderCmnd& cmnd : rlist.next) {
 				if (cmnd.sprite_ == sprite) {
@@ -966,29 +966,29 @@ namespace pilecode {
 		return GetRenderCmnd(sprite, w.x, w.y, w.z);
 	}
 
-	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl, Vec2Si32 off)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz, Si32 zl, Vec2Si32 off)
 	{
 		RenderList& rlist = renderList(wx, wy, wz, zl);
 		rlist.next.emplace_back(RenderCmnd(RenderCmnd::kSprite, sprite, off));
 		return rlist.next.back();
 	}
 
-	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, int wx, int wy, int wz, int zl)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Si32 wx, Si32 wy, Si32 wz, Si32 zl)
 	{
 		return Draw(sprite, wx, wy, wz, zl, Vec2Si32(0, 0));
 	}
 
-	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl, Vec2Si32 off)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, Si32 zl, Vec2Si32 off)
 	{
 		return Draw(sprite, w.x, w.y, w.z, zl, off);
 	}
 
-	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, int zl)
+	ViewPort::RenderCmnd& ViewPort::Draw(Sprite* sprite, Vec3Si32 w, Si32 zl)
 	{
 		return Draw(sprite, w, zl, Vec2Si32(0, 0));
 	}
 
-	ViewPort::RenderCmnd& ViewPort::DrawShadow(int wx, int wy, int wz, int zl)
+	ViewPort::RenderCmnd& ViewPort::DrawShadow(Si32 wx, Si32 wy, Si32 wz, Si32 zl)
 	{
 		RenderList& rlist = renderList(wx, wy, wz, zl);
 		rlist.next.emplace_back(RenderCmnd(Shadow(world_, Vec3Si32(wx, wy, wz))));
@@ -1006,19 +1006,13 @@ namespace pilecode {
 
 	void ViewPort::ApplyCommands()
 	{
-		Pos p2 = GetPos(0, 0);
 		RenderList* rlist = &cmnds_[0];
-		for (int iz = 0, ez = (int)std::min(visible_z_ + 1, wparams_.zsize()); iz < ez; iz++, p2.Ceil()) {
-			for (int zl = 0; zl < zlSize; zl++) {
-				RenderCmnd::Filter filter = (
-					iz == visible_z_ - 1 ?
-					RenderCmnd::kFilterNone :
-					(iz < visible_z_ ? RenderCmnd::kFilterNone : RenderCmnd::kFilterTransparent)
-					);
-				Pos p1 = p2;
-				for (int iy = 0; iy < wparams_.ysize(); iy++, p1.Up()) {
-					Pos p0 = p1;
-					for (int ix = 0; ix < wparams_.xsize(); ix++, p0.Right()) {
+		drawn_z_ = std::min(visible_z_ + 1, wparams_.zsize());
+		for (Pos p2 = GetPos(0, 0); p2.wz < drawn_z_; p2.Ceil()) {
+			for (Si32 zl = 0; zl < zlSize; zl++) {
+				RenderCmnd::Filter filter = p2.wz < visible_z_ ? RenderCmnd::kFilterNone : RenderCmnd::kFilterTransparent;
+				for (Pos p1 = p2; p1.wy < wparams_.ysize(); p1.Up()) {
+					for (Pos p0 = p1; p0.wx < wparams_.xsize(); p0.Right()) {
 						for (RenderCmnd& cmnd : rlist->next) {
 							cmnd.Apply(this, p0.x, p0.y, filter);
 						}
@@ -1033,10 +1027,10 @@ namespace pilecode {
 	void ViewPort::DrawCeiling(Vec3Si32 w)
 	{
 		// TODO: start/finish animation???
-		int xRadius = Pos::dx;
-		int yRadius = Pos::dy;
-		int aspect = Pos::dx / Pos::dy;
-		int aspectSq = aspect*aspect;
+		Si32 xRadius = Pos::dx;
+		Si32 yRadius = Pos::dy;
+		Si32 aspect = Pos::dx / Pos::dy;
+		Si32 aspectSq = aspect*aspect;
 
 		Si32 rsqMax = xRadius*xRadius + yRadius*yRadius*aspectSq;
 		Sprite bb = ae::GetEngine()->GetBackbuffer();
@@ -1090,6 +1084,40 @@ namespace pilecode {
 		lastFrameTime_ = curFrameTime_;
 	}
 
+	void ViewPort::Event(Vec2Si32 s, std::function<void(EventHandling& eh, Ui64 tag, void* data)> handler)
+	{
+		EventHandling eh(this);
+		Si32 zsize = drawn_z_ - 1; // do not pass events to transparent ceiling z-level
+		Pos p2 = GetPos(wparams_.xsize() - 1, wparams_.ysize() - 1, zsize - 1);
+		RenderList* rlist = &renderList(p2.wx, p2.wy, p2.wz, zlSize - 1);
+		for (; p2.wz >= 0; p2.Floor()) {
+			for (eh.zl_ = zlSize - 1; eh.zl_ >= 0; eh.zl_--) {
+				for (Pos p1 = p2; p1.wy >= 0; p1.Down()) {
+					for (eh.p_ = p1; eh.p_.wx >= 0; eh.p_.Left()) {
+						for (auto i = rlist->prev.rbegin(), e = rlist->prev.rend(); i != e; ++i) {
+							RenderCmnd& cmnd = *i;
+							if (cmnd.passing_ == kPass) {
+								continue;
+							}
+							if (cmnd.IsHit(s, eh)) {
+								if (cmnd.passing_ == kBlock) {
+									return;
+								}
+								else { // kInteract
+									handler(eh, cmnd.tag_, cmnd.data_);
+									if (!eh.propagate_) {
+										return;
+									}
+								}
+							}
+						}
+						rlist--;
+					}
+				}
+			}
+		}
+	}
+
 	void ViewPort::Move(Vec2F delta)
 	{
 		x_ = ae::Clamp(x_ + delta.x, xmin_, xmax_);
@@ -1128,20 +1156,20 @@ namespace pilecode {
 	}
 
 	// Converts screen coords `p' into world coords at given z-level `wz'
-	Vec3Si32 ViewPort::ToWorldAtZ(int wz, Vec2Si32 p) const
+	Vec3Si32 ViewPort::ToWorldAtZ(Si32 wz, Vec2Si32 p) const
 	{
-		p.x -= int(x_ + 0.5f);
-		p.y -= int(y_ + 0.5f);
+		p.x -= Si32(x_ + 0.5f);
+		p.y -= Si32(y_ + 0.5f);
 		p.x -= g_xtileorigin;
 		p.y -= g_ytileorigin;
 		return Pos::ToWorld(p, wz);
 	}
 
 	// Converts screen coords `p' into world coords and tile coords `tp' at given z-level `wz'
-	Vec3Si32 ViewPort::ToWorldTileAtZ(int wz, Vec2Si32 p, Vec2F& tp) const
+	Vec3Si32 ViewPort::ToWorldTileAtZ(Si32 wz, Vec2Si32 p, Vec2F& tp) const
 	{
-		p.x -= int(x_ + 0.5f);
-		p.y -= int(y_ + 0.5f);
+		p.x -= Si32(x_ + 0.5f);
+		p.y -= Si32(y_ + 0.5f);
 		p.x -= g_xtileorigin;
 		p.y -= g_ytileorigin;
 		Vec3Si32 result = Pos::ToWorld(p, wz);
@@ -1155,7 +1183,7 @@ namespace pilecode {
 	// Returns false iff real tile was not found (`w' is not changed)
 	bool ViewPort::ToWorld(Vec2Si32 p, Vec3Si32& w) const
 	{
-		for (int wz = int(visible_z_) - 1; wz >= 0; wz--) {
+		for (Si32 wz = visible_z_ - 1; wz >= 0; wz--) {
 			Vec3Si32 w0 = ToWorldAtZ(wz, p);
 			if (Tile* tile = world_->At(w0)) {
 				w = w0;
@@ -1170,7 +1198,7 @@ namespace pilecode {
 	// Returns false iff real tile was not found (`w' and `tp' are not changed)
 	bool ViewPort::ToWorldTile(Vec2Si32 p, Vec3Si32& w, Vec2F& tp) const
 	{
-		for (int wz = int(visible_z_) - 1; wz >= 0; wz--) {
+		for (Si32 wz = visible_z_ - 1; wz >= 0; wz--) {
 			Vec2F tp0;
 			Vec3Si32 w0 = ToWorldTileAtZ(wz, p, tp0);
 			if (Tile* tile = world_->At(w0)) {
@@ -1182,11 +1210,11 @@ namespace pilecode {
 		return false;
 	}
 
-	Pos ViewPort::GetPos(int wx, int wy, int wz)
+	Pos ViewPort::GetPos(Si32 wx, Si32 wy, Si32 wz)
 	{
 		Pos p(wx, wy, wz);
-		p.x += int(x_ + 0.5f);
-		p.y += int(y_ + 0.5f);
+		p.x += Si32(x_ + 0.5f);
+		p.y += Si32(y_ + 0.5f);
 		return p;
 	}
 
@@ -1272,7 +1300,21 @@ namespace pilecode {
 		return *this;
 	}
 
-	void ViewPort::RenderCmnd::Apply(ViewPort* vp, int x, int y, ViewPort::RenderCmnd::Filter filter)
+	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Interactive(Ui64 tag, void* data)
+	{
+		passing_ = kInteract;
+		tag_ = tag;
+		data_ = data;
+		return *this;
+	}
+
+	ViewPort::RenderCmnd& ViewPort::RenderCmnd::PassEventThrough()
+	{
+		passing_ = kPass;
+		return *this;
+	}
+
+	void ViewPort::RenderCmnd::Apply(ViewPort* vp, Si32 x, Si32 y, ViewPort::RenderCmnd::Filter filter)
 	{
 		Sprite to_sprite = filter == kFilterTransparent? vp->transparent(): ae::GetEngine()->GetBackbuffer();
 		x += off_.x;
@@ -1298,5 +1340,15 @@ namespace pilecode {
 			AlphaDrawAndBlend(vp->ShadowMask(image::g_tileMask, shadow_), x, y, to_sprite, Rgba(0, 0, 0, 255), opacity_);
 			break;
 		}
+	}
+
+	bool ViewPort::RenderCmnd::IsHit(Vec2Si32 s, const EventHandling& eh, Ui8 alphaThreshold)
+	{
+		// Calculate sprite coordinates
+		Vec2Si32 r = s - eh.p().Screen() + sprite_->Pivot();
+		Rgba* to = sprite_->RgbaData()
+			+ r.y * sprite_->StridePixels()
+			+ r.x;
+		return to->a > alphaThreshold;
 	}
 }
