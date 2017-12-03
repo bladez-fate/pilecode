@@ -81,7 +81,8 @@ namespace pilecode {
 		// tile brick
 		if (type_ != kTlNone) {
 			Sprite* sprite = vp->world()->params().data().TileSprite(color, type_);
-			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0)).Alpha();
+			vp->Draw(sprite, wx, wy, wz, 1, Vec2Si32(0, 0))
+				.Alpha();
 		}
 
 		// output
@@ -89,12 +90,16 @@ namespace pilecode {
 			Sprite* sprite = output_ == letter_ ?
 				&image::g_letter_output_filled[output_] :
 				&image::g_letter_output[output_];
-			vp->Draw(sprite, wx, wy, wz, 1).Alpha();
+			vp->Draw(sprite, wx, wy, wz, 1)
+				.Alpha()
+				.PassEventThrough();
 		}
 
 		// letter
 		if (letter_ != kLtSpace) {
-			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0)).Alpha();
+			vp->Draw(&image::g_letter[letter_], wx, wy, wz, 1, Vec2Si32(0, 0))
+				.Alpha()
+				.PassEventThrough();
 		}
 
 		// shadow
@@ -439,14 +444,17 @@ namespace pilecode {
 		CalculatePosition(vp, w, off, body_off_y);
 
 		vp->Draw(&image::g_robotShadow, w, 2, off)
-			.Alpha();
+			.Alpha()
+			.PassEventThrough();
 		vp->Draw(&image::g_robot, w, 2, Vec2Si32(off.x, off.y + body_off_y))
-			.Alpha();
+			.Alpha()
+			.Interactive(0, this);
 
 		if (reg_ != kLtSpace) {
 			vp->Draw(&image::g_letter[reg_], w, 2,
 				Vec2Si32(off.x, off.y + body_off_y + g_yrobotReg))
-				.Alpha();
+				.Alpha()
+				.PassEventThrough();
 		}
 	}
 
@@ -1280,6 +1288,7 @@ namespace pilecode {
 	ViewPort::RenderCmnd::RenderCmnd(const Shadow& shadow)
 		: type_(kShadow)
 		, shadow_(shadow)
+		, passing_(kPass) // shadow shouldn't block events (which is default)
 	{}
 
 	ViewPort::RenderCmnd& ViewPort::RenderCmnd::Blend(Rgba rgba)

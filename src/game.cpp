@@ -711,13 +711,18 @@ namespace pilecode {
 			// Draw frame on all z-layers
 			if (frameVisibility_) {
 				for (int wz = 0; wz <= wmouse_.z; wz++) {
-					vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1).Alpha();
+					vp_->Draw(&image::g_frame, Vec3Si32(wmouse_.x, wmouse_.y, wz), 1)
+						.Alpha()
+						.PassEventThrough();
 				}
 			}
 			// Show letter on tile to be placed
 			if (ae::Time() > responseDeadline_) {
 				if (placeMode_ == kPmRobot) {
-					vp_->Draw(&image::g_robot, wmouse_, 3).Alpha().Blend(ui::PlaceColorBlink());
+					vp_->Draw(&image::g_robot, wmouse_, 3)
+						.Alpha()
+						.Blend(ui::PlaceColorBlink())
+						.PassEventThrough();
 				}
 				else if (placeMode_ == kPmLetter) {
 					if (Tile* tile = world_->At(wmouse_)) {
@@ -730,17 +735,22 @@ namespace pilecode {
 								}
 							}
 							Rgba color = erase ? ui::EraseColorBlink() : ui::PlaceColorBlink();
-							vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha().Blend(color);
+							vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1)
+								.Alpha()
+								.Blend(color)
+								.PassEventThrough();
 						}
 						else { // Any actions are forbidden
 							Rgba color = ui::ForbidColorBlink();
 							Ui8 opacity = ui::ForbidOpacityBlink();
 							vp_->Draw(&image::g_letter[placeLetter_], wmouse_, 1).Alpha()
 								.Blend(color)
-								.Opacity(opacity);
+								.Opacity(opacity)
+								.PassEventThrough();
 							vp_->Draw(&image::g_boldFrame, wmouse_, 1).Alpha()
 								.Blend(color)
-								.Opacity(opacity);
+								.Opacity(opacity)
+								.PassEventThrough();
 						}
 					}
 				}
