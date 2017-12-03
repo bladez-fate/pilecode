@@ -236,17 +236,19 @@ namespace pilecode {
 
 		// utility
 		Robot* Clone() const;
-		Vec2Si32 d_pos();
-		Vec2Si32 dir_delta();
+		Vec2Si32 d_pos() const;
+		Vec2Si32 dir_delta() const;
 		void SaveTo(std::ostream& s) const;
 		void LoadFrom(std::istream& s);
-
+		
 		// accessors
 		int priority() const { return priority_; }
 		int set_priority() const { return priority_; }
 		int platform() const { return platform_; }
 		int x() const { return x_; }
 		int y() const { return y_; }
+	private:
+		void CalculatePosition(ViewPort* vp, Vec3Si32& w, Vec2Si32& off, Si32& body_off_y) const;
 	private:
 		// robot configuration
 		int seed_;

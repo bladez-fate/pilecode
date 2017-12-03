@@ -419,31 +419,32 @@ namespace pilecode {
 		py_ = y_ = p->PlatformY(w.y);
 	}
 
-	void Robot::Draw(ViewPort * vp)
+	void Robot::CalculatePosition(ViewPort* vp, Vec3Si32& w, Vec2Si32& off, Si32& body_off_y) const
 	{
 		Platform* p = vp->world()->platform(platform_);
+		w = p->ToWorld(px_, py_, 0);
 
-		Vec2Si32 off = Pos::ToScreen(d_pos());
+		off = Pos::ToScreen(d_pos());
 		off.x = Si32(off.x * vp->progress());
 		off.y = Si32(off.y * vp->progress());
 
-		int body_off_y = (int)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
+		body_off_y = (Si32)round(4.0 * sin((vp->progress() + (seed_ % 1000) / 1000.0) * 2.0 * M_PI));
+	}
 
-		vp->Draw(&image::g_robotShadow,
-			p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
-			2,
-			off)
+	void Robot::Draw(ViewPort* vp)
+	{
+		Vec3Si32 w;
+		Vec2Si32 off;
+		Si32 body_off_y;
+		CalculatePosition(vp, w, off, body_off_y);
+
+		vp->Draw(&image::g_robotShadow, w, 2, off)
 			.Alpha();
-		vp->Draw(&image::g_robot,
-			p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
-			2,
-			Vec2Si32(off.x, off.y + body_off_y))
+		vp->Draw(&image::g_robot, w, 2, Vec2Si32(off.x, off.y + body_off_y))
 			.Alpha();
 
 		if (reg_ != kLtSpace) {
-			vp->Draw(&image::g_letter[reg_],
-				p->WorldX(px_),	p->WorldY(py_),	p->WorldZ(0),
-				2,
+			vp->Draw(&image::g_letter[reg_], w, 2,
 				Vec2Si32(off.x, off.y + body_off_y + g_yrobotReg))
 				.Alpha();
 		}
@@ -592,12 +593,12 @@ namespace pilecode {
 		return new Robot(*this);	
 	}
 
-	Vec2Si32 Robot::d_pos()
+	Vec2Si32 Robot::d_pos() const
 	{
 		return Vec2Si32(x_ - px_, y_ - py_);
 	}
 
-	Vec2Si32 Robot::dir_delta()
+	Vec2Si32 Robot::dir_delta() const
 	{
 		switch (dir_) {
 		case kDirRight:
