@@ -52,7 +52,7 @@ namespace pilecode {
 	bool IsKeyOnce(T t)
 	{
 		if (ae::IsKey(t)) {
-			SetKey(t, false);
+			ae::SetKey(t, false);
 			return true;
 		}
 		else {
