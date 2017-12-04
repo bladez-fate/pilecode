@@ -70,7 +70,7 @@ namespace pilecode {
 
 	private:
 		template <class... Args>
-		Button* Game::AddButton(Args... args)
+		Button* AddButton(Args... args)
 		{
 			buttons_.emplace_back(args...);
 			Button* btn = &buttons_.back();

@@ -29,6 +29,7 @@
 #include "engine/vec2si32.h"
 #include "engine/vec3si32.h"
 
+#include <iostream>
 #include <vector>
 #include <cmath>
 #include <algorithm>
