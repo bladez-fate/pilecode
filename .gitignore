@@ -39,5 +39,9 @@ x64/
 Debug/
 .vs/
 
+# XCode artifacts
+.DS_Store
+xcuserdata
+
 # PileCode artifacts
 profile.sav
