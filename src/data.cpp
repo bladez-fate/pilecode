@@ -31,10 +31,11 @@ namespace pilecode {
 	const Vec2Si32 g_tileCenter(64, 54);
 
 	namespace image {
+        // logo
 		Sprite g_pilecode;
 
+        // pilecode
 		Sprite g_empty;
-
 		Sprite g_tile[kTlMax];
 		Sprite g_letter[kLtMax];
 		Sprite g_letter_output[kLtMax];
@@ -42,10 +43,10 @@ namespace pilecode {
 		Sprite g_frame;
 		Sprite g_boldFrame;
 		Sprite g_tileMask;
-
 		Sprite g_robot;
 		Sprite g_robotShadow;
 
+        // ui
 		Sprite g_button_musicalnote;
 		Sprite g_button_nextlevel;
 		Sprite g_button_prevlevel;
@@ -63,6 +64,7 @@ namespace pilecode {
 		Sprite g_button_robot;
 		Sprite g_button_letter[kLtMax];
 
+        // bg
 		Sprite g_background[g_backgroundCount];
 	}
 
