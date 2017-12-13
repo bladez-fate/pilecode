@@ -13,7 +13,7 @@
    inkscape:export-ydpi="82.290001"
    inkscape:export-xdpi="82.290001"
    inkscape:export-filename="pilecode-1440x900.png"
-   sodipodi:docname="logo5.svg"
+   sodipodi:docname="pilecode.svg"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06"
    id="svg8"
    version="1.1"
@@ -40,14 +40,14 @@
      inkscape:window-maximized="1"
      inkscape:window-y="1"
      inkscape:window-x="0"
-     inkscape:window-height="775"
-     inkscape:window-width="1440"
+     inkscape:window-height="926"
+     inkscape:window-width="1680"
      showborder="true"
      showgrid="false"
      inkscape:current-layer="svg8"
      inkscape:document-units="px"
      inkscape:cy="564.12836"
-     inkscape:cx="839.99999"
+     inkscape:cx="471.78275"
      inkscape:zoom="0.53093658"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -1273,6 +1273,11 @@
         <dc:title></dc:title>
         <cc:license
            rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>bladez-fate</dc:title>
+          </cc:Agent>
+        </dc:creator>
       </cc:Work>
       <cc:License
          rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
@@ -1899,4 +1904,12 @@
        d="m 156.13415,57.186686 8.26247,18.241976 10.57768,-5.28897 -5.62339,-19.561902 z"
        id="path10305"
        inkscape:connector-curvature="0"
-       transform="matrix(1.1102776,0.6410191,-0.6410191,1.1102776,64.385026                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+       transform="matrix(1.1102776,0.6410191,-0.6410191,1.1102776,64.385026,-148.45961)" />
+    <path
+       style="display:inline;opacity:0.25;fill:url(#linearGradient12930);fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter10823)"
+       d="m 207.69991,97.080173 2.541,-12.840354 34.26233,-17.130903 -9.38202,16.260543 z"
+       id="path10345"
+       inkscape:connector-curvature="0"
+       transform="matrix(1.1102776,0.6410191,-0.6410191,1.1102776,64.385026,-148.45961)" />
+  </g>
+</svg>
