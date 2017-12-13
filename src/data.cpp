@@ -323,9 +323,9 @@ namespace pilecode {
 	void InitImage()
 	{
 		Sprite sheet;
-		sheet.Load("data/spritesheet.tga");
+		sheet.Load("data/game/spritesheet.tga");
 		Si32 sw = 128, sh = 256;
-		image::g_empty.Load("data/empty.tga");
+		image::g_empty.Load("data/game/empty.tga");
 
 		image::g_tile[kTlNone] = image::g_empty;
 		LoadImageFromSpritesheet(sheet, sw, sh, 0, 0, image::g_tile[kTlBrick]);
@@ -342,9 +342,9 @@ namespace pilecode {
 		LoadLetter(sheet, 1, 3, kLtOutput);
 		LoadLetter(sheet, 0, 6, kLtDot);
 
-		image::g_frame.Load("data/letter-frame.tga");
+		image::g_frame.Load("data/game/letter-frame.tga");
 		image::g_boldFrame = CreateShadow(image::g_frame, 1, 2, Rgba(0xff, 0xff, 0xff, 0xff));
-		image::g_tileMask.Load("data/tile-mask.tga");
+		image::g_tileMask.Load("data/game/tile-mask.tga");
 
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 0, image::g_robot);
 		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
@@ -381,7 +381,7 @@ namespace pilecode {
 
 	void InitMusic()
 	{
-		music::g_background[0].Load("data/music-observing-the-star.ogg");
+		music::g_background[0].Load("data/music/observing-the-star.ogg");
 	}
 
 	void InitSfx()

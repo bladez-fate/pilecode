@@ -42,6 +42,7 @@ Debug/
 # XCode artifacts
 .DS_Store
 xcuserdata
+DerivedData
 
 # PileCode artifacts
 profile.sav
