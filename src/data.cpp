@@ -46,7 +46,6 @@ namespace pilecode {
 		Sprite g_robot;
 		Sprite g_robotShadow;
 
-		Sprite g_button_frame;
 		Sprite g_button_musicalnote;
 		Sprite g_button_nextlevel;
 		Sprite g_button_prevlevel;
@@ -350,7 +349,6 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, sw, sh, 1, 0, image::g_robot);
 		LoadImageFromSpritesheet(sheet, sw, sh, 2, 1, image::g_robotShadow);
 	
-		image::g_button_frame.Load("data/button-frame.tga");
 		LoadMask(image::g_button_musicalnote, "data/ui/musical-note.tga");
 		LoadMask(image::g_button_nextlevel, "data/ui/up-arrow.tga");
 		LoadMask(image::g_button_prevlevel, "data/ui/down-arrow.tga");
