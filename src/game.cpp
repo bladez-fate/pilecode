@@ -463,6 +463,11 @@ namespace pilecode {
 			DefaultPlaceMode();
 		}
 	}
+    
+    void Game::Replay()
+    {
+        
+    }
 
 	void Game::DefaultPlaceMode()
 	{
@@ -557,6 +562,11 @@ namespace pilecode {
 		})->OnUpdate([=](Button* btn) {
 			btn->SetSprite(simPaused_ ? image::g_button_play : image::g_button_pause);
 		});
+        AddButton(image::g_button_replay, Region::Screen(), kLeftBottom)->Click([=](Button* btn) {
+            Replay();
+        })->OnUpdate([=](Button* btn) {
+            btn->set_enabled(world_->steps() == 0);
+        });
 
 		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))->HotKey('-')->Click([=](Button* btn) {
 			if (simSpeed_ == 2.0f) {

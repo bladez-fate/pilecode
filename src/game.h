@@ -56,7 +56,8 @@ namespace pilecode {
 		bool ControlTools();
 		void UpdateTools();
 		void RenderTools();
-		void PlayOrPause();
+        void PlayOrPause();
+		void Replay();
 		void DefaultPlaceMode();
 		void SwitchPlaceMode(PlaceMode mode, Letter right, Letter down, Letter up, Letter left);
 		void SwitchPlaceMode(PlaceMode mode, Letter letter);

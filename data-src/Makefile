@@ -121,6 +121,10 @@ $(UI)/%.tga: ui/chanut/%.tga
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 
+$(OUI)/replay.png: ui/chanut/replay.svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ -w 64 -h 64 `pwd`/$<
+
 $(OUI)/palette.png: ui/bladez-fate/palette.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
