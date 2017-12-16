@@ -388,9 +388,9 @@ namespace pilecode {
 
 	void InitSfx()
 	{
-		sfx::g_click.Load("data/lokif/click.wav");
-		sfx::g_click2.Load("data/lokif/click_2.wav");
-		sfx::g_positive.Load("data/lokif/positive.wav");
+		sfx::g_click.Load("data/sfx/click.wav");
+		sfx::g_click2.Load("data/sfx/click_2.wav");
+		sfx::g_positive.Load("data/sfx/positive.wav");
 		sfx::g_negative2.Load("data/sfx/negative_2.wav");
 		sfx::g_read.Load("data/sfx/read.wav");
 		sfx::g_write.Load("data/sfx/write.wav");
