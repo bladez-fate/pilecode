@@ -26,6 +26,16 @@
 
 namespace pilecode {
 
+    namespace screen {
+        extern Si32 w;
+        extern Si32 h;
+        extern Si32 cx;
+        extern Si32 cy;
+        extern Si64 size;
+
+        void Init();        
+    }
+
 	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y);
 	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite);
 	void DrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend);

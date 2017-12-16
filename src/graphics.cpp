@@ -24,7 +24,101 @@
 
 #include "engine/easy.h"
 
+#include <map>
+
 namespace pilecode {
+
+    namespace screen {
+        Si32 w = 1680;
+        Si32 h = 1050;
+        Si32 cx;
+        Si32 cy;
+        Si64 size;
+
+        std::map<Si32, std::map<Si32, Si32>> allowedResolutions;
+
+        Si32 Aspect(Vec2Si32 s)
+        {
+            return s.x * 1000 / s.y;
+        }
+        
+        void AllowResolution(Vec2Si32 s)
+        {
+            allowedResolutions[Aspect(s)][s.x] = s.y;
+        }
+        
+        void Init()
+        {
+            std::vector<Vec2Si32> res = {
+                Vec2Si32(1024, 576),
+                Vec2Si32(1024, 600),
+                Vec2Si32(1024, 640),
+                Vec2Si32(1024, 768),
+                Vec2Si32(1024, 800),
+                
+                Vec2Si32(1136, 640),
+                
+                Vec2Si32(1152, 720),
+                
+                Vec2Si32(1280, 720),
+                Vec2Si32(1280, 768),
+                Vec2Si32(1280, 800),
+                Vec2Si32(1280, 854),
+                Vec2Si32(1280, 960),
+                Vec2Si32(1280, 1024),
+                Vec2Si32(1280, 720),
+                Vec2Si32(1280, 720),
+
+                Vec2Si32(1366, 768),
+
+                Vec2Si32(1440, 900),
+                Vec2Si32(1440, 960),
+                Vec2Si32(1440, 1024),
+                Vec2Si32(1440, 1080),
+                
+                Vec2Si32(1600, 768),
+                Vec2Si32(1600, 900),
+                Vec2Si32(1600, 1024),
+                Vec2Si32(1600, 1200),
+                Vec2Si32(1600, 1280),
+
+                Vec2Si32(1680, 1050),
+
+                Vec2Si32(1920, 1080),
+                Vec2Si32(1920, 1200),
+                Vec2Si32(1920, 1280),
+                Vec2Si32(1920, 1400),
+                Vec2Si32(1920, 1440)
+            };
+            
+            for (auto r : res) {
+                AllowResolution(r);
+            }
+            
+            Vec2Si32 window = ae::WindowSize();
+            Si32 wAspect = Aspect(window);
+
+            w = window.x;
+            h = window.y;
+            for (auto kv : allowedResolutions) {
+                if (kv.first >= wAspect) {
+                    for (auto i = kv.second.rbegin(), e = kv.second.rend(); i != e; i++) {
+                        w = i->first;
+                        h = i->second;
+                        if (window.x <= w) {
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            
+            cx = w / 2;
+            cy = h / 2;
+            size = Si64(w) * Si64(h);
+        }
+        
+    }
 
 	template <class FilterFunc>
 	void FilterDraw(Sprite sprite, const Si32 to_x_pivot, const Si32 to_y_pivot,

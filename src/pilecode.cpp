@@ -36,14 +36,6 @@ namespace pilecode {
 	Si32 Pos::dy = 7 * 4;
 	Si32 Pos::dz = 25 * 4;
 
-	namespace screen {
-		Si32 w = 1440;// 1680;
-		Si32 h = 900; // 1050;
-		Si32 cx = w/2;
-		Si32 cy = h/2;
-		size_t size = w*h;
-	}
-
 	Shadow::Shadow()
 	{
 		for (bool& v : ceiling_) {

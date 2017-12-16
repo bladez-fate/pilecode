@@ -307,6 +307,7 @@ void EasyMain()
 {
 	// Init system stuff
 	srand((int)time(nullptr));
+    screen::Init();
 	ResizeScreen(screen::w, screen::h);
 
 	// Init game

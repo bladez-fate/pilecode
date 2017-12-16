@@ -37,14 +37,6 @@
 
 namespace pilecode {
 
-	namespace screen {
-		extern Si32 w;
-		extern Si32 h;
-		extern Si32 cx;
-		extern Si32 cy;
-		extern size_t size;
-	}
-
 	class Robot;
 	class Tile;
 	class Platform;
