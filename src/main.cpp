@@ -193,11 +193,11 @@ IScene* GameScene::Run()
 			}
 		}
 
+#ifdef DEV_MODE
 		if (IsKeyOnce(kKeyF4)) {
 			return new EditorScene(level_);
 		}
 
-#ifdef DEV_MODE
 		if (IsKeyOnce(kKeyF8)) {
 			level_ = -1;
 			break;
