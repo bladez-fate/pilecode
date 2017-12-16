@@ -164,6 +164,10 @@ IScene* GameScene::Run()
 			break;
 		}
 
+        if (screen::CheckResize()) {
+            break;
+        }
+        
 		game.Update();
 		game.Render();
 		if (game.IsComplete()) {
@@ -238,6 +242,10 @@ IScene* EditorScene::Run()
 			break;
 		}
 
+        if (screen::CheckResize()) {
+            break;
+        }
+
 		game.Update();
 		game.Render();
 
@@ -307,11 +315,9 @@ void EasyMain()
 {
 	// Init system stuff
 	srand((int)time(nullptr));
-    screen::Init();
-	ResizeScreen(screen::w, screen::h);
 
 	// Init game
-	PreInitData();
+    screen::Init();
 	InitData();
 	g_profile.LoadFromDisk();
 
@@ -321,6 +327,10 @@ void EasyMain()
 	UpdateMusic();
 	IScene* scene = new GameScene(g_profile.LastAvailableLevel(), 0);
 	while (scene) {
+        if (screen::CheckResize()) {
+            screen::Init();
+            InitData();
+        }
 		IScene* nextScene = scene->Run();
 		delete scene;
 		scene = nextScene;

@@ -324,6 +324,12 @@ namespace pilecode {
 
 	void InitImage()
 	{
+        image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
+        
+        CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+        CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
+        CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
+
 		Sprite sheet;
 		sheet.Load("data/game/spritesheet.tga");
 		Si32 sw = 128, sh = 256;
@@ -394,15 +400,6 @@ namespace pilecode {
 		sfx::g_negative2.Load("data/sfx/negative_2.wav");
 		sfx::g_read.Load("data/sfx/read.wav");
 		sfx::g_write.Load("data/sfx/write.wav");
-	}
-
-	void PreInitData()
-	{
-		image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
-
-		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
-		CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
-		CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
 	}
 
 	void InitData()

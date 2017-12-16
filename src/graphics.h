@@ -33,7 +33,8 @@ namespace pilecode {
         extern Si32 cy;
         extern Si64 size;
 
-        void Init();        
+        void Init();
+        bool CheckResize();
     }
 
 	void DrawSprite(Sprite sprite, const Si32 to_x, const Si32 to_y);

@@ -107,6 +107,5 @@ namespace pilecode {
 		Si32 blurRadius,
 		Rgba color);
 
-	void PreInitData();
 	void InitData();
 }

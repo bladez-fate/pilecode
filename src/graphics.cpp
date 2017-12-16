@@ -35,6 +35,7 @@ namespace pilecode {
         Si32 cy;
         Si64 size;
 
+        Vec2Si32 window;
         std::map<Si32, std::map<Si32, Si32>> allowedResolutions;
 
         Si32 Aspect(Vec2Si32 s)
@@ -47,9 +48,30 @@ namespace pilecode {
             allowedResolutions[Aspect(s)][s.x] = s.y;
         }
         
+        void ChooseResolution()
+        {
+            Si32 wAspect = Aspect(window);
+            w = window.x;
+            h = window.y;
+            for (auto kv : allowedResolutions) {
+                if (kv.first >= wAspect) {
+                    for (Si32 scaling : {1, 2, 3, 4}) {
+                        for (auto wh : kv.second) {
+                            w = wh.first;
+                            h = wh.second;
+                            if (window.x <= w * scaling) {
+                                return;
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+        
         void Init()
         {
-            std::vector<Vec2Si32> res = {
+            static std::vector<Vec2Si32> res = {
                 Vec2Si32(1024, 576),
                 Vec2Si32(1024, 600),
                 Vec2Si32(1024, 640),
@@ -91,33 +113,25 @@ namespace pilecode {
                 Vec2Si32(1920, 1440)
             };
             
-            for (auto r : res) {
-                AllowResolution(r);
-            }
-            
-            Vec2Si32 window = ae::WindowSize();
-            Si32 wAspect = Aspect(window);
-
-            w = window.x;
-            h = window.y;
-            for (auto kv : allowedResolutions) {
-                if (kv.first >= wAspect) {
-                    for (auto i = kv.second.rbegin(), e = kv.second.rend(); i != e; i++) {
-                        w = i->first;
-                        h = i->second;
-                        if (window.x <= w) {
-                            break;
-                        }
-                    }
-                    break;
+            if (allowedResolutions.empty()) {
+                for (auto r : res) {
+                    AllowResolution(r);
                 }
             }
+            
+            window = ae::WindowSize();
+            ChooseResolution();
             
             cx = w / 2;
             cy = h / 2;
             size = Si64(w) * Si64(h);
+            ae::ResizeScreen(screen::w, screen::h);
         }
-        
+
+        bool CheckResize()
+        {
+            return !(window == ae::WindowSize());
+        }
     }
 
 	template <class FilterFunc>
