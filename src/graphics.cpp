@@ -50,6 +50,54 @@ namespace pilecode {
         
         void ChooseResolution()
         {
+            if (allowedResolutions.empty()) {
+                std::vector<Vec2Si32> res = {
+                    Vec2Si32(1024, 576),
+                    Vec2Si32(1024, 600),
+                    Vec2Si32(1024, 640),
+                    Vec2Si32(1024, 768),
+                    Vec2Si32(1024, 800),
+                    
+                    Vec2Si32(1136, 640),
+                    
+                    Vec2Si32(1152, 720),
+                    
+                    Vec2Si32(1280, 720),
+                    Vec2Si32(1280, 768),
+                    Vec2Si32(1280, 800),
+                    Vec2Si32(1280, 854),
+                    Vec2Si32(1280, 960),
+                    Vec2Si32(1280, 1024),
+                    Vec2Si32(1280, 720),
+                    Vec2Si32(1280, 720),
+                    
+                    Vec2Si32(1366, 768),
+                    
+                    Vec2Si32(1440, 900),
+                    Vec2Si32(1440, 960),
+                    Vec2Si32(1440, 1024),
+                    Vec2Si32(1440, 1080),
+                    
+                    Vec2Si32(1600, 768),
+                    Vec2Si32(1600, 900),
+                    Vec2Si32(1600, 1024),
+                    Vec2Si32(1600, 1200),
+                    Vec2Si32(1600, 1280),
+                    
+                    Vec2Si32(1680, 1050),
+                    
+                    Vec2Si32(1920, 1080),
+                    Vec2Si32(1920, 1200),
+                    Vec2Si32(1920, 1280),
+                    Vec2Si32(1920, 1400),
+                    Vec2Si32(1920, 1440)
+                };
+                
+                for (auto r : res) {
+                    AllowResolution(r);
+                }
+            }
+            
             Si32 wAspect = Aspect(window);
             w = window.x;
             h = window.y;
@@ -71,57 +119,8 @@ namespace pilecode {
         
         void Init()
         {
-            static std::vector<Vec2Si32> res = {
-                Vec2Si32(1024, 576),
-                Vec2Si32(1024, 600),
-                Vec2Si32(1024, 640),
-                Vec2Si32(1024, 768),
-                Vec2Si32(1024, 800),
-                
-                Vec2Si32(1136, 640),
-                
-                Vec2Si32(1152, 720),
-                
-                Vec2Si32(1280, 720),
-                Vec2Si32(1280, 768),
-                Vec2Si32(1280, 800),
-                Vec2Si32(1280, 854),
-                Vec2Si32(1280, 960),
-                Vec2Si32(1280, 1024),
-                Vec2Si32(1280, 720),
-                Vec2Si32(1280, 720),
-
-                Vec2Si32(1366, 768),
-
-                Vec2Si32(1440, 900),
-                Vec2Si32(1440, 960),
-                Vec2Si32(1440, 1024),
-                Vec2Si32(1440, 1080),
-                
-                Vec2Si32(1600, 768),
-                Vec2Si32(1600, 900),
-                Vec2Si32(1600, 1024),
-                Vec2Si32(1600, 1200),
-                Vec2Si32(1600, 1280),
-
-                Vec2Si32(1680, 1050),
-
-                Vec2Si32(1920, 1080),
-                Vec2Si32(1920, 1200),
-                Vec2Si32(1920, 1280),
-                Vec2Si32(1920, 1400),
-                Vec2Si32(1920, 1440)
-            };
-            
-            if (allowedResolutions.empty()) {
-                for (auto r : res) {
-                    AllowResolution(r);
-                }
-            }
-            
             window = ae::WindowSize();
             ChooseResolution();
-            
             cx = w / 2;
             cy = h / 2;
             size = Si64(w) * Si64(h);
