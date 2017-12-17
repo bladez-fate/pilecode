@@ -76,7 +76,8 @@ $(OBG)/pilecode-1680x1050.png: bg/bladez-fate/pilecode.svg
 ################################################################################
 # RULERS FOR game FOLDER
 #
-game: $(GAME)/empty.tga $(GAME)/letter-frame.tga $(GAME)/spritesheet.tga $(GAME)/tile-mask.tga
+game: $(GAME)/empty.tga $(GAME)/letter-frame.tga $(GAME)/spritesheet.tga \
+$(GAME)/tile-mask.tga
 
 $(GAME)/%.tga: game/bladez-fate/%.tga
 	mkdir -p `dirname $@`
@@ -98,7 +99,8 @@ $(MUSIC)/%.ogg: music/cc0/%.ogg
 ################################################################################
 # RULERS FOR sfx FOLDER
 #
-sfx: $(SFX)/click.wav $(SFX)/click_2.wav $(SFX)/negative_2.wav $(SFX)/positive.wav $(SFX)/read.wav $(SFX)/write.wav
+sfx: $(SFX)/click.wav $(SFX)/click_2.wav $(SFX)/negative_2.wav \
+$(SFX)/positive.wav $(SFX)/read.wav $(SFX)/write.wav
 
 $(SFX)/%.wav: sfx/circlerun/%.wav
 	mkdir -p `dirname $@`
@@ -111,7 +113,13 @@ $(SFX)/%.wav: sfx/lokif/%.wav
 ################################################################################
 # RULERS FOR ui FOLDER
 #
-ui: $(UI)/button-x1.tga $(UI)/button-x2.tga $(UI)/button-x4.tga $(UI)/button-x8.tga $(UI)/down-arrow.tga $(UI)/fast-forward.tga $(UI)/minus.tga $(UI)/musical-note.tga $(UI)/palette.tga $(UI)/pause.tga $(UI)/play.tga $(UI)/plus.tga $(UI)/replay.tga $(UI)/rewind.tga $(UI)/up-arrow.tga
+CONFIRM_DPI = 192
+
+ui: $(UI)/button-x1.tga $(UI)/button-x2.tga $(UI)/button-x4.tga \
+$(UI)/button-x8.tga $(UI)/cancel.tga $(UI)/checked.tga $(UI)/down-arrow.tga \
+$(UI)/fast-forward.tga $(UI)/minus.tga $(UI)/musical-note.tga \
+$(UI)/palette.tga $(UI)/pause.tga $(UI)/play.tga $(UI)/plus.tga \
+$(UI)/replay.tga $(UI)/rewind.tga $(UI)/up-arrow.tga
 
 $(UI)/%.tga: ui/bladez-fate/%.tga
 	mkdir -p `dirname $@`
@@ -124,6 +132,14 @@ $(UI)/%.tga: ui/chanut/%.tga
 $(OUI)/replay.png: ui/chanut/replay.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ -w 64 -h 64 `pwd`/$<
+
+$(OUI)/cancel.png: ui/chanut/cancel.svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ -d $(CONFIRM_DPI) `pwd`/$<
+
+$(OUI)/checked.png: ui/chanut/checked.svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ -d $(CONFIRM_DPI) `pwd`/$<
 
 $(OUI)/palette.png: ui/bladez-fate/palette.svg
 	mkdir -p `dirname $@`
