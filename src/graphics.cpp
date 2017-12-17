@@ -321,7 +321,33 @@ namespace pilecode {
 			0, 0, sprite.Width(), sprite.Height(), to_sprite, alpha);
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    void RgbDraw(Sprite sprite, const Si32 to_x, const Si32 to_y,
+                   const Si32 to_width, const Si32 to_height,
+                   const Si32 from_x, const Si32 from_y,
+                   const Si32 from_width, const Si32 from_height, Sprite to_sprite)
+    {
+        FilterDraw(sprite, to_x, to_y, to_width, to_height,
+            from_x, from_y, from_width, from_height,
+            to_sprite, [=](const Rgba* fg, const Rgba*) {
+                return Rgba(fg->r, fg->g, fg->b, 0xff);
+        });
+    }
+    
+    void RgbDraw(Sprite sprite, const Si32 to_x, const Si32 to_y)
+    {
+        RgbDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+            0, 0, sprite.Width(), sprite.Height(), ae::GetEngine()->GetBackbuffer());
+    }
+
+    void RgbDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite)
+    {
+        RgbDraw(sprite, to_x, to_y, sprite.Width(), sprite.Height(),
+            0, 0, sprite.Width(), sprite.Height(), to_sprite);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y,
 		const Si32 to_width, const Si32 to_height,
@@ -456,11 +482,22 @@ namespace pilecode {
 
 	void FilterBrightness(Sprite sprite, Ui8 alpha)
 	{
-		float a = float(alpha) / 255.0f;
 		FilterFillColor(Rgba(), 0, 0, sprite.Width(), sprite.Height(),
 			sprite, [=](const Rgba*, const Rgba* bg) {
 			return RgbaMult(*bg, alpha);
 		});
 	}
-
+    
+    void FilterSB(Sprite sprite, float saturation, float brightness)
+    {
+        FilterFillColor(Rgba(), 0, 0, sprite.Width(), sprite.Height(),
+            sprite, [=](const Rgba*, const Rgba* bg) {
+            return Rgba(
+                brightness * (255 - saturation * (255 - bg->r)),
+                brightness * (255 - saturation * (255 - bg->g)),
+                brightness * (255 - saturation * (255 - bg->b)),
+                0xff
+            );
+        });
+    }
 }

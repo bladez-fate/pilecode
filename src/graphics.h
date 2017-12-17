@@ -46,6 +46,9 @@ namespace pilecode {
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 alpha);
 	void DrawWithFixedAlphaBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 alpha);
 
+    void RgbDraw(Sprite sprite, const Si32 to_x, const Si32 to_y);
+    void RgbDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite);
+
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Ui8 opacity = 0xff);
 	void AlphaDraw(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Ui8 opacity = 0xff);
 	void AlphaDrawAndBlend(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend, Ui8 opacity = 0xff);
@@ -53,7 +56,8 @@ namespace pilecode {
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Rgba blend1, Rgba blend2);
 	void AlphaDrawAndBlend2(Sprite sprite, const Si32 to_x, const Si32 to_y, Sprite to_sprite, Rgba blend1, Rgba blend2);
 
-	void FilterBrightness(Sprite sprite, Ui8 alpha);
+    void FilterBrightness(Sprite sprite, Ui8 alpha);
+	void FilterSB(Sprite sprite, float saturation, float brightness);
 
 	inline Rgba RgbaMult(Rgba c, Ui32 m)
 	{
