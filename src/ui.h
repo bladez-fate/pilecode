@@ -23,6 +23,7 @@
 #pragma once
 
 #include "defs.h"
+#include "music.h"
 
 namespace pilecode {
 
@@ -382,12 +383,16 @@ namespace pilecode {
 				ae::MousePos().y >= reg_.y1() + padding_ &&
 				ae::MousePos().x <  reg_.x2() - padding_ &&
 				ae::MousePos().y <  reg_.y2() - padding_;
-
-			if (enabled_ && onClick_) {
+            
+            click_ = false;
+			if (enabled_) {
 				if ((visible_ && hoverNext_ && IsKeyOnce(ae::kKeyMouseLeft))
 					|| (hotkey_ && IsKeyOnce(hotkey_))) {
 					sfx::g_click2.Play();
-					onClick_(this);
+                    click_ = true;
+                    if (onClick_) {
+                        onClick_(this);
+                    }
 				}
 			}
 
@@ -399,7 +404,7 @@ namespace pilecode {
 		{
 			hover_ = hoverNext_;
 			hoverNext_ = false;
-			if (onUpdate_) {
+            if (onUpdate_) {
 				onUpdate_(this);
 			}
 		}
@@ -439,6 +444,8 @@ namespace pilecode {
 		void set_visible(bool value) { visible_ = value; }
 		Rgba color() const { return color_; }
 		void set_color(Rgba value) { color_ = value; }
+        bool hover() const { return hover_; }
+        bool click() const { return click_; }
 
 	private:
 		Region reg_;
@@ -449,7 +456,8 @@ namespace pilecode {
 		std::function<void(Button*)> onUpdate_;
 		bool hover_ = false;
 		bool hoverNext_ = false;
-		bool contour_ = false;
+        bool click_ = false;
+        bool contour_ = false;
 		bool enabled_ = true;
 		bool visible_ = true;
 		char hotkey_ = 0;
@@ -457,4 +465,50 @@ namespace pilecode {
 		Rgba color_ = Rgba(0, 0, 0, 0);
 	};
 
+    inline bool ConfirmModal()
+    {
+        // Clone backbuffer into bg sprite and do some filters
+        Sprite bb = ae::GetEngine()->GetBackbuffer();
+        Sprite bg;
+        bg.Create(bb.Width(), bb.Height());
+        RgbDraw(bb, 0, 0, bg);
+        FilterSB(bg, 0.5f, 0.8f);
+        
+        // Create buttons for YES and NO
+        HorizontalFluidFrame frm(kCenter, 128);
+        frm
+            .Add(image::g_button_cancel)
+            .Add(image::g_button_checked)
+        ;
+        std::unique_ptr<Button> btn0(new Button(image::g_button_cancel, frm.Place(0)));
+        std::unique_ptr<Button> btn1(new Button(image::g_button_checked, frm.Place(1)));
+        btn0->HotKey('N');
+        btn1->HotKey('Y');
+        
+        // Wait user action
+        while (true) {
+            btn0->Control();
+            btn1->Control();
+            if (btn0->click() || IsKeyOnce(ae::kKeyEscape)) {
+                return false;
+            }
+            if (btn1->click() || IsKeyOnce(ae::kKeyEnter)) {
+                return true;
+            }
+
+            btn0->Update();
+            btn1->Update();
+            
+            bg.Draw(0, 0);
+            btn0->Render();
+            btn1->Render();
+            ae::ShowFrame();
+           
+            ae::Sleep(0.01);
+
+            UpdateMusic();
+        }
+        
+        return false;
+    }
 }
