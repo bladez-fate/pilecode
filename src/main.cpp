@@ -113,6 +113,14 @@ class IScene {
 public:
 	virtual ~IScene() {}
 	virtual IScene* Run() = 0;
+    void set_transition(SceneTransition transition) { transition_ = transition; }
+    SceneTransition transition() const { return transition_; }
+private:
+#ifdef DEV_MODE
+    SceneTransition transition_ = kStDisabled;
+#else
+    SceneTransition transition_ = kStFly;
+#endif
 };
 
 class GameScene : public IScene {
@@ -147,6 +155,7 @@ private:
 IScene* GameScene::Run()
 {
 	Game game;
+    game.SetTransition(transition());
 	if (level_ >= 0) {
 		game.Start(level_, prevLevel_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
 		if (!g_profile.IsLevelAvailable(level_)) {
@@ -165,6 +174,7 @@ IScene* GameScene::Run()
 		}
 
         if (screen::CheckResize()) {
+            game.SetTransition(kStDisabled);
             break;
         }
         
@@ -229,6 +239,7 @@ IScene* GameScene::Run()
 IScene* EditorScene::Run()
 {
 	Game game;
+    game.SetTransition(transition());
 	if (level_ >= 0) {
 		game.StartWithEditor(level_, level_, g_profile.LastAvailableLevel(), g_profile.GetSavedWorld(level_));
 	}
@@ -243,6 +254,7 @@ IScene* EditorScene::Run()
 		}
 
         if (screen::CheckResize()) {
+            game.SetTransition(kStDisabled);
             break;
         }
 
@@ -330,7 +342,15 @@ void EasyMain()
         if (screen::CheckResize()) {
             screen::Init();
             InitData();
+            
+            // Do not start scene if window size keeps changing
+            Sleep(0.5);
+            if (screen::CheckResize()) {
+                continue;
+            }
+            scene->set_transition(kStFade);
         }
+
 		IScene* nextScene = scene->Run();
 		delete scene;
 		scene = nextScene;

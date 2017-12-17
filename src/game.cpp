@@ -40,6 +40,11 @@ namespace pilecode {
 		simPaused_ = true;
 	}
 
+    void Game::SetTransition(SceneTransition transition)
+    {
+        transition_ = transition;
+    }
+
 	void Game::ForwardStartTransition()
 	{
 		frameVisibility_ = false;
@@ -208,11 +213,39 @@ namespace pilecode {
 		Pos::dy = dy0;
 		Pos::dz = dz0;
 	}
+    
+    void Game::FadeStartTransition()
+    {
+        double transitionSec = 0.4f;
+        double startTime = ae::Time();
+        double finishTime = startTime + transitionSec;
+        while (ae::Time() < finishTime) {
+            Render(false);
+            Ui8 brightness = Ui8(ae::Clamp(float((ae::Time() - startTime) * 255 / transitionSec), 0.0f, 255.0f));
+            FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
+            ae::ShowFrame();
+            Sleep(0.010);
+        }
+    }
+    
+    void Game::FadeFinishTransition()
+    {
+        double transitionSec = 0.4f;
+        double startTime = ae::Time();
+        double finishTime = startTime + transitionSec;
+        while (ae::Time() < finishTime) {
+            Render(false);
+            Ui8 brightness = Ui8(ae::Clamp(float((finishTime - ae::Time()) * 255 / transitionSec), 0.0f, 255.0f));
+            FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
+            ae::ShowFrame();
+            Sleep(0.010);
+        }
+    }
 
 	void Game::StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld)
 	{
 		editorMode_ = true;
-		disableTransition_ = true;
+		transition_ = kStDisabled;
 		Start(level, prevLevel, maxLevel, savedWorld);
 	}
 
@@ -230,13 +263,20 @@ namespace pilecode {
 
 		Control();
 
-		if (!disableTransition_) {
+		switch (transition_) {
+        case kStDisabled:
+            break;
+        case kStFly:
 			if (prevLevel <= level) {
 				ForwardStartTransition();
 			}
 			else {
 				BackwardStartTransition();
 			}
+            break;
+        case kStFade:
+            FadeStartTransition();
+            break;
 		}
 
 		vp_->Center();
@@ -247,14 +287,21 @@ namespace pilecode {
 
 	void Game::Finish(int level, int prevLevel)
 	{
-		if (!disableTransition_) {
+        switch (transition_) {
+        case kStDisabled:
+            break;
+        case kStFly:
 			if (prevLevel <= level) {
 				ForwardFinishTransition();
 			}
 			else {
 				BackwardFinishTransition();
 			}
-		}
+            break;
+        case kStFade:
+            FadeFinishTransition();
+            break;
+        }
 	}
 
 	void Game::Response(ResultBase status)
@@ -707,7 +754,7 @@ namespace pilecode {
 		return image::g_background[abs(level) % image::g_backgroundCount];
 	}
 
-	void Game::Render()
+	void Game::Render(bool show)
 	{
 		BgForLevel(level_).Draw(0, 0);
 		if (bgTransition_ > 0.0f) {
@@ -773,7 +820,9 @@ namespace pilecode {
 			RenderTools();
 		}
 
-		ae::ShowFrame();
+        if (show) {
+            ae::ShowFrame();
+        }
 	}
 
 	bool Game::IsComplete()

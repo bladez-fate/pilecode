@@ -33,6 +33,12 @@
 
 namespace pilecode {
 
+    enum SceneTransition {
+        kStDisabled,
+        kStFly,
+        kStFade,
+    };
+    
 	class Game {
 	private:
 		enum PlaceMode {
@@ -40,13 +46,16 @@ namespace pilecode {
 			kPmRobot,
 			kPmLetter,
 		};
-
+        
 	public:
 		void Restart();
+        void SetTransition(SceneTransition transition);
 		void ForwardStartTransition();
 		void ForwardFinishTransition();
 		void BackwardFinishTransition();
 		void BackwardStartTransition();
+        void FadeStartTransition();
+        void FadeFinishTransition();
 		void StartWithEditor(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Start(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Finish(int level, int prevLevel);
@@ -64,7 +73,7 @@ namespace pilecode {
 		Letter PlaceLetter(Vec2F tp, Letter right, Letter down, Letter up, Letter left);
 		void MakeTools();
 		Sprite& BgForLevel(int level);
-		void Render();
+		void Render(bool show = true);
 		bool IsComplete();
 		World* GetInitWorld() const;
 		int GetNextLevel() const;
@@ -126,12 +135,8 @@ namespace pilecode {
 		Letter placeLetterLeft_;
 		Letter placeLetter_; // with respect to current mouse position 
 
-		// debug
-#ifdef DEV_MODE
-		bool disableTransition_ = true;
-#else
-		bool disableTransition_ = false;
-#endif
+		// transition
+        SceneTransition transition_ = kStDisabled;
 	};
 
 }

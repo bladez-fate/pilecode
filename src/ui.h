@@ -71,6 +71,7 @@ namespace pilecode {
 				|| IsKeyOnce(ae::kKeyEscape)
 				|| IsKeyOnce(ae::kKeyEnter)
 				|| IsKeyOnce(ae::kKeySpace)
+                || screen::CheckResize()
 				;
 		}
 	}
