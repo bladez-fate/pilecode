@@ -57,6 +57,8 @@ namespace pilecode {
 		Sprite g_button_replay;
 		Sprite g_button_minus;
 		Sprite g_button_plus;
+        Sprite g_button_cancel;
+        Sprite g_button_checked;
 		Sprite g_button_x1;
 		Sprite g_button_x2;
 		Sprite g_button_x4;
@@ -298,30 +300,6 @@ namespace pilecode {
 		}
 	}
 
-	void LoadImage(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
-	{
-		if (false /* width || height */) {
-			Sprite src;
-			src.Load(file_name);
-
-			// Try 1
-			//sprite.Create(width ? width : src.Width(), height ? height : src.Height());
-			//src.Draw(0, 0, 0, std::min(float(sprite.Width()) / src.Width(), float(sprite.Height()) / src.Height()), sprite);
-
-			// Try 2
-			//sprite.Create(src.Width(), src.Height());
-			//src.Draw(0, 0, sprite.Width(), sprite.Height(), 0, 0, src.Width(), src.Height(), sprite);
-
-			// Try 3
-			sprite.Create(src.Width(), src.Height());
-			src.Draw(0, 0, 0, 1.0f, sprite);
-			
-		}
-		else {
-			sprite.Load(file_name);
-		}
-	}
-
 	void InitImage()
 	{
         image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
@@ -367,6 +345,8 @@ namespace pilecode {
 		LoadMask(image::g_button_replay, "data/ui/replay.tga");
 		LoadMask(image::g_button_minus, "data/ui/minus.tga");
 		LoadMask(image::g_button_plus, "data/ui/plus.tga");
+        LoadMask(image::g_button_cancel, "data/ui/cancel.tga");
+        LoadMask(image::g_button_checked, "data/ui/checked.tga");
 		image::g_button_x1.Load("data/ui/button-x1.tga");
 		image::g_button_x2.Load("data/ui/button-x2.tga");
 		image::g_button_x4.Load("data/ui/button-x4.tga");
