@@ -513,7 +513,9 @@ namespace pilecode {
     
     void Game::Replay()
     {
-        
+        initWorld_.reset(GenerateLevel(level_));
+        Restart();
+        DefaultPlaceMode();
     }
 
 	void Game::DefaultPlaceMode()
