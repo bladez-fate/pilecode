@@ -28,6 +28,13 @@ namespace pilecode {
 
 	using namespace ae;
 
+    void Game::Replay()
+    {
+        initWorld_.reset(GenerateLevel(level_));
+        Restart();
+        DefaultPlaceMode();
+    }
+    
 	void Game::Restart()
 	{
 		world_.reset(initWorld_->Clone());
@@ -511,13 +518,6 @@ namespace pilecode {
 		}
 	}
     
-    void Game::Replay()
-    {
-        initWorld_.reset(GenerateLevel(level_));
-        Restart();
-        DefaultPlaceMode();
-    }
-
 	void Game::DefaultPlaceMode()
 	{
 		placeMode_ = kPmNone;

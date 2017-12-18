@@ -48,6 +48,7 @@ namespace pilecode {
 		};
         
 	public:
+        void Replay();
 		void Restart();
         void SetTransition(SceneTransition transition);
 		void ForwardStartTransition();
@@ -66,7 +67,6 @@ namespace pilecode {
 		void UpdateTools();
 		void RenderTools();
         void PlayOrPause();
-		void Replay();
 		void DefaultPlaceMode();
 		void SwitchPlaceMode(PlaceMode mode, Letter right, Letter down, Letter up, Letter left);
 		void SwitchPlaceMode(PlaceMode mode, Letter letter);
