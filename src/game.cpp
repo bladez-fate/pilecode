@@ -55,7 +55,7 @@ namespace pilecode {
 	void Game::ForwardStartTransition()
 	{
 		frameVisibility_ = false;
-		panelVisibility_ = false;
+		toolsVisibility_ = false;
 
 		int N = 50;
 		bgTransition_ = 1.0f;
@@ -74,7 +74,7 @@ namespace pilecode {
 		bgTransition_ = 0.0f;
 
 		frameVisibility_ = true;
-		panelVisibility_ = true;
+		toolsVisibility_ = true;
 	}
 
 	void Game::ForwardFinishTransition()
@@ -88,7 +88,7 @@ namespace pilecode {
 		float dz = (float)Pos::dz;
 
 		frameVisibility_ = false;
-		panelVisibility_ = false;
+		toolsVisibility_ = false;
 
 		//float speed = 1.01;
 		int M = 10;
@@ -125,7 +125,7 @@ namespace pilecode {
 		}
 
 		frameVisibility_ = true;
-		panelVisibility_ = true;
+		toolsVisibility_ = true;
 
 		Pos::dx = dx0;
 		Pos::dy = dy0;
@@ -135,7 +135,7 @@ namespace pilecode {
 	void Game::BackwardFinishTransition()
 	{
 		frameVisibility_ = false;
-		panelVisibility_ = false;
+		toolsVisibility_ = false;
 
 		int N = 50;
 		auto speed = Vec2F(0.0f, 0.0f);
@@ -150,7 +150,7 @@ namespace pilecode {
 		}
 
 		frameVisibility_ = true;
-		panelVisibility_ = true;
+		toolsVisibility_ = true;
 	}
 
 	void Game::BackwardStartTransition()
@@ -176,7 +176,7 @@ namespace pilecode {
 		vp_->MoveNoClamp(delta * float(-M));
 
 		frameVisibility_ = false;
-		panelVisibility_ = false;
+		toolsVisibility_ = false;
 
 		bgTransition_ = 1.0f;
 		auto speed = Vec2F(0.0f, N * 1.0f);
@@ -214,7 +214,7 @@ namespace pilecode {
 		}
 
 		frameVisibility_ = true;
-		panelVisibility_ = true;
+		toolsVisibility_ = true;
 
 		Pos::dx = dx0;
 		Pos::dy = dy0;
@@ -318,7 +318,7 @@ namespace pilecode {
 			responseDeadline_ = ae::Time() + 0.5;
 		}
 	}
-
+    
 	bool Game::Control()
 	{
 		if (IsKeyOnce(kKeyEscape)) {
@@ -451,33 +451,39 @@ namespace pilecode {
 	void Game::Update()
 	{
 		double time = Time();
-		double secondsPerStep = secondsPerStepDefault_ / simSpeed_;
 		if (lastUpdateTime_ == 0.0) {
 			lastUpdateTime_ = time;
 		}
-
-		while (true) {
-			double progress = lastProgress_ + (time - lastUpdateTime_) / secondsPerStep;
-			if (progress >= 1.0) {
-				if (simPaused_) {
-					lastUpdateTime_ = 0;
-					lastProgress_ = 1.0;
-					break;
-				}
-				else {
-					world_->Simulate();
-					lastUpdateTime_ = time;
-					lastProgress_ = progress - 1.0;
-					time = Time();
-				}
-			}
-			else {
-				vp_->set_progress(progress);
-				lastUpdateTime_ = time;
-				lastProgress_ = progress;
-				break;
-			}
-		}
+        if (fastForward_) {
+            world_->Simulate();
+            lastUpdateTime_ = time;
+            lastProgress_ = 0.0;
+            vp_->set_progress(0.0);
+        } else {
+            double secondsPerStep = secondsPerStepDefault_ / simSpeed_;
+            while (true) {
+                double progress = lastProgress_ + (time - lastUpdateTime_) / secondsPerStep;
+                if (progress >= 1.0) {
+                    if (simPaused_) {
+                        lastUpdateTime_ = 0;
+                        lastProgress_ = 1.0;
+                        break;
+                    }
+                    else {
+                        world_->Simulate();
+                        lastUpdateTime_ = time;
+                        lastProgress_ = progress - 1.0;
+                        time = Time();
+                    }
+                }
+                else {
+                    vp_->set_progress(progress);
+                    lastUpdateTime_ = time;
+                    lastProgress_ = progress;
+                    break;
+                }
+            }
+        }
 
 		vp_->set_progress(lastProgress_);
 
@@ -504,7 +510,6 @@ namespace pilecode {
 
 	void Game::RenderTools()
 	{
-		//DrawPanel(panelWidth_, panelHeight_);
 		for (Button& button : buttons_) {
 			button.Render();
 		}
@@ -512,11 +517,21 @@ namespace pilecode {
 
 	void Game::PlayOrPause()
 	{
-		simPaused_ = !simPaused_;
-		if (simPaused_ == false) {
-			DefaultPlaceMode();
-		}
+        if (fastForward_) {
+            fastForward_ = false;
+        } else {
+            simPaused_ = !simPaused_;
+            if (simPaused_ == false) {
+                DefaultPlaceMode();
+            }
+        }
 	}
+    
+    void Game::FastForward()
+    {
+        simPaused_ = false;
+        fastForward_ = true;
+    }
     
 	void Game::DefaultPlaceMode()
 	{
@@ -602,14 +617,14 @@ namespace pilecode {
 			btn->set_enabled(world_->steps() != 0);
 		});
 		AddButton(image::g_button_fastforward, frmPlayback.Place(2))->Click([=](Button* btn) {
-			//FastForward();
+			FastForward();
 		})->OnUpdate([=](Button* btn) {
 			btn->set_enabled(world_->steps() != 0);
 		});
 		AddButton(image::g_button_play, frmPlayback.Place(1))->Click([=](Button* btn) {
 			PlayOrPause();
 		})->OnUpdate([=](Button* btn) {
-			btn->SetSprite(simPaused_ ? image::g_button_play : image::g_button_pause);
+			btn->SetSprite(simPaused_ || fastForward_ ? image::g_button_play : image::g_button_pause);
 		});
         AddButton(image::g_button_replay, Region::Screen(), kLeftBottom)->Click([=](Button* btn) {
             if (ConfirmModal()) {
@@ -820,7 +835,7 @@ namespace pilecode {
 
 		vp_->EndRender(tileHover_, wmouse_);
 
-		if (panelVisibility_) {
+		if (toolsVisibility_) {
 			RenderTools();
 		}
 

@@ -61,13 +61,14 @@ namespace pilecode {
 		void Start(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Finish(int level, int prevLevel);
 		void Response(ResultBase status);
-		bool Control();
+        bool Control();
 		void Update();
 		bool ControlTools();
 		void UpdateTools();
 		void RenderTools();
         void PlayOrPause();
-		void DefaultPlaceMode();
+        void FastForward();
+        void DefaultPlaceMode();
 		void SwitchPlaceMode(PlaceMode mode, Letter right, Letter down, Letter up, Letter left);
 		void SwitchPlaceMode(PlaceMode mode, Letter letter);
 		Letter PlaceLetter(Vec2F tp, Letter right, Letter down, Letter up, Letter left);
@@ -116,6 +117,7 @@ namespace pilecode {
 		// simulation 
 		double lastProgress_ = 1.0;
 		bool simPaused_ = true;
+        bool fastForward_ = false;
 		double simSpeed_ = 1.0;
 
 		// gameplay
@@ -124,9 +126,7 @@ namespace pilecode {
 		Vec3Si32 wmouse_;
 		Vec2F tilePos_;
 		bool frameVisibility_ = true;
-		bool panelVisibility_ = true;
-		Si32 panelWidth_;
-		Si32 panelHeight_;
+		bool toolsVisibility_ = true;
 		std::list<Button> buttons_;
 		PlaceMode placeMode_;
 		Letter placeLetterRight_;
