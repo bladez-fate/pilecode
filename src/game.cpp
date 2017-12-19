@@ -45,6 +45,7 @@ namespace pilecode {
 
 		lastProgress_ = 1.0;
 		simPaused_ = true;
+        fastForward_ = false;
 	}
 
     void Game::SetTransition(SceneTransition transition)
