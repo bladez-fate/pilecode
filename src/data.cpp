@@ -380,17 +380,31 @@ namespace pilecode {
 
 	void InitMusic()
 	{
-		music::g_background[0].Load("data/music/observing-the-star.ogg");
+        static bool done = false;
+        if (done) {
+            return;
+        }
+		
+        music::g_background[0].Load("data/music/observing-the-star.ogg");
+        
+        done = true;
 	}
 
 	void InitSfx()
 	{
-		sfx::g_click.Load("data/sfx/click.wav");
+        static bool done = false;
+        if (done) {
+            return;
+        }
+		
+        sfx::g_click.Load("data/sfx/click.wav");
 		sfx::g_click2.Load("data/sfx/click_2.wav");
 		sfx::g_positive.Load("data/sfx/positive.wav");
 		sfx::g_negative2.Load("data/sfx/negative_2.wav");
 		sfx::g_read.Load("data/sfx/read.wav");
 		sfx::g_write.Load("data/sfx/write.wav");
+
+        done = true;
 	}
 
 	void InitData()
