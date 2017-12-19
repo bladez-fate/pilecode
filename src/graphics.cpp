@@ -36,91 +36,28 @@ namespace pilecode {
         Si64 size;
 
         Vec2Si32 window;
-        std::map<Si32, std::map<Si32, Si32>> allowedResolutions;
-
-        Si32 Aspect(Vec2Si32 s)
-        {
-            return s.x * 1000 / s.y;
-        }
         
-        void AllowResolution(Vec2Si32 s)
+        Vec2Si32 GetScreenSize(Vec2Si32 window, Vec2Si32 mi, Vec2Si32 ma)
         {
-            allowedResolutions[Aspect(s)][s.x] = s.y;
-        }
-        
-        void ChooseResolution()
-        {
-            if (allowedResolutions.empty()) {
-                std::vector<Vec2Si32> res = {
-                    Vec2Si32(1024, 576),
-                    Vec2Si32(1024, 600),
-                    Vec2Si32(1024, 640),
-                    Vec2Si32(1024, 768),
-                    Vec2Si32(1024, 800),
-                    
-                    Vec2Si32(1136, 640),
-                    
-                    Vec2Si32(1152, 720),
-                    
-                    Vec2Si32(1280, 720),
-                    Vec2Si32(1280, 768),
-                    Vec2Si32(1280, 800),
-                    Vec2Si32(1280, 854),
-                    Vec2Si32(1280, 960),
-                    Vec2Si32(1280, 1024),
-                    Vec2Si32(1280, 720),
-                    Vec2Si32(1280, 720),
-                    
-                    Vec2Si32(1366, 768),
-                    
-                    Vec2Si32(1440, 900),
-                    Vec2Si32(1440, 960),
-                    Vec2Si32(1440, 1024),
-                    Vec2Si32(1440, 1080),
-                    
-                    Vec2Si32(1600, 768),
-                    Vec2Si32(1600, 900),
-                    Vec2Si32(1600, 1024),
-                    Vec2Si32(1600, 1200),
-                    Vec2Si32(1600, 1280),
-                    
-                    Vec2Si32(1680, 1050),
-                    
-                    Vec2Si32(1920, 1080),
-                    Vec2Si32(1920, 1200),
-                    Vec2Si32(1920, 1280),
-                    Vec2Si32(1920, 1400),
-                    Vec2Si32(1920, 1440)
-                };
-                
-                for (auto r : res) {
-                    AllowResolution(r);
+            for (Si32 scaling : {1, 2, 3, 4}) {
+                Vec2Si32 scaled = window / scaling;
+                if (mi.x <= scaled.x && scaled.x <= ma.x &&
+                    mi.y <= scaled.y && scaled.y <= ma.y) {
+                    return scaled;
                 }
             }
-            
-            Si32 wAspect = Aspect(window);
-            w = window.x;
-            h = window.y;
-            for (auto kv : allowedResolutions) {
-                if (kv.first >= wAspect) {
-                    for (Si32 scaling : {1, 2, 3, 4}) {
-                        for (auto wh : kv.second) {
-                            w = wh.first;
-                            h = wh.second;
-                            if (window.x <= w * scaling) {
-                                return;
-                            }
-                        }
-                    }
-                    return;
-                }
-            }
+            return Vec2Si32(
+                ae::Clamp(window.x, mi.x, ma.x),
+                ae::Clamp(window.y, mi.y, ma.y)
+            );
         }
         
         void Init()
         {
             window = ae::WindowSize();
-            ChooseResolution();
+            Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1024, 576), Vec2Si32(1920, 1440));
+            w = ss.x;
+            h = ss.y;
             cx = w / 2;
             cy = h / 2;
             size = Si64(w) * Si64(h);
