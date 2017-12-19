@@ -60,8 +60,18 @@ namespace pilecode {
 		kLtDown,           // y-
 		kLtUp,             // y+
 		kLtLeft,           // x-
-		kLtInput,           // read letter from upper platform into register
-		kLtOutput,          // write letter from register to upper platform
+		kLtInput,          // read letter from upper platform into register
+		kLtOutput,         // write letter from register to upper platform
+        kLtCounterClockwise,
+        kLtClockwise,
+        kLtEq,
+        kLtNe,
+        kLtLt,
+        kLtGt,
+        kLtCircles,
+        kLtContrast,
+        kLtBrightness,
+        kLtEmit,
 		kLtDot,
 
 		kLtMax		

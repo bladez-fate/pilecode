@@ -320,12 +320,23 @@ namespace pilecode {
 		image::g_letter[kLtSpace] = image::g_empty;
 		image::g_letter_output[kLtSpace] = image::g_empty;
 		image::g_letter_output_filled[kLtSpace] = image::g_empty;
+        LoadLetter(sheet, 0, 2, kLtLeft);
+        LoadLetter(sheet, 1, 2, kLtRight);
 		LoadLetter(sheet, 2, 2, kLtUp);
 		LoadLetter(sheet, 3, 2, kLtDown);
-		LoadLetter(sheet, 1, 2, kLtRight);
-		LoadLetter(sheet, 0, 2, kLtLeft);
 		LoadLetter(sheet, 0, 3, kLtInput);
 		LoadLetter(sheet, 1, 3, kLtOutput);
+        LoadLetter(sheet, 2, 3, kLtCounterClockwise);
+        LoadLetter(sheet, 3, 3, kLtClockwise);
+        LoadLetter(sheet, 0, 4, kLtEq);
+        LoadLetter(sheet, 1, 4, kLtNe);
+        LoadLetter(sheet, 2, 4, kLtLt);
+        LoadLetter(sheet, 3, 4, kLtGt);
+        LoadLetter(sheet, 0, 5, kLtCircles);
+        LoadLetter(sheet, 1, 5, kLtContrast);
+        LoadLetter(sheet, 2, 5, kLtBrightness);
+        LoadLetter(sheet, 3, 5, kLtEmit);
+
 		LoadLetter(sheet, 0, 6, kLtDot);
 
 		image::g_frame.Load("data/game/letter-frame.tga");
