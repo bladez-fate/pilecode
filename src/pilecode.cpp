@@ -933,17 +933,33 @@ namespace pilecode {
 		ymin_ -= 2*Pos::dy;
 		ymax_ += Pos::dz;
 
-		// adjustment for screen size
+		// adjustment for screen center
 		xmin_ += screen::cx;
 		xmax_ += screen::cx;
 		ymin_ += screen::cy;
 		ymax_ += screen::cy;
-
+        
 		// adjustment for tile position
 		xmin_ -= g_xtileorigin;
 		xmax_ -= g_xtileorigin;
 		ymin_ -= g_ytileorigin;
 		ymax_ -= g_ytileorigin;
+
+        // adjustment for screen size
+        float xscreen = screen::w;
+        float yscreen = screen::h;
+        if (xmax_ - xmin_ < xscreen) {
+            xmin_ = xmax_ = (xmin_ + xmax_ ) / 2;
+        } else {
+            xmin_ += xscreen / 2;
+            xmax_ -= xscreen / 2;
+        }
+        if (ymax_ - ymin_ < yscreen) {
+            ymin_ = ymax_ = (ymin_ + ymax_ ) / 2;
+        } else {
+            ymin_ += yscreen / 2;
+            ymax_ -= yscreen / 2;
+        }
 
 		Center();
 	}
