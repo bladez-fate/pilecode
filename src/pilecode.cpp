@@ -946,8 +946,8 @@ namespace pilecode {
 		ymax_ -= g_ytileorigin;
 
         // adjustment for screen size
-        float xscreen = screen::w;
-        float yscreen = screen::h;
+        float xscreen = (float)screen::w;
+        float yscreen = (float)screen::h;
         if (xmax_ - xmin_ < xscreen) {
             xmin_ = xmax_ = (xmin_ + xmax_ ) / 2;
         } else {

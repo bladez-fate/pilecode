@@ -430,9 +430,9 @@ namespace pilecode {
         FilterFillColor(Rgba(), 0, 0, sprite.Width(), sprite.Height(),
             sprite, [=](const Rgba*, const Rgba* bg) {
             return Rgba(
-                brightness * (255 - saturation * (255 - bg->r)),
-                brightness * (255 - saturation * (255 - bg->g)),
-                brightness * (255 - saturation * (255 - bg->b)),
+                Ui8(brightness * (255 - saturation * (255 - bg->r))),
+                Ui8(brightness * (255 - saturation * (255 - bg->g))),
+                Ui8(brightness * (255 - saturation * (255 - bg->b))),
                 0xff
             );
         });
