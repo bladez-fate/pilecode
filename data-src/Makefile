@@ -47,6 +47,16 @@ OSFX = $(OBJ)/sfx
 OUI = $(OBJ)/ui
 
 ################################################################################
+# MODS
+# 
+#
+
+# Default: MOD = 
+# XMas: MOD = -xmas
+
+MOD = -xmas
+
+################################################################################
 # TOOLS
 #
 CONVERT = convert
@@ -83,7 +93,7 @@ $(GAME)/%.tga: game/bladez-fate/%.tga
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 
-$(OGAME)/spritesheet.png: game/bladez-fate/spritesheet.svg
+$(OGAME)/spritesheet.png: game/bladez-fate/spritesheet$(MOD).svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
 
