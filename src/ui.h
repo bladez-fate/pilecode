@@ -156,7 +156,17 @@ namespace pilecode {
                 constexpr Si32 size = 42;
                 static Snowflake snowflake[size];
                 static double time = ae::Time();
-                
+
+                // Check for resize
+                static Vec2Si32 screen = ae::ScreenSize();
+                Vec2Si32 newScreen = ae::ScreenSize();
+                if (!(screen == newScreen)) {
+                    screen = newScreen;
+                    for (Snowflake& sf : snowflake) {
+                        sf = Snowflake();
+                    }
+                }
+
                 // Step
                 double newTime = ae::Time();
                 double delta = newTime - time;
