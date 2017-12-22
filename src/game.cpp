@@ -401,13 +401,15 @@ namespace pilecode {
 			switch (placeMode_) {
 			case kPmNone:
 				if (tileHover_) {
-					if (world_->IsTouched(wmouse_)) {
-						Response(kRsForbidden);
-					}
-					else if (IsKeyOnce(kKeyMouseRight)) {
-						world_->SetLetter(wmouse_, kLtSpace);
-						auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
-						Response(res);
+					if (IsKeyOnce(kKeyMouseRight)) {
+                        if (world_->IsTouched(wmouse_)) {
+                            Response(kRsForbidden);
+                        }
+                        else {
+                            world_->SetLetter(wmouse_, kLtSpace);
+                            auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
+                            Response(res);
+                        }
 					}
 				}
 				break;
