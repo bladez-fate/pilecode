@@ -310,8 +310,8 @@ namespace pilecode {
         sheet.Load("data/ui/snowflakes.tga");
         Si32 sw = 70, sh = 80;
         Si32 count = 0;
-        for (Si32 iy = 0; iy < 4; iy++) {
-            for (Si32 ix = 0; ix < 6; ix++, count++) {
+        for (Si32 iy = 0; iy < image::g_snowflakeH; iy++) {
+            for (Si32 ix = 0; ix < image::g_snowflakeW; ix++, count++) {
                 LoadImageFromSpritesheet(sheet, sw, sh, ix, iy, image::g_snowflake[count]);
             }
         }

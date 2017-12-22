@@ -84,7 +84,9 @@ namespace pilecode {
 		extern Sprite g_background[g_backgroundCount];
 
 #ifdef MOD_XMAS
-        constexpr int g_snowflakeCount = 3;
+        constexpr int g_snowflakeW = 6;
+        constexpr int g_snowflakeH = 4;
+        constexpr int g_snowflakeCount = g_snowflakeW * g_snowflakeH;
         extern Sprite g_snowflake[g_snowflakeCount];
 #endif
 }
