@@ -79,9 +79,11 @@ namespace pilecode {
         struct Snowflake {
             Sprite sprite;
             Vec2F r;
+            Si32 seed;
             
             Snowflake()
             {
+                seed = rand();
                 sprite = RandomSprite();
                 r = RandomPosition();
             }
@@ -111,28 +113,35 @@ namespace pilecode {
 
             void Redrop()
             {
+                seed = rand();
                 sprite = RandomSprite();
                 r = RandomPositionOnTop();
             }
             
-            void Update(double delta)
+            void Update(double time, double delta)
             {
                 // Compute speed field at position r
+                Si32 len = std::max(screen::w, screen::h);
                 Vec2F v = Vec2F(
-                    sin(r.x * 10.0f / screen::w) * sin(r.y * 10.0f / screen::h),
-                    -1.0f
+                    sin((r.x + r.y)*10.0f/len + time/5.0 + seed % 10000 / 10000.0 * 2.0 * M_PI) *
+                    sin((r.x - r.y)*10.0f/len + time/5.0) +
+                    2.0 * pow(sin((r.x/len + time)/4), 9),
+                    -1.0f + (rand() % 500 / 1000.0) *
+                    sin((r.x + 2 * r.y)*10.0f/screen::h + time/10.0)
                 );
                 
                 // Integrate
-                r += v * 100 * delta;
+                r += v * float(len) / 16.0 * delta;
                 
                 // Restart snowflakes if it moves out of the screen
-                if (r.x > screen::w + sprite.Width() ||
-                    r.x < -sprite.Width()||
-                    r.y > screen::h + sprite.Height() ||
-                    r.y < -sprite.Height())
-                {
+                if (r.y > screen::h + sprite.Height() || r.y < -sprite.Height()) {
                     Redrop();
+                }
+                if (r.x > screen::w + sprite.Width()) {
+                    r.x -= screen::w + 1.5f * sprite.Width();
+                }
+                if (r.x < -sprite.Width()) {
+                    r.x += screen::w + 1.5f * sprite.Width();
                 }
             }
             
@@ -144,7 +153,7 @@ namespace pilecode {
             static void Run()
             {
                 // Init
-                constexpr Si32 size = 30;
+                constexpr Si32 size = 42;
                 static Snowflake snowflake[size];
                 static double time = ae::Time();
                 
@@ -152,7 +161,7 @@ namespace pilecode {
                 double newTime = ae::Time();
                 double delta = newTime - time;
                 for (Snowflake& sf : snowflake) {
-                    sf.Update(delta);
+                    sf.Update(time, delta);
                 }
                 time = newTime;
                 
