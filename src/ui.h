@@ -75,6 +75,100 @@ namespace pilecode {
                 || screen::CheckResize()
 				;
 		}
+
+        struct Snowflake {
+            Sprite sprite;
+            Vec2F r;
+            
+            Snowflake()
+            {
+                sprite = RandomSprite();
+                r = RandomPosition();
+            }
+            
+            Sprite RandomSprite()
+            {
+                Sprite s = image::g_snowflake[rand() % image::g_snowflakeCount];
+                s.SetPivot(Vec2Si32(s.Width() / 2, s.Height() / 2));
+                return s;
+            }
+            
+            Vec2F RandomPosition()
+            {
+                return Vec2F(
+                    float(rand() % screen::w),
+                    float(rand() % screen::h)
+                );
+            }
+
+            Vec2F RandomPositionOnTop()
+            {
+                return Vec2F(
+                    float(rand() % screen::w),
+                    float(screen::h + sprite.Height() / 2)
+                );
+            }
+
+            void Redrop()
+            {
+                sprite = RandomSprite();
+                r = RandomPositionOnTop();
+            }
+            
+            void Update(double delta)
+            {
+                // Compute speed field at position r
+                Vec2F v = Vec2F(
+                    sin(r.x * 10.0f / screen::w) * sin(r.y * 10.0f / screen::h),
+                    -1.0f
+                );
+                
+                // Integrate
+                r += v * 100 * delta;
+                
+                // Restart snowflakes if it moves out of the screen
+                if (r.x > screen::w + sprite.Width() ||
+                    r.x < -sprite.Width()||
+                    r.y > screen::h + sprite.Height() ||
+                    r.y < -sprite.Height())
+                {
+                    Redrop();
+                }
+            }
+            
+            void Render()
+            {
+                sprite.Draw(Si32(r.x), Si32(r.y));
+            }
+            
+            static void Run()
+            {
+                // Init
+                constexpr Si32 size = 30;
+                static Snowflake snowflake[size];
+                static double time = ae::Time();
+                
+                // Step
+                double newTime = ae::Time();
+                double delta = newTime - time;
+                for (Snowflake& sf : snowflake) {
+                    sf.Update(delta);
+                }
+                time = newTime;
+                
+                // Render
+                for (Snowflake& sf : snowflake) {
+                    sf.Render();
+                }
+            }
+        };
+
+        inline void RenderBgParticles()
+        {
+#ifdef MOD_XMAS
+            Snowflake::Run();
+#endif
+        }
 	}
 
 	enum Align : Si32 {

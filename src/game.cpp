@@ -783,6 +783,8 @@ namespace pilecode {
 			DrawWithFixedAlphaBlend(BgForLevel(prevLevel_), 0, 0, Ui8(bgTransition_ * 255));
 		}
 
+        ui::RenderBgParticles();
+        
 		vp_->BeginRender(ae::Time());
 		world_->Draw(vp_.get());
 
