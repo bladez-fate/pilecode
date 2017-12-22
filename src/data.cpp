@@ -68,7 +68,11 @@ namespace pilecode {
 
         // bg
 		Sprite g_background[g_backgroundCount];
-	}
+
+#ifdef MOD_XMAS
+        Sprite g_snowflake[g_snowflakeCount];
+#endif
+    }
 
 	namespace music {
 		Sound g_background[g_backgroundCount];
@@ -300,6 +304,19 @@ namespace pilecode {
 		}
 	}
 
+    void InitSnowflakes()
+    {
+        Sprite sheet;
+        sheet.Load("data/ui/snowflakes.tga");
+        Si32 sw = 70, sh = 80;
+        Si32 count = 0;
+        for (Si32 iy = 0; iy < 4; iy++) {
+            for (Si32 ix = 0; ix < 6; ix++, count++) {
+                LoadImageFromSpritesheet(sheet, sw, sh, ix, iy, image::g_snowflake[count]);
+            }
+        }
+    }
+    
 	void InitImage()
 	{
         image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
@@ -376,7 +393,11 @@ namespace pilecode {
 		LoadImageFromSpritesheet(palette, pw, ph, 2, 0, image::g_button_letter[kLtInput]);
 		LoadImageFromSpritesheet(palette, pw, ph, 3, 0, image::g_button_letter[kLtOutput]);
 		image::g_button_letter[kLtDot] = image::g_empty;
-	}
+
+#ifdef MOD_XMAS
+        InitSnowflakes();
+#endif
+}
 
 	void InitMusic()
 	{

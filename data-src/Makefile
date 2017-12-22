@@ -66,7 +66,7 @@ CP = cp
 ################################################################################
 # AUXILATY RULES
 #
-.PHONY: $(SUBDIRS)
+.PHONY: $(SUBDIRS) xmas
 
 all: $(SUBDIRS)
 
@@ -154,6 +154,15 @@ $(OUI)/checked.png: ui/chanut/checked.svg
 $(OUI)/palette.png: ui/bladez-fate/palette.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
+	
+################################################################################
+# XMAS MOD RULES
+#
+xmas: $(UI)/snowflakes.tga
+
+$(OUI)/snowflakes.png: ui/vecteezy/snowflakes.svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
 
 ################################################################################
 # COMMON RULES
@@ -161,3 +170,4 @@ $(OUI)/palette.png: ui/bladez-fate/palette.svg
 $(DATA)/%.tga: $(OBJ)/%.png
 	mkdir -p `dirname $@`
 	$(CONVERT) $< $@
+
