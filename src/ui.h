@@ -123,15 +123,15 @@ namespace pilecode {
                 // Compute speed field at position r
                 Si32 len = std::max(screen::w, screen::h);
                 Vec2F v = Vec2F(
-                    sin((r.x + r.y)*10.0f/len + time/5.0 + seed % 10000 / 10000.0 * 2.0 * M_PI) *
-                    sin((r.x - r.y)*10.0f/len + time/5.0) +
-                    2.0 * pow(sin((r.x/len + time)/4), 9),
-                    -1.0f + (rand() % 500 / 1000.0) *
-                    sin((r.x + 2 * r.y)*10.0f/screen::h + time/10.0)
+                    float(sin((r.x + r.y)*10.0/len + time/5.0 + seed % 10000 / 10000.0 * 2.0 * M_PI) *
+                    sin((r.x - r.y)*10.0/len + time/5.0) +
+                    2.0 * pow(sin((r.x/len + time)/4.0), 9)),
+                    float(-1.0 + (rand() % 500 / 1000.0) *
+                    sin((r.x + 2 * r.y)*10.0/screen::h + time/10.0))
                 );
                 
                 // Integrate
-                r += v * float(len) / 16.0 * delta;
+                r += v * float(len) / 16.0f * float(delta);
                 
                 // Restart snowflakes if it moves out of the screen
                 if (r.y > screen::h + sprite.Height() || r.y < -sprite.Height()) {
