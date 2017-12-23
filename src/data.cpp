@@ -85,6 +85,7 @@ namespace pilecode {
 		Sound g_negative2;
 		Sound g_read;
 		Sound g_write;
+        Sound g_eraseLetter;
 	}
 
 	void CreateBackground(Sprite& bgSprite, Rgba c1, Rgba c2)
@@ -424,6 +425,7 @@ namespace pilecode {
 		sfx::g_negative2.Load("data/sfx/negative_2.wav");
 		sfx::g_read.Load("data/sfx/read.wav");
 		sfx::g_write.Load("data/sfx/write.wav");
+        sfx::g_eraseLetter.Load("data/sfx/erase-letter.ogg");
 
         done = true;
 	}

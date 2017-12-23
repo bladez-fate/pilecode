@@ -103,6 +103,7 @@ namespace pilecode {
 		extern Sound g_negative2;
 		extern Sound g_read;
 		extern Sound g_write;
+        extern Sound g_eraseLetter;
 	}
 
 	Sprite CreateBoundary(Sprite sprite,

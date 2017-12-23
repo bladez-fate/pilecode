@@ -38,7 +38,7 @@ namespace pilecode {
 			// keep silence
 			break;
 		case kRsUndone:
-			sfx::g_click.Play(); // TODO: change sound
+			sfx::g_eraseLetter.Play();
 			break;
 		case kRsFailed:
 			// keep silence

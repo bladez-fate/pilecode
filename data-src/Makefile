@@ -110,13 +110,18 @@ $(MUSIC)/%.ogg: music/cc0/%.ogg
 # RULERS FOR sfx FOLDER
 #
 sfx: $(SFX)/click.wav $(SFX)/click_2.wav $(SFX)/negative_2.wav \
-$(SFX)/positive.wav $(SFX)/read.wav $(SFX)/write.wav
+$(SFX)/positive.wav $(SFX)/read.wav $(SFX)/write.wav \
+$(SFX)/erase-letter.ogg
 
 $(SFX)/%.wav: sfx/circlerun/%.wav
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 
 $(SFX)/%.wav: sfx/lokif/%.wav
+	mkdir -p `dirname $@`
+	$(CP) $< $@
+
+$(SFX)/%.ogg: sfx/bladez-fate/%.ogg
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 

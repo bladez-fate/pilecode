@@ -320,6 +320,18 @@ namespace pilecode {
 		}
 	}
     
+    void Game::EraseLetter()
+    {
+        world_->SetLetter(wmouse_, kLtSpace);
+        auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
+        if (res.IsOk()) {
+            Response(kRsUndone);
+        }
+        else {
+            Response(res);
+        }
+    }
+    
 	bool Game::Control()
 	{
 		if (IsKeyOnce(kKeyEscape)) {
@@ -406,9 +418,7 @@ namespace pilecode {
                             Response(kRsForbidden);
                         }
                         else {
-                            world_->SetLetter(wmouse_, kLtSpace);
-                            auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
-                            Response(res);
+                            EraseLetter();
                         }
 					}
 				}
@@ -438,9 +448,7 @@ namespace pilecode {
 							Response(res);
 						}
 						else if (IsKeyOnce(kKeyMouseRight)) {
-							world_->SetLetter(wmouse_, kLtSpace);
-							auto res = initWorld_->SetLetter(wmouse_, kLtSpace);
-							Response(res);
+                            EraseLetter();
 						}
 					}
 				}

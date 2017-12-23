@@ -61,6 +61,7 @@ namespace pilecode {
 		void Start(int level, int prevLevel, int maxLevel, World* savedWorld);
 		void Finish(int level, int prevLevel);
 		void Response(ResultBase status);
+        void EraseLetter();
         bool Control();
 		void Update();
 		bool ControlTools();
