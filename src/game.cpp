@@ -335,7 +335,10 @@ namespace pilecode {
 	bool Game::Control()
 	{
 		if (IsKeyOnce(kKeyEscape)) {
-			return false;
+            if (ConfirmModal()) {
+                transition_ = kStFade;
+                return false;
+            }
 		}
 
 		if (IsKeyOnce(kKeyF5)) {

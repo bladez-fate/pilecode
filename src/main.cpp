@@ -339,7 +339,9 @@ void EasyMain()
 	// Run game
 	UpdateMusic();
 	IScene* scene = new GameScene(g_profile.LastAvailableLevel(), 0);
-	while (scene) {
+    scene->set_transition(kStFade); // Fade transition into first screen
+	
+    while (scene) {
         if (screen::CheckResize()) {
             screen::Init();
             InitData();
