@@ -55,7 +55,7 @@ namespace pilecode {
         void Init()
         {
             window = ae::WindowSize();
-            Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1024, 576), Vec2Si32(1920, 1440));
+            Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1280, 720), Vec2Si32(1920, 1440));
             w = ss.x;
             h = ss.y;
             cx = w / 2;
