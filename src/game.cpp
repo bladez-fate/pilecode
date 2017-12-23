@@ -335,15 +335,14 @@ namespace pilecode {
 	bool Game::Control()
 	{
 		if (IsKeyOnce(kKeyEscape)) {
+            if (world_->steps() != 0) {
+                Restart();
+                return true;
+            }
             if (ConfirmModal()) {
                 transition_ = kStFade;
                 return false;
             }
-		}
-
-		if (IsKeyOnce(kKeyF5)) {
-			Restart();
-			return true;
 		}
 
 		double time = Time();
