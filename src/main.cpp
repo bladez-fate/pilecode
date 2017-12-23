@@ -289,7 +289,7 @@ IScene* EditorScene::Run()
 
 void DrawIntro()
 {
-	DrawWithFixedAlphaBlend(image::g_background[2], 0, 0, Ui8(255));
+	DrawWithFixedAlphaBlend(image::g_introBackground, 0, 0, Ui8(255));
 	Region pos = Region::FullScreen().Place(kCenter, image::g_pilecode.Size());
 	AlphaDraw(image::g_pilecode, pos.x1(), pos.y1());
 }

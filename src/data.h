@@ -82,13 +82,13 @@ namespace pilecode {
 
 		constexpr int g_backgroundCount = 3;
 		extern Sprite g_background[g_backgroundCount];
+		extern Sprite g_introBackground;
 
-#ifdef MOD_XMAS
+        // for MOD_XMAS
         constexpr int g_snowflakeW = 6;
         constexpr int g_snowflakeH = 4;
         constexpr int g_snowflakeCount = g_snowflakeW * g_snowflakeH;
         extern Sprite g_snowflake[g_snowflakeCount];
-#endif
 }
 
 	namespace music {

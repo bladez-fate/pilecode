@@ -28,12 +28,15 @@
 namespace pilecode {
 
 	namespace {
-		int g_musicIdx = 0;
+		int g_musicIdx = -1;
 		bool g_musicDisabled = false;
 	}
 
 	void UpdateMusic()
 	{
+		if (g_musicIdx == -1) {
+			g_musicIdx = rand() % music::g_background.size();
+		}
 		if (!g_musicDisabled) {
 			// switch background music tracks
 			if (!music::g_background[g_musicIdx].IsPlaying()) {

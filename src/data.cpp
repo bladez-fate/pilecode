@@ -68,10 +68,10 @@ namespace pilecode {
 
         // bg
 		Sprite g_background[g_backgroundCount];
+		Sprite g_introBackground;
 
-#ifdef MOD_XMAS
+        // for MOD_XMAS
         Sprite g_snowflake[g_snowflakeCount];
-#endif
     }
 
 	namespace music {
@@ -321,11 +321,19 @@ namespace pilecode {
 	void InitImage()
 	{
         image::g_pilecode.Load("data/bg/pilecode-1440x900.tga");
-        
+
+		//CreateBackground(image::g_introBackground, Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
+		CreateBackground(image::g_introBackground, Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+
+#ifndef MOD_XMAS
         CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
         CreateBackground(image::g_background[1], Rgba(0xee, 0xff, 0xaa), Rgba(0xcc, 0xff, 0x77));
         CreateBackground(image::g_background[2], Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
-
+#else
+		CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+		CreateBackground(image::g_background[1], Rgba(0xee, 0xcc, 0xff), Rgba(0xcc, 0x99, 0xff));
+		CreateBackground(image::g_background[2], Rgba(0xff, 0xcc, 0xee), Rgba(0xff, 0x99, 0xcc));
+#endif
 		Sprite sheet;
 		sheet.Load("data/game/spritesheet.tga");
 		Si32 sw = 128, sh = 256;
