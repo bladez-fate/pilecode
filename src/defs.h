@@ -24,7 +24,7 @@
 
 #define _USE_MATH_DEFINES
 //#define DEV_MODE
-
+#define SCROLL_DISABLED
 #define MOD_XMAS 1
 
 #include "engine/easy.h"
