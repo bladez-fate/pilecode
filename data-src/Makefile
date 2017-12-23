@@ -159,15 +159,20 @@ $(OUI)/checked.png: ui/chanut/checked.svg
 $(OUI)/palette.png: ui/bladez-fate/palette.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
-	
+
 ################################################################################
 # XMAS MOD RULES
 #
-xmas: $(UI)/snowflakes.tga
+xmas: $(UI)/snowflakes.tga $(MUSIC)/dance-of-the-sugar-plum-fairy.ogg \
+$(MUSIC)/deck-the-hall-a.ogg $(MUSIC)/jingle-bells-calm.ogg
 
 $(OUI)/snowflakes.png: ui/vecteezy/snowflakes.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
+
+$(MUSIC)/%.ogg: music/macleod/%.ogg
+	mkdir -p `dirname $@`
+	$(CP) $< $@
 
 ################################################################################
 # COMMON RULES

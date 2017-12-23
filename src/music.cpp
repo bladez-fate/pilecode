@@ -37,7 +37,7 @@ namespace pilecode {
 		if (!g_musicDisabled) {
 			// switch background music tracks
 			if (!music::g_background[g_musicIdx].IsPlaying()) {
-				g_musicIdx = (g_musicIdx + 1) % music::g_backgroundCount;
+				g_musicIdx = (g_musicIdx + 1) % music::g_background.size();
 				music::g_background[g_musicIdx].Play(0.2f);
 			}
 		}
@@ -45,7 +45,7 @@ namespace pilecode {
 			if (music::g_background[g_musicIdx].IsPlaying()) {
 				music::g_background[g_musicIdx].Stop();
 			}
-			g_musicIdx = (g_musicIdx + 1) % music::g_backgroundCount;
+			g_musicIdx = (g_musicIdx + 1) % music::g_background.size();
 		}
 	}
 

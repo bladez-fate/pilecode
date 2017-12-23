@@ -92,8 +92,7 @@ namespace pilecode {
 }
 
 	namespace music {
-		constexpr int g_backgroundCount = 1;
-		extern Sound g_background[g_backgroundCount];
+        extern std::vector<Sound> g_background;
 	}
 
 	namespace sfx {

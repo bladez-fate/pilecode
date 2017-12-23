@@ -75,7 +75,7 @@ namespace pilecode {
     }
 
 	namespace music {
-		Sound g_background[g_backgroundCount];
+        std::vector<Sound> g_background;
 	}
 
 	namespace sfx {
@@ -400,14 +400,26 @@ namespace pilecode {
 #endif
 }
 
+    void AddMusic(const std::string& filename)
+    {
+        music::g_background.push_back(Sound());
+        music::g_background.back().Load(filename);
+    }
+    
 	void InitMusic()
 	{
         static bool done = false;
         if (done) {
             return;
         }
-		
-        music::g_background[0].Load("data/music/observing-the-star.ogg");
+        
+#ifndef MOD_XMAS
+        AddMusic("data/music/observing-the-star.ogg");
+#else
+        AddMusic("data/music/dance-of-the-sugar-plum-fairy.ogg");
+        AddMusic("data/music/deck-the-hall-a.ogg");
+        AddMusic("data/music/jingle-bells-calm.ogg");
+#endif
         
         done = true;
 	}
