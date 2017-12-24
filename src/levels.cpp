@@ -185,8 +185,8 @@ namespace pilecode {
 						{ 2 },
 					});
 
-				plat2->changable_tile(0, 0)->set_letter(kLtCircles);
-				plat3->changable_tile(0, 0)->set_output(kLtCircles);
+				plat2->changable_tile(0, 0)->set_letter(kLtBrightness);
+				plat3->changable_tile(0, 0)->set_output(kLtBrightness);
 
 				world->AddPlatform(plat1);
 				world->AddPlatform(plat2);
@@ -333,9 +333,9 @@ namespace pilecode {
 						{ 2 },
 					});
 
-				plat2->changable_tile(0, 0)->set_letter(kLtContrast);
-				plat3->changable_tile(0, 0)->set_output(kLtContrast);
-				plat4->changable_tile(0, 0)->set_output(kLtContrast);
+				plat2->changable_tile(0, 0)->set_letter(kLtBrightness);
+				plat3->changable_tile(0, 0)->set_output(kLtBrightness);
+				plat4->changable_tile(0, 0)->set_output(kLtBrightness);
 
 				world->AddPlatform(plat1);
 				world->AddPlatform(plat2);
