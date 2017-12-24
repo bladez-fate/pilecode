@@ -28,15 +28,13 @@
 namespace pilecode {
 
 	namespace {
-		int g_musicIdx = -1;
+		int g_musicIdx = 0;
 		bool g_musicDisabled = false;
+        bool g_musicRandomize = true;
 	}
 
 	void UpdateMusic()
 	{
-		if (g_musicIdx == -1) {
-			g_musicIdx = rand() % music::g_background.size();
-		}
 		if (!g_musicDisabled) {
 			// switch background music tracks
 			if (!music::g_background[g_musicIdx].IsPlaying()) {
@@ -48,13 +46,20 @@ namespace pilecode {
 			if (music::g_background[g_musicIdx].IsPlaying()) {
 				music::g_background[g_musicIdx].Stop();
 			}
-			g_musicIdx = (g_musicIdx + 1) % music::g_background.size();
+
+            if (g_musicRandomize) {
+                g_musicIdx = rand() % music::g_background.size();
+                g_musicRandomize = false;
+            } else {
+                g_musicIdx = (g_musicIdx + 1) % music::g_background.size();
+            }
 		}
 	}
 
 	void ToggleMusic()
 	{
 		g_musicDisabled = !g_musicDisabled;
+        g_musicRandomize = true;
 	}
 
 	bool IsMusicEnabled()
