@@ -720,7 +720,7 @@ namespace pilecode {
                 vp_->SetVisibleZ(i);
             })->OnUpdate([=](Button* btn) {
                 btn->set_opacity(i <= vp_->visible_z()? 0xff: 0x80);
-            });
+            })->HoverUseMask();
             Si32 dyLayers = 26;
             regLayers = regLayers.Offset(0, dyLayers);
         }

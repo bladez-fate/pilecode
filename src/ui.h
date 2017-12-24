@@ -489,13 +489,34 @@ namespace pilecode {
 			return this;
 		}
 
+        Button* HoverUseMask()
+        {
+            hoverUseMask_ = true;
+            return this;
+        }
+        
 		bool Control()
 		{
-			hoverNext_ =
-				ae::MousePos().x >= reg_.x1() + padding_ &&
-				ae::MousePos().y >= reg_.y1() + padding_ &&
-				ae::MousePos().x <  reg_.x2() - padding_ &&
-				ae::MousePos().y <  reg_.y2() - padding_;
+            Vec2Si32 s = ae::MousePos();
+            if (hoverUseMask_) {
+                // Calculate sprite coordinates
+                Vec2Si32 r = s - reg_.p1 + sprite_.Pivot();
+                if (r.x >= 0 && r.y < sprite_.Width() && r.y >= 0 && r.y < sprite_.Height()) {
+                    Rgba* to = sprite_.RgbaData()
+                        + r.y * sprite_.StridePixels()
+                        + r.x;
+                    hoverNext_ = to->a > 0x80;
+                } else {
+                    hoverNext_ = false;
+                }
+            }
+            else {
+                hoverNext_ =
+                    s.x >= reg_.x1() + padding_ &&
+                    s.y >= reg_.y1() + padding_ &&
+                    s.x <  reg_.x2() - padding_ &&
+                    s.y <  reg_.y2() - padding_;
+            }
             
             click_ = false;
 			if (enabled_) {
@@ -581,6 +602,7 @@ namespace pilecode {
 		Si32 padding_ = 8;
 		Rgba color_ = Rgba(0, 0, 0, 0);
         Ui8 opacity_ = 0xff;
+        bool hoverUseMask_ = false;
 	};
 
     inline bool ConfirmModal()
