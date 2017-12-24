@@ -134,7 +134,8 @@ ui: $(UI)/button-x1.tga $(UI)/button-x2.tga $(UI)/button-x4.tga \
 $(UI)/button-x8.tga $(UI)/cancel.tga $(UI)/checked.tga $(UI)/down-arrow.tga \
 $(UI)/fast-forward.tga $(UI)/minus.tga $(UI)/musical-note.tga \
 $(UI)/palette.tga $(UI)/pause.tga $(UI)/play.tga $(UI)/plus.tga \
-$(UI)/replay.tga $(UI)/rewind.tga $(UI)/up-arrow.tga
+$(UI)/replay.tga $(UI)/rewind.tga $(UI)/up-arrow.tga $(UI)/credits.tga \
+$(UI)/btn-credits.tga
 
 $(UI)/%.tga: ui/bladez-fate/%.tga
 	mkdir -p `dirname $@`
@@ -157,6 +158,14 @@ $(OUI)/checked.png: ui/chanut/checked.svg
 	$(INKSCAPE) -e `pwd`/$@ -d $(CONFIRM_DPI) `pwd`/$<
 
 $(OUI)/palette.png: ui/bladez-fate/palette.svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
+
+$(OUI)/credits.png: ui/bladez-fate/credits$(MOD).svg
+	mkdir -p `dirname $@`
+	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
+
+$(OUI)/btn-credits.png: ui/bladez-fate/btn-credits.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
 

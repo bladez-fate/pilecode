@@ -66,10 +66,12 @@ namespace pilecode {
 		Sprite g_button_x8;
 		Sprite g_button_robot;
 		Sprite g_button_letter[kLtMax];
+        Sprite g_button_credits;
 
         // bg
 		Sprite g_background[g_backgroundCount];
 		Sprite g_introBackground;
+        Sprite g_credits;
 
         // for MOD_XMAS
         Sprite g_snowflake[g_snowflakeCount];
@@ -325,6 +327,8 @@ namespace pilecode {
 
 		//CreateBackground(image::g_introBackground, Rgba(0xff, 0xee, 0xaa), Rgba(0xff, 0xcc, 0x77));
 		CreateBackground(image::g_introBackground, Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));
+        image::g_credits.Load("data/ui/credits.tga");
+        image::g_button_credits.Load("data/ui/btn-credits.tga");
 
 #ifndef MOD_XMAS
         CreateBackground(image::g_background[0], Rgba(0xaa, 0xee, 0xff), Rgba(0x77, 0xcc, 0xff));

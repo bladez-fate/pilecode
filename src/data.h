@@ -80,10 +80,12 @@ namespace pilecode {
 		extern Sprite g_button_x8;
 		extern Sprite g_button_robot;
 		extern Sprite g_button_letter[kLtMax];
+        extern Sprite g_button_credits;
 
 		constexpr int g_backgroundCount = 3;
 		extern Sprite g_background[g_backgroundCount];
 		extern Sprite g_introBackground;
+        extern Sprite g_credits;
 
         // for MOD_XMAS
         constexpr int g_snowflakeW = 6;

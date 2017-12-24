@@ -298,15 +298,32 @@ void Intro()
 {
 	double transitionSec = 1.2f;
 
+    // Credits button
+    std::unique_ptr<Button> btn0(new Button(image::g_button_credits, Region::Screen(), kRightBottom));
+    btn0->Click([=] (Button*) {
+        SpriteModal(image::g_credits);
+    });
+	
 	// Show Intro
 	double startTime = ae::Time();
 	while (true) {
-		if (ui::StopAnimationKey()) {
-			break;
-		}
+        // Control
+        btn0->Control();
+        if (btn0->click()) {
+            continue;
+        }
+        if (ui::StopAnimationKey()) {
+            break;
+        }
+
+        // Update
+        btn0->Update();
+
+        // Render
 		DrawIntro();
-		Ui8 brightness = Ui8(ae::Clamp(float((ae::Time() - startTime) * 255 / transitionSec), 0.0f, 255.0f));
-		FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
+        Ui8 brightness = Ui8(ae::Clamp(float((ae::Time() - startTime) * 255 / transitionSec), 0.0f, 255.0f));
+        btn0->Render();
+        FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
 		ae::ShowFrame();
 		Sleep(0.010);
 	}
@@ -317,6 +334,7 @@ void Intro()
 	while (ae::Time() < finishTime) {
 		DrawIntro();
 		Ui8 brightness = Ui8(ae::Clamp(float((finishTime - ae::Time()) * 255 / transitionSec), 0.0f, 255.0f));
+        btn0->Render();
 		FilterBrightness(ae::GetEngine()->GetBackbuffer(), brightness);
 		ae::ShowFrame();
 		Sleep(0.010);

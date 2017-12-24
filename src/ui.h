@@ -651,4 +651,29 @@ namespace pilecode {
         
         return false;
     }
+
+    inline void SpriteModal(Sprite sprite)
+    {
+        // Clone backbuffer into bg sprite and do some filters
+        Sprite bb = ae::GetEngine()->GetBackbuffer();
+        Sprite bg;
+        bg.Create(bb.Width(), bb.Height());
+        RgbDraw(bb, 0, 0, bg);
+        FilterSB(bg, 0.5f, 0.5f);
+        
+        // Wait user action
+        while (true) {
+            if (IsKeyOnce(ae::kKeyEscape) || IsKeyOnce(ae::kKeyEnter) || IsKeyOnce(ae::kKeyMouseLeft)) {
+                return;
+            }
+            
+            bg.Draw(0, 0);
+
+            Region pos = Region::FullScreen().Place(kCenter, sprite.Size());
+            AlphaDraw(sprite, pos.x1(), pos.y1());
+
+            ae::ShowFrame();
+            ae::Sleep(0.01);
+        }
+    }
 }
