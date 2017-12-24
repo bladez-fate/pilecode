@@ -698,8 +698,8 @@ namespace pilecode {
 		->HotKey('M')->Click([=](Button* btn) {
 			ToggleMusic();
 		})->OnUpdate([=](Button* btn) {
-			// TODO: btn->set_opacity(IsMusicEnabled() ? 0xff : 0x80);
-		})->Hidden();
+			btn->set_opacity(IsMusicEnabled() ? 0xff : 0x80);
+		});
 
 		// Add level switching buttons
 		AddButton(image::g_button_prevlevel, Region::Screen(), kRightBottom)->Click([=](Button* btn) {
