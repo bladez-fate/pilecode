@@ -532,12 +532,12 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="196.33998"
-     inkscape:cy="125.48887"
+     inkscape:zoom="2.5158884"
+     inkscape:cx="515.02129"
+     inkscape:cy="285.87894"
      inkscape:document-units="px"
-     inkscape:current-layer="svg8"
-     showgrid="true"
+     inkscape:current-layer="layer16"
+     showgrid="false"
      showborder="true"
      inkscape:window-width="1680"
      inkscape:window-height="922"
@@ -592,7 +592,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <cc:license
            rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
       </cc:Work>
@@ -874,8 +874,28 @@
        inkscape:groupmode="layer"
        id="layer16"
        inkscape:label="reserved"
-       transform="translate(0,-135.46666)"
-       sodipodi:insensitive="true" />
+       transform="translate(0,-135.46666)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3878"
+         d="m 118.53337,117.07853 -9.25894,4.62924 v 2.64573 l 9.25894,4.63046 9.25893,-4.62923 V 121.709 Z"
+         style="display:inline;opacity:1;fill:#b2bcb3;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="opacity:1;fill:#b2bcb3;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 118.53336,117.07853 -9.2589,4.62941 9.2589,4.63045 9.2589,-4.62941 z"
+         id="path3880"
+         inkscape:connector-curvature="0" />
+      <path
+         style="opacity:1;fill:#d1d3d1;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 109.27446,121.70794 v 2.64558 l 9.2589,4.63044 v -2.64557 z"
+         id="path3882"
+         inkscape:connector-curvature="0" />
+      <path
+         style="opacity:1;fill:#8fa192;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 118.53336,126.33839 v 2.64557 l 9.2589,-4.6294 v -2.64558 z"
+         id="path3884"
+         inkscape:connector-curvature="0" />
+    </g>
     <g
        inkscape:groupmode="layer"
        id="layer15"
@@ -1158,7 +1178,8 @@
        inkscape:groupmode="layer"
        id="layer9"
        inkscape:label="tile-brick"
-       style="display:inline">
+       style="display:inline"
+       sodipodi:insensitive="true">
       <path
          style="fill:#000000;stroke-width:1"
          d=""

@@ -713,6 +713,18 @@ namespace pilecode {
 			btn->set_enabled(level_ < maxLevel_ && world_->steps() == 0);
 		});
 
+        // Add layer selection
+        Region regLayers = GridFrame(kRightCenter, 1, 1, image::g_layer.Width(), image::g_layer.Height(), 10, 10).Place(0, 0);
+        for (Si32 i = 1; i <= world_->params().zsize(); i++) {
+            AddButton(image::g_layer, regLayers)->Click([=](Button* btn) {
+                vp_->SetVisibleZ(i);
+            })->OnUpdate([=](Button* btn) {
+                btn->set_opacity(i <= vp_->visible_z()? 0xff: 0x80);
+            });
+            Si32 dyLayers = 26;
+            regLayers = regLayers.Offset(0, dyLayers);
+        }
+        
 		// Add palette buttons
 		Si32 btnPos = 0;
 		GridFrame frmPalette(kLeftCenter, 1, 4, image::g_button_robot.Width(), image::g_button_robot.Height(), 10, 10);

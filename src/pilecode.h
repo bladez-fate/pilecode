@@ -540,6 +540,8 @@ namespace pilecode {
 		void Center();
 		void IncVisibleZ();
 		void DecVisibleZ();
+        void SetVisibleZ(Si32 z);
+        Si32 visible_z() const { return visible_z_; }
 
 		// simulation support
 		double progress() const { return progress_; }

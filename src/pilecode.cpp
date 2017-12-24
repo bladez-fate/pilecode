@@ -1171,6 +1171,11 @@ namespace pilecode {
 		}
 	}
 
+    void ViewPort::SetVisibleZ(Si32 z)
+    {
+        visible_z_ = ae::Clamp(z, 1, wparams_.zsize() + 1);
+    }
+    
 	// Converts screen coords `p' into world coords at given z-level `wz'
 	Vec3Si32 ViewPort::ToWorldAtZ(Si32 wz, Vec2Si32 p) const
 	{

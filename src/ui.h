@@ -526,11 +526,13 @@ namespace pilecode {
 		{
 			if (enabled_ && visible_) {
 				auto blend = (hover_ ? ui::HoverColor() : color_);
-				AlphaDrawAndBlend(shadow_, reg_.x1(), reg_.y1(), Rgba(0, 0, 0, 0xff));
+                if (opacity_ == 0xff) {
+                    AlphaDrawAndBlend(shadow_, reg_.x1(), reg_.y1(), Rgba(0, 0, 0, 0xff));
+                }
 				if (contour_) {
 					AlphaDrawAndBlend(contourSprite_, reg_.x1(), reg_.y1(), ui::ContourColor());
 				}
-				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend);
+				AlphaDrawAndBlend(sprite_, reg_.x1(), reg_.y1(), blend, opacity_);
 			}
 		}
 
@@ -559,6 +561,8 @@ namespace pilecode {
 		void set_color(Rgba value) { color_ = value; }
         bool hover() const { return hover_; }
         bool click() const { return click_; }
+        float opacity() const { return opacity_; }
+        void set_opacity(Ui8 value) { opacity_ = value; }
 
 	private:
 		Region reg_;
@@ -576,6 +580,7 @@ namespace pilecode {
 		char hotkey_ = 0;
 		Si32 padding_ = 8;
 		Rgba color_ = Rgba(0, 0, 0, 0);
+        Ui8 opacity_ = 0xff;
 	};
 
     inline bool ConfirmModal()

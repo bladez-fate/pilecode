@@ -59,7 +59,8 @@ namespace pilecode {
 		extern Sprite g_tileMask;
 
 		extern Sprite g_robot;
-		extern Sprite g_robotShadow;
+        extern Sprite g_robotShadow;
+        extern Sprite g_layer;
 
 		extern Sprite g_button_musicalnote;
 		extern Sprite g_button_nextlevel;
