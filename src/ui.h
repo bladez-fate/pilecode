@@ -160,7 +160,7 @@ namespace pilecode {
                 // Check for resize
                 static Vec2Si32 screen = ae::ScreenSize();
                 Vec2Si32 newScreen = ae::ScreenSize();
-                if (!(screen == newScreen)) {
+                if (screen != newScreen) {
                     screen = newScreen;
                     for (Snowflake& sf : snowflake) {
                         sf = Snowflake();

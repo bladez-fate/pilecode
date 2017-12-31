@@ -66,7 +66,7 @@ namespace pilecode {
 
         bool CheckResize()
         {
-            return !(window == ae::WindowSize());
+            return window != ae::WindowSize();
         }
     }
 
