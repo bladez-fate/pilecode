@@ -53,7 +53,7 @@ namespace pilecode {
 	template <class T>
 	bool IsKeyOnce(T t)
 	{
-		if (ae::IsKey(t)) {
+		if (ae::IsKeyDown(t)) {
 			ae::SetKey(t, false);
 			return true;
 		}
