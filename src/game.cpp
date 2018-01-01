@@ -349,10 +349,9 @@ namespace pilecode {
 		if (lastControlTime_ == 0.0) {
 			lastControlTime_ = time;
 		}
-		float dt = float(time - lastControlTime_);
-		lastControlTime_ = time;
 
 #ifndef SCROLL_DISABLED
+        float dt = float(time - lastControlTime_);
 		if (IsKey(kKeyUp) || ae::MousePos().y >= screen::h - mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(0.0f, 1.0f));
 		}
@@ -366,7 +365,9 @@ namespace pilecode {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(-1.0f, 0.0f));
 		}
 #endif
-        
+
+        lastControlTime_ = time;
+
 		if (ae::MouseWheelDelta() > 0) {
 			vp_->IncVisibleZ();
 		}

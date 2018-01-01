@@ -222,9 +222,7 @@ namespace pilecode {
 		h_ = 0;
 		for (auto& xdata : data) {
 			if (w_ == 0) {
-				for (Si32 x : xdata) {
-					w_++;
-				}
+                w_ = (Si32)xdata.size();
 			}
 			h_++;
 		}
@@ -466,6 +464,7 @@ namespace pilecode {
 					wu.z++;
 
 					switch (cur_tile->ReadLetter()) {
+                    default: // unknown letter is equivalent to space
 					case kLtSpace:
 						blocked_ = false;
 						break; // just keep moving
@@ -609,9 +608,10 @@ namespace pilecode {
 			return Vec2Si32(-1, 0);
 		case kDirDown:
 			return Vec2Si32(0, -1);
+        default:
+            return Vec2Si32(0, 0);
 		}
-		return Vec2Si32(0, 0);
-	}
+    }
 
 	void Robot::SaveTo(std::ostream& s) const
 	{
