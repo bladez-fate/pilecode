@@ -312,7 +312,7 @@ void Intro()
         if (btn0->click()) {
             continue;
         }
-        if (ui::StopAnimationKey()) {
+        if (ae::IsAnyKeyDown() || IsKeyOnce(ae::kKeyMouseLeft)) {
             break;
         }
 
