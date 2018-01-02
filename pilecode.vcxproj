@@ -95,6 +95,7 @@
       <DisableSpecificWarnings>4201</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(SolutionDir)..\arctic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -136,6 +137,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <CallingConvention>FastCall</CallingConvention>
       <AdditionalIncludeDirectories>$(SolutionDir)..\arctic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
