@@ -54,7 +54,6 @@ namespace pilecode {
         
         void Init()
         {
-            ae::SetFullScreen(false);
             window = ae::WindowSize();
             Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1280, 720), Vec2Si32(1920, 1440));
             w = ss.x;
@@ -67,6 +66,10 @@ namespace pilecode {
 
         bool CheckResize()
         {
+            if (ae::IsKeyDown(ae::kKeyAlt) && IsKeyOnce(ae::kKeyEnter)) {
+                ae::SetFullScreen(!ae::IsFullScreen());
+                return true;
+            }
             return window != ae::WindowSize();
         }
     }
