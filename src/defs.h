@@ -26,6 +26,7 @@
 //#define DEV_MODE
 //#define SCROLL_DISABLED
 //#define MOD_XMAS
+#define SHOW_FPS
 
 #include "engine/easy.h"
 

@@ -870,6 +870,26 @@ namespace pilecode {
 		}
 
         if (show) {
+#ifdef SHOW_FPS
+            static double prev_time = ae::Time();
+            static double fps = 0.0;
+            double new_time = ae::Time();
+            double dt = new_time - prev_time;
+            prev_time = new_time;
+            if (dt > 0.0) {
+                double new_fps = 1.0 / dt;
+                fps = 0.05 * new_fps + 0.95 * fps;
+                static Font font;
+                static bool loaded = false;
+                if (!loaded) {
+                    font.Load("data/ui/arctic_one_bmf.fnt");
+                    loaded = true;
+                }
+                char text[128];
+                sprintf(text, "%4.0lf", fps);
+                font.Draw(text, 0, 0);
+            }
+#endif
             ae::ShowFrame();
         }
 	}
