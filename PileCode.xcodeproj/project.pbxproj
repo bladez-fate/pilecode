@@ -31,6 +31,9 @@
 		5D8C56361FD54040004CEB3A /* levels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D8C562C1FD54040004CEB3A /* levels.cpp */; };
 		5D8C56371FD54040004CEB3A /* pilecode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D8C562E1FD54040004CEB3A /* pilecode.cpp */; };
 		5D8C56381FD54040004CEB3A /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D8C56301FD54040004CEB3A /* game.cpp */; };
+		5D949DE1200903C500404672 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D949DDC200903C400404672 /* log.cpp */; };
+		5D949DE2200903C500404672 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D949DDF200903C500404672 /* font.cpp */; };
+		5D949DE3200903C500404672 /* arctic_platform_pi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D949DE0200903C500404672 /* arctic_platform_pi.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +101,11 @@
 		5D8C562E1FD54040004CEB3A /* pilecode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pilecode.cpp; path = src/pilecode.cpp; sourceTree = SOURCE_ROOT; };
 		5D8C562F1FD54040004CEB3A /* data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = data.h; path = src/data.h; sourceTree = SOURCE_ROOT; };
 		5D8C56301FD54040004CEB3A /* game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = game.cpp; path = src/game.cpp; sourceTree = SOURCE_ROOT; };
+		5D949DDC200903C400404672 /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = ../../arctic/engine/log.cpp; sourceTree = "<group>"; };
+		5D949DDD200903C500404672 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = ../../arctic/engine/log.h; sourceTree = "<group>"; };
+		5D949DDE200903C500404672 /* font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = font.h; path = ../../arctic/engine/font.h; sourceTree = "<group>"; };
+		5D949DDF200903C500404672 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = font.cpp; path = ../../arctic/engine/font.cpp; sourceTree = "<group>"; };
+		5D949DE0200903C500404672 /* arctic_platform_pi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arctic_platform_pi.cpp; path = ../../arctic/engine/arctic_platform_pi.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +171,11 @@
 		34A37FB21F68AD4E005ACF7B /* engine */ = {
 			isa = PBXGroup;
 			children = (
+				5D949DE0200903C500404672 /* arctic_platform_pi.cpp */,
+				5D949DDF200903C500404672 /* font.cpp */,
+				5D949DDE200903C500404672 /* font.h */,
+				5D949DDC200903C400404672 /* log.cpp */,
+				5D949DDD200903C500404672 /* log.h */,
 				34A37FD21F68AD73005ACF7B /* arctic_input.cpp */,
 				34A37FC51F68AD73005ACF7B /* arctic_input.h */,
 				34A37FD81F68AD73005ACF7B /* arctic_math.cpp */,
@@ -304,6 +317,8 @@
 			files = (
 				5D8C56351FD54040004CEB3A /* sfx.cpp in Sources */,
 				34A37FDC1F68AD73005ACF7B /* arctic_platform_windows.cpp in Sources */,
+				5D949DE2200903C500404672 /* font.cpp in Sources */,
+				5D949DE3200903C500404672 /* arctic_platform_pi.cpp in Sources */,
 				34A37FDE1F68AD73005ACF7B /* arctic_platform_macosx.mm in Sources */,
 				5D8C56381FD54040004CEB3A /* game.cpp in Sources */,
 				34A37FE11F68AD73005ACF7B /* engine.cpp in Sources */,
@@ -320,6 +335,7 @@
 				34A37FE51F68AD73005ACF7B /* arctic_input.cpp in Sources */,
 				34A37FE31F68AD73005ACF7B /* easy_sound.cpp in Sources */,
 				5D8C56341FD54040004CEB3A /* graphics.cpp in Sources */,
+				5D949DE1200903C500404672 /* log.cpp in Sources */,
 				34A37FDD1F68AD73005ACF7B /* easy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
