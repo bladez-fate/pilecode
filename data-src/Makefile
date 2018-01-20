@@ -135,13 +135,18 @@ $(UI)/button-x8.tga $(UI)/cancel.tga $(UI)/checked.tga $(UI)/down-arrow.tga \
 $(UI)/fast-forward.tga $(UI)/minus.tga $(UI)/musical-note.tga \
 $(UI)/palette.tga $(UI)/pause.tga $(UI)/play.tga $(UI)/plus.tga \
 $(UI)/replay.tga $(UI)/rewind.tga $(UI)/up-arrow.tga $(UI)/credits.tga \
-$(UI)/btn-credits.tga
+$(UI)/btn-credits.tga \
+$(UI)/arctic_one_bmf.fnt $(UI)/arctic_one_bmf_0.tga
 
 $(UI)/%.tga: ui/bladez-fate/%.tga
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 
 $(UI)/%.tga: ui/chanut/%.tga
+	mkdir -p `dirname $@`
+	$(CP) $< $@
+
+$(UI)/%.tga: ui/huldra/%.tga
 	mkdir -p `dirname $@`
 	$(CP) $< $@
 
@@ -168,6 +173,10 @@ $(OUI)/credits.png: ui/bladez-fate/credits$(MOD).svg
 $(OUI)/btn-credits.png: ui/bladez-fate/btn-credits.svg
 	mkdir -p `dirname $@`
 	$(INKSCAPE) -e `pwd`/$@ `pwd`/$<
+
+$(UI)/%.fnt: ui/huldra/%.fnt
+	mkdir -p `dirname $@`
+	$(CP) $< $@
 
 ################################################################################
 # XMAS MOD RULES
