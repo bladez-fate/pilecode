@@ -1344,8 +1344,9 @@ namespace pilecode {
 		switch (type_) {
 		case kSprite:
 			if (blend_.a == 0) {
-				DrawSprite(*sprite_, x, y, to_sprite);
-			}
+                sprite_->Draw(x, y, sprite_->Width(), sprite_->Height(),
+                              0, 0, sprite_->Width(), sprite_->Height(), to_sprite);
+            }
 			else {
 				DrawAndBlend(*sprite_, x, y, to_sprite, blend_);
 			}

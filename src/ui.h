@@ -605,14 +605,19 @@ namespace pilecode {
         bool hoverUseMask_ = false;
 	};
 
-    inline bool ConfirmModal()
+    inline Sprite MakeBgForModal()
     {
         // Clone backbuffer into bg sprite and do some filters
-        Sprite bb = ae::GetEngine()->GetBackbuffer();
         Sprite bg;
-        bg.Create(bb.Width(), bb.Height());
-        RgbDraw(bb, 0, 0, bg);
+        bg.Clone(ae::GetEngine()->GetBackbuffer());
         FilterSB(bg, 0.5f, 0.8f);
+        
+        return bg;
+    }
+    
+    inline bool ConfirmModal()
+    {
+        Sprite bg = MakeBgForModal();
         
         // Create buttons for YES and NO
         HorizontalFluidFrame frm(kCenter, 128);
@@ -639,7 +644,10 @@ namespace pilecode {
             btn0->Update();
             btn1->Update();
             
-            bg.Draw(0, 0);
+            bg.Draw(0, 0, bg.Width(), bg.Height(),
+                    0, 0, bg.Width(), bg.Height(),
+                    ae::GetEngine()->GetBackbuffer(), ae::kCopyRgba);
+            
             btn0->Render();
             btn1->Render();
             ae::ShowFrame();
@@ -654,21 +662,18 @@ namespace pilecode {
 
     inline void SpriteModal(Sprite sprite)
     {
-        // Clone backbuffer into bg sprite and do some filters
-        Sprite bb = ae::GetEngine()->GetBackbuffer();
-        Sprite bg;
-        bg.Create(bb.Width(), bb.Height());
-        RgbDraw(bb, 0, 0, bg);
-        FilterSB(bg, 0.5f, 0.5f);
-        
+        Sprite bg = MakeBgForModal();
+
         // Wait user action
         while (true) {
             if (IsKeyOnce(ae::kKeyEscape) || IsKeyOnce(ae::kKeyEnter) || IsKeyOnce(ae::kKeyMouseLeft)) {
                 return;
             }
             
-            bg.Draw(0, 0);
-
+            bg.Draw(0, 0, bg.Width(), bg.Height(),
+                    0, 0, bg.Width(), bg.Height(),
+                    ae::GetEngine()->GetBackbuffer(), ae::kCopyRgba);
+            
             Region pos = Region::FullScreen().Place(kCenter, sprite.Size());
             AlphaDraw(sprite, pos.x1(), pos.y1());
 
