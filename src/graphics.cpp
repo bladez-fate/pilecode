@@ -39,7 +39,7 @@ namespace pilecode {
         
         Vec2Si32 GetScreenSize(Vec2Si32 window, Vec2Si32 mi, Vec2Si32 ma)
         {
-            for (Si32 scaling : {1, 2, 3, 4}) {
+            for (Si32 scaling : {4, 3, 2, 1}) {
                 Vec2Si32 scaled = window / scaling;
                 if (mi.x <= scaled.x && scaled.x <= ma.x &&
                     mi.y <= scaled.y && scaled.y <= ma.y) {
@@ -55,7 +55,7 @@ namespace pilecode {
         void Init()
         {
             window = ae::WindowSize();
-            Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1280, 720), Vec2Si32(1920, 1440));
+            Vec2Si32 ss = GetScreenSize(window, Vec2Si32(1120, 700), Vec2Si32(1920, 1440));
             w = ss.x;
             h = ss.y;
             cx = w / 2;
