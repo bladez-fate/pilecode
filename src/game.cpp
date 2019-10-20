@@ -886,7 +886,10 @@ namespace pilecode {
                     loaded = true;
                 }
                 char text[128];
-                sprintf(text, "%4.0lf (%dx%d)", fps, ScreenSize().x, ScreenSize().y);
+                sprintf(text, "BB:%dx%d WND:%dx%d FPS:%4.0lf",
+                        ScreenSize().x, ScreenSize().y,
+                        WindowSize().x, WindowSize().y,
+                        fps);
                 font.Draw(text, 0, 0);
             }
 #endif
