@@ -352,16 +352,16 @@ namespace pilecode {
 
 #ifndef SCROLL_DISABLED
         float dt = float(time - lastControlTime_);
-		if (IsKey(kKeyUp) || ae::MousePos().y >= screen::h - mouseScrollMargin_) {
+		if (IsKeyDown(kKeyUp) || ae::MousePos().y >= screen::h - mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(0.0f, 1.0f));
 		}
-		if (IsKey(kKeyDown) || ae::MousePos().y < mouseScrollMargin_) {
+		if (IsKeyDown(kKeyDown) || ae::MousePos().y < mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(0.0f, -1.0f));
 		}
-		if (IsKey(kKeyRight) || ae::MousePos().x >= screen::w - mouseScrollMargin_) {
+		if (IsKeyDown(kKeyRight) || ae::MousePos().x >= screen::w - mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(1.0f, 0.0f));
 		}
-		if (IsKey(kKeyLeft) || ae::MousePos().x < mouseScrollMargin_) {
+		if (IsKeyDown(kKeyLeft) || ae::MousePos().x < mouseScrollMargin_) {
 			vp_->Move(-movePxlPerSec_ * dt * Vec2F(-1.0f, 0.0f));
 		}
 #endif

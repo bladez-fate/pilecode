@@ -307,8 +307,8 @@ namespace pilecode {
 		void ForEachTile(std::function<void(Vec3Si32, Tile*)> func);
 		void SaveTo(std::ostream& s) const;
 		void LoadFrom(std::istream& s);
-        void SaveToText(std::ostream& s) const;
-        void LoadFromText(std::istream& s);
+        void SaveToText(std::ostream& s) const; // TODO
+        void LoadFromText(std::istream& s); // TODO
 
 		// accessors
 		Platform* platform(Si32 i) const { return platform_[i].get(); }
