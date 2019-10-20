@@ -1078,9 +1078,10 @@ namespace pilecode {
 				Ui64 rsq = (x - cx)*(x - cx) + ysq;
 				Ui32 alpha = Ui32(arctic::Clamp(float(rsq) / rsqMax, 0.0f, 1.0f) * 256.0f + 0.5f);
 				if (fg->a > 0) {
+                    Ui32 k = std::min(256 - alpha, (Ui32)fg->a);
 					*bg = RgbaSum(
-						RgbaMult(*fg, 256 - alpha),
-						RgbaMult(*bg, alpha)
+						RgbaMult(*fg, k),
+						RgbaMult(*bg, 256 - k)
 					);
 				}
 				fg++;
