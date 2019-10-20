@@ -29,6 +29,7 @@
 #include "engine/arctic_math.h"
 
 #include <sstream>
+#include <unordered_map>
 
 namespace pilecode {
 
@@ -645,7 +646,7 @@ namespace pilecode {
 
 	World::World()
 	{
-		// intended to be used with LoadFrom()
+		// intended to be used with LoadFrom() or LoadFromText()
 	}
 
 	World::World(const WorldParams & wparams)

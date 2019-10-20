@@ -445,51 +445,51 @@ namespace pilecode {
 		std::vector<Vec2Si32> elements_;
 	};
 
-	class Button {
+	class PButton {
 	public:
-		Button(Sprite sprite, Region region, Align align = kCenter)
+		PButton(Sprite sprite, Region region, Align align = kCenter)
 			: reg_(region.Place(align, sprite))
 		{
 			SetSprite(sprite);
 		}
 
-		Button* Click(std::function<void(Button*)> onClick)
+		PButton* Click(std::function<void(PButton*)> onClick)
 		{
 			onClick_ = onClick;
 			return this;
 		}
 
-		Button* OnUpdate(std::function<void(Button*)> onUpdate)
+		PButton* OnUpdate(std::function<void(PButton*)> onUpdate)
 		{
 			onUpdate_ = onUpdate;
 			return this;
 		}
 
-		Button* HotKey(char hotkey)
+		PButton* HotKey(char hotkey)
 		{
 			hotkey_ = hotkey;
 			return this;
 		}
 
-		Button* Padding(Si32 padding)
+		PButton* Padding(Si32 padding)
 		{
 			padding_ = padding;
 			return this;
 		}
 
-		Button* Color(Rgba color)
+		PButton* Color(Rgba color)
 		{
 			set_color(color);
 			return this;
 		}
 
-		Button* Hidden()
+		PButton* Hidden()
 		{
 			set_visible(false);
 			return this;
 		}
 
-        Button* HoverUseMask()
+        PButton* HoverUseMask()
         {
             hoverUseMask_ = true;
             return this;
@@ -590,8 +590,8 @@ namespace pilecode {
 		Sprite sprite_;
 		Sprite shadow_;
 		Sprite contourSprite_;
-		std::function<void(Button*)> onClick_;
-		std::function<void(Button*)> onUpdate_;
+		std::function<void(PButton*)> onClick_;
+		std::function<void(PButton*)> onUpdate_;
 		bool hover_ = false;
 		bool hoverNext_ = false;
         bool click_ = false;
@@ -625,8 +625,8 @@ namespace pilecode {
             .Add(image::g_button_cancel)
             .Add(image::g_button_checked)
         ;
-        std::unique_ptr<Button> btn0(new Button(image::g_button_cancel, frm.Place(0)));
-        std::unique_ptr<Button> btn1(new Button(image::g_button_checked, frm.Place(1)));
+        std::unique_ptr<PButton> btn0(new PButton(image::g_button_cancel, frm.Place(0)));
+        std::unique_ptr<PButton> btn1(new PButton(image::g_button_checked, frm.Place(1)));
         btn0->HotKey('N');
         btn1->HotKey('Y');
         

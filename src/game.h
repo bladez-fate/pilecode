@@ -82,10 +82,10 @@ namespace pilecode {
 
 	private:
 		template <class... Args>
-		Button* AddButton(Args... args)
+		PButton* AddButton(Args... args)
 		{
 			buttons_.emplace_back(args...);
-			Button* btn = &buttons_.back();
+			PButton* btn = &buttons_.back();
 			return btn;
 		}
 
@@ -128,7 +128,7 @@ namespace pilecode {
 		Vec2F tilePos_;
 		bool frameVisibility_ = true;
 		bool toolsVisibility_ = true;
-		std::list<Button> buttons_;
+		std::list<PButton> buttons_;
 		PlaceMode placeMode_;
 		Letter placeLetterRight_;
 		Letter placeLetterDown_;

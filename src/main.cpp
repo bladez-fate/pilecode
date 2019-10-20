@@ -299,8 +299,8 @@ void Intro()
 	double transitionSec = 1.2f;
 
     // Credits button
-    std::unique_ptr<Button> btn0(new Button(image::g_button_credits, Region::Screen(), kRightBottom));
-    btn0->Click([=] (Button*) {
+    std::unique_ptr<PButton> btn0(new PButton(image::g_button_credits, Region::Screen(), kRightBottom));
+    btn0->Click([=] (PButton*) {
         SpriteModal(image::g_credits);
     });
 	
