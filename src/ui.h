@@ -25,6 +25,8 @@
 #include "defs.h"
 #include "music.h"
 
+#include <initializer_list>
+
 namespace pilecode {
 
 	namespace ui {
@@ -453,6 +455,16 @@ namespace pilecode {
 			SetSprite(sprite);
 		}
 
+        PButton(std::initializer_list<Sprite> sprites, Region region, Align align = kCenter)
+            : reg_(region.Place(align, *sprites.begin()))
+        {
+            Si32 i = 0;
+            for (Sprite sprite : sprites) {
+                AddSprite(sprite, i++);
+            }
+            SetSprite(0);
+        }
+
 		PButton* Click(std::function<void(PButton*)> onClick)
 		{
 			onClick_ = onClick;
@@ -557,18 +569,36 @@ namespace pilecode {
 			}
 		}
 
-		void SetSprite(Sprite sprite)
+        void SetSprite(Sprite sprite)
+        {
+            AddSprite(sprite, 0);
+            SetSprite(0);
+        }
+        
+		void AddSprite(Sprite sprite, Si32 index)
 		{
-			sprite_ = sprite;
+            if (index >= spriteArray_.size()) {
+                spriteArray_.resize(index + 1);
+                shadowArray_.resize(index + 1);
+                contourSpriteArray_.resize(index + 1);
+            }
+			spriteArray_[index] = sprite;
 			Si32 size = std::min(sprite.Width(), sprite.Height());
 			Si32 shadowBlur = size > 64 ? 17 : 9;
 			Si32 contourBlur = size > 64 ? 12 : 6;
-			shadow_ = CreateShadow(sprite, 1, shadowBlur, Rgba(0, 0, 0, 0x80));
-			contourSprite_ = CreateBoundary(sprite,
+			shadowArray_[index] = CreateShadow(sprite, 1, shadowBlur, Rgba(0, 0, 0, 0x80));
+			contourSpriteArray_[index] = CreateBoundary(sprite,
 				0, 0, contourBlur, contourBlur,
 				0x40, 0xff, 2, 8,
 				Rgba(0xff, 0xff, 0xff, 0xff));
 		}
+        
+        void SetSprite(Si32 index)
+        {
+            sprite_ = spriteArray_[index];
+            shadow_ = shadowArray_[index];
+            contourSprite_ = contourSpriteArray_[index];
+        }
 
 		// accessors
 		bool contour() const { return contour_; }
@@ -590,6 +620,9 @@ namespace pilecode {
 		Sprite sprite_;
 		Sprite shadow_;
 		Sprite contourSprite_;
+        std::vector<Sprite> spriteArray_;
+        std::vector<Sprite> shadowArray_;
+        std::vector<Sprite> contourSpriteArray_;
 		std::function<void(PButton*)> onClick_;
 		std::function<void(PButton*)> onUpdate_;
 		bool hover_ = false;

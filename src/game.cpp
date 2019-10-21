@@ -627,22 +627,27 @@ namespace pilecode {
 			.Add(image::g_button_x1)
 			.Add(image::g_button_plus)
 			;
-		AddButton(image::g_button_rewind, frmPlayback.Place(0))->Click([=](PButton* btn) {
+		AddButton(image::g_button_rewind, frmPlayback.Place(0))
+        ->Click([=](PButton* btn) {
 			Restart();
 		})->OnUpdate([=](PButton* btn) {
 			btn->set_enabled(world_->steps() != 0);
 		});
-		AddButton(image::g_button_fastforward, frmPlayback.Place(2))->Click([=](PButton* btn) {
+		AddButton(image::g_button_fastforward, frmPlayback.Place(2))
+        ->Click([=](PButton* btn) {
 			FastForward();
 		})->OnUpdate([=](PButton* btn) {
 			btn->set_enabled(world_->steps() != 0);
 		});
-		AddButton(image::g_button_play, frmPlayback.Place(1))->Click([=](PButton* btn) {
+        AddButton({image::g_button_play, image::g_button_pause},
+                  frmPlayback.Place(1))
+        ->Click([=](PButton* btn) {
 			PlayOrPause();
 		})->OnUpdate([=](PButton* btn) {
-			btn->SetSprite(simPaused_ || fastForward_ ? image::g_button_play : image::g_button_pause);
+			btn->SetSprite(simPaused_ || fastForward_ ? 0 : 1);
 		});
-        AddButton(image::g_button_replay, Region::Screen(), kLeftBottom)->Click([=](PButton* btn) {
+        AddButton(image::g_button_replay, Region::Screen(), kLeftBottom)
+        ->Click([=](PButton* btn) {
             if (ConfirmModal()) {
                 Replay();
             }
@@ -650,7 +655,9 @@ namespace pilecode {
             btn->set_enabled(world_->steps() == 0);
         });
 
-		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))->HotKey('-')->Click([=](PButton* btn) {
+		AddButton(image::g_button_minus, frmPlaybackRate.Place(0))
+        ->HotKey('-')
+        ->Click([=](PButton* btn) {
 			if (simSpeed_ == 2.0f) {
 				simSpeed_ = 1.0f;
 			}
@@ -664,7 +671,9 @@ namespace pilecode {
 			btn->set_enabled(world_->steps() != 0);
 		})->Padding(0);
 
-		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))->HotKey('=')->Click([=](PButton* btn) {
+		AddButton(image::g_button_plus, frmPlaybackRate.Place(2))
+        ->HotKey('=')
+        ->Click([=](PButton* btn) {
 			if (simSpeed_ == 1.0f) {
 				simSpeed_ = 2.0f;
 			}
@@ -678,25 +687,28 @@ namespace pilecode {
 			btn->set_enabled(world_->steps() != 0);
 		})->Padding(0);
 
-		AddButton(image::g_button_x1, frmPlaybackRate.Place(1))->OnUpdate([=](PButton* btn) {
+        AddButton({image::g_button_x1, image::g_button_x2, image::g_button_x4, image::g_button_x8},
+                  frmPlaybackRate.Place(1))
+        ->OnUpdate([=](PButton* btn) {
 			btn->set_enabled(world_->steps() != 0);
 			if (simSpeed_ == 1.0f) {
-				btn->SetSprite(image::g_button_x1);
+				btn->SetSprite(0);
 			}
 			else if (simSpeed_ == 2.0f) {
-				btn->SetSprite(image::g_button_x2);
+				btn->SetSprite(1);
 			}
 			else if (simSpeed_ == 4.0f) {
-				btn->SetSprite(image::g_button_x4);
+				btn->SetSprite(2);
 			}
 			else if (simSpeed_ == 8.0f) {
-				btn->SetSprite(image::g_button_x8);
+				btn->SetSprite(3);
 			}
 		});
 
 		// Add music on/off button
 		AddButton(image::g_button_musicalnote, Region::Screen(), kLeftTop)
-		->HotKey('M')->Click([=](PButton* btn) {
+		->HotKey('M')
+        ->Click([=](PButton* btn) {
 			ToggleMusic();
 		})->OnUpdate([=](PButton* btn) {
 			btn->set_opacity(IsMusicEnabled() ? 0xff : 0x80);

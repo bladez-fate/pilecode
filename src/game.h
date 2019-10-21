@@ -89,6 +89,14 @@ namespace pilecode {
 			return btn;
 		}
 
+        template <class... Args>
+        PButton* AddButton(std::initializer_list<Sprite> sprites, Args... args)
+        {
+            buttons_.emplace_back(sprites, args...);
+            PButton* btn = &buttons_.back();
+            return btn;
+        }
+
 	private:
 		// control configuration
 		float movePxlPerSec_ = float(screen::h) * 0.50f;
