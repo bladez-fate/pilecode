@@ -223,6 +223,7 @@ namespace pilecode {
 			}
 		}
 
+        result.UpdateOpaqueSpans();
 		return result;
 	}
 
@@ -279,6 +280,7 @@ namespace pilecode {
 			}
 		}
 
+        result.UpdateOpaqueSpans();
 		return result;
 	}
 
@@ -295,10 +297,8 @@ namespace pilecode {
 		LoadImageFromSpritesheet(sheet, 128, 256, posx, posy, image::g_letter[letter]);
 		image::g_letter_output[letter] = CreateBoundary(
 			image::g_letter[letter], 0, 0, 8, 4, 0x40, 0xc0, 2, 5, Rgba(0xff, 0xff, 0xff, 0xff));
-        image::g_letter_output[letter].UpdateOpaqueSpans();
 		image::g_letter_output_filled[letter] = CreateBoundary(
 			image::g_letter[letter], 0, 0, 14, 7, 0x30, 0xc0, 2, 5, Rgba(0x66, 0xff, 0x66, 0xff));
-        image::g_letter_output_filled[letter].UpdateOpaqueSpans();
     }
 
 	void LoadMask(Sprite& sprite, const std::string& file_name, Si32 width = 0, Si32 height = 0)
@@ -348,7 +348,6 @@ namespace pilecode {
 		sheet.Load("data/game/spritesheet.tga");
 		Si32 sw = 128, sh = 256;
 		image::g_empty.Load("data/game/empty.tga");
-        image::g_empty.UpdateOpaqueSpans();
         
 		image::g_tile[kTlNone] = image::g_empty;
 		LoadImageFromSpritesheet(sheet, sw, sh, 0, 0, image::g_tile[kTlBrick]);
