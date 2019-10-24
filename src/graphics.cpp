@@ -283,15 +283,17 @@ namespace pilecode {
 		const Si32 from_width, const Si32 from_height, Sprite to_sprite, Ui8 opacity)
 	{
         if (opacity == 0xff) {
-//            sprite.Draw(to_x, to_y, to_width, to_height, from_x, from_y, from_width, from_height, to_sprite);
-            FilterDraw(sprite, to_x, to_y, to_width, to_height,
-                from_x, from_y, from_width, from_height,
-                to_sprite, [=](const Rgba* fg, const Rgba* bg) {
-                return RgbaSum(
-                    RgbaMult(*fg, fg->a),
-                    RgbaMult(*bg, 256 - fg->a)
-                );
-            });
+            sprite.Draw(to_x, to_y, to_width, to_height,
+                        from_x, from_y, from_width, from_height,
+                        to_sprite, ae::kAlphaBlendRgba);
+//            FilterDraw(sprite, to_x, to_y, to_width, to_height,
+//                from_x, from_y, from_width, from_height,
+//                to_sprite, [=](const Rgba* fg, const Rgba* bg) {
+//                return RgbaSum(
+//                    RgbaMult(*fg, fg->a),
+//                    RgbaMult(*bg, 256 - fg->a)
+//                );
+//            });
         }
         else {
             FilterDraw(sprite, to_x, to_y, to_width, to_height,
